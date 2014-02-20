@@ -1,0 +1,108 @@
+.nr-default {
+}
+.nr-default table {
+    width: 100%;
+    font-family: Tahoma, Verdana, Segoe, sans-serif;
+    border-collapse: collapse;
+    background: #fff;
+}
+.nr-default td,
+.nr-default th {
+    border: 1px solid #e8e8e8;
+    vertical-align: middle;
+}
+.nr-default td {
+    color: #373d47;
+    font-size: 14px;
+    line-height: 18px;
+}
+.nr-default thead th,
+.nr-default tfoot th {
+    border: none;
+}
+.nr-default thead td {
+    height: 90px;
+    background: #f9fafc;
+    font-size: 30px;
+    color: #666;
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: normal;
+}
+.nr-default tbody th {
+    text-align: left;
+    font-size: 14px;
+    padding: 18px 20px 18px 25px;
+    font-weight: normal;
+}
+.nr-default tbody td {
+    text-align: center;
+    padding: 0 10px;
+}
+.nr-default tfoot td {
+    text-align: center;
+    padding: 12px 0;
+}
+.nr-default th.nr-price {
+    color: #666;
+    height: 38px;
+    background-color: #f2f4f8;
+    text-align: left;
+    font-weight: normal;
+}
+.nr-default td.nr-price {
+    color: #fb6b5b;
+    font-size: 36px;
+    background-color: #f2f4f8;
+}
+.nr-default tfoot a {
+    display: inline-block;
+    color: #fff;
+    background: #5dcff3;
+    height: 45px;
+    line-height: 45px;
+    text-align: center;
+    padding: 0 30px;
+    font-weight: bold;
+    text-decoration: none;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+.nr-default .nr-check {
+    width: 16px;
+    height: 16px;
+    display: block;
+    margin: 0 auto;
+    background: url("../images/ico-sprite.gif") 0 0 no-repeat;
+}
+.nr-default .nr-check.nr-yes { background-position: 0 0; }
+.nr-default .nr-check.nr-no { background-position: -16px 0; }
+.nr-default .nr-notify {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 18px;
+    padding: 20px;
+    margin: 0 0 15px;
+    font-family: Tahoma, Verdana, Segoe, sans-serif;
+    letter-spacing: 1px;
+}
+.nr-default .nr-notify.nr-red {
+    background: #f2dede;
+    color: #a94442;
+}
+.nr-default .nr-notify.nr-yellow {
+    background: #fcf8e3;
+    color: #986d3b;
+}
+.nr-default .nr-container {
+    height: 304px;
+    margin: 0 auto 10px;
+}
+.nr-default .nr-container.nr-loading {
+    background: url("../images/loader.gif") 50% 50% no-repeat;
+}
+.nr-default .nr-container.nr-empty {
+    background: url("../images/empty.gif") 50% 50% no-repeat;
+}

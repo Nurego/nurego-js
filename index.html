@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body style="padding: 10px">
+<h2 style="color: #666666">Result</h2>
+<script type="text/javascript">
+    var nr_debug = true;
+    var nr_params = {
+        api_key: 'l413e7b2-7163-4678-96bb-ece41b809d66',
+        element_id: 'result'
+    };
+    (function () {
+        var scr = document.createElement('script');
+        scr.type = 'text/javascript';
+        scr.async = true;
+        scr.src = document.location.protocol + '//nurego.bilberrysoft.com/lib/js/pricing.js';
+        var nr = document.getElementsByTagName('script')[0];
+        nr.parentNode.insertBefore(scr, nr);
+    })();
+</script>
+<div id="result">
+</div>
+<hr style="height: 0px; border: 1px #eaeaea solid; margin: 30px 0px">
+<h2 style="color: #666666">Code example</h2>
+<pre style="background:#fff;color:#3b3b3b">&lt;<span style="color:#016cff">script</span> <span style="color:#963dff">type</span>=<span style="color:#666">"text/javascript"</span>>
+    <span style="color:#ff5600">var</span> nr_params <span style="color:#069;font-weight:700">=</span> {
+        api_key: <span style="color:#666">'API-KEY'</span>
+    };
+    (<span style="color:#ff5600">function</span> () {
+        <span style="color:#ff5600">var</span> scr <span style="color:#069;font-weight:700">=</span> <span style="color:#a535ae">document</span>.<span style="color:#45ae34;font-weight:700">createElement</span>(<span style="color:#666">'script'</span>);
+        scr.<span style="color:#b7734c">type</span> <span style="color:#069;font-weight:700">=</span> <span style="color:#666">'text/javascript'</span>;
+        scr.async <span style="color:#069;font-weight:700">=</span> <span style="color:#a535ae">true</span>;
+        scr.<span style="color:#b7734c">src</span> <span style="color:#069;font-weight:700">=</span> <span style="color:#a535ae">document</span>.<span style="color:#b7734c">location</span>.<span style="color:#b7734c">protocol</span> <span style="color:#069;font-weight:700">+</span> <span style="color:#666">'//nurego.bilberrysoft.com/pricing.js'</span>;
+        <span style="color:#ff5600">var</span> nr <span style="color:#069;font-weight:700">=</span> <span style="color:#a535ae">document</span>.<span style="color:#45ae34;font-weight:700">getElementsByTagName</span>(<span style="color:#666">'script'</span>)[<span style="color:#a8017e">0</span>];
+        nr.<span style="color:#b7734c">parentNode</span>.<span style="color:#45ae34;font-weight:700">insertBefore</span>(scr, nr);
+    })();
+&lt;/<span style="color:#016cff">script</span>>
+</pre>
+<hr style="height: 0px; border: 1px #eaeaea solid; margin: 30px 0px">
+<h2 style="color: #666666">Default params</h2>
+<pre style="background:#fff;color:#3b3b3b">{
+    api_key: <span style="color:#666">''</span>,
+    element_id: <span style="color:#a535ae">false</span>,
+    theme: <span style="color:#666">'nr-default'</span>,
+    css_url: <span style="color:#666">'http://nurego.bilberrysoft.com/lib/css/themes.css'</span>,
+    select_url: <span style="color:#666">'/?plan_id='</span>,
+    select_callback: <span style="color:#a535ae">false</span>,
+    label_select: <span style="color:#666">'Monthly cost'</span>,
+    label_select: <span style="color:#666">'Select'</span>,
+    label_feature_on: <span style="color:#666">'&lt;span class="nr-check nr-yes">&lt;/span>'</span>,
+    label_feature_off: <span style="color:#666">'&lt;span class="nr-check nr-no">&lt;/span>'</span>,
+    label_before_price: <span style="color:#666">'$'</span>,
+    label_after_price: <span style="color:#666">''</span>,
+    ...
+};
+</pre>
+</body>
+</html>
