@@ -21,12 +21,11 @@
 
 ```JavaScript
 {
-    api_key: '',
-    element_id: false,
+    element_id: null,
     theme: 'nr-default',
-    css_url: '',
+    css_url: null,
     select_url: '/?plan_id=',
-    select_callback: false,
+    select_callback: null,
     label_price: 'Monthly cost',
     label_select: 'Select',
     label_feature_on: '<span class="nr-check nr-yes"></span>',
