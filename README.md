@@ -1,7 +1,7 @@
 
 ###Code example
 
-```JavaScript HTMl
+```JavaScript
 <script type="text/javascript">
     var nr_params = {
         api_key: 'API-KEY'
