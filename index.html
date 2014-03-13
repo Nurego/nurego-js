@@ -25,37 +25,42 @@
 </div>
 <hr style="height: 0px; border: 1px #eaeaea solid; margin: 30px 0px">
 <h2 style="color: #666666">Code example</h2>
-<pre style="background:#fff;color:#3b3b3b">&lt;<span style="color:#016cff">script</span> <span style="color:#963dff">type</span>=<span style="color:#666">"text/javascript"</span>>
-    <span style="color:#ff5600">var</span> nr_params <span style="color:#069;font-weight:700">=</span> {
-        api_key: <span style="color:#666">'API-KEY'</span>
+<pre style="background:#fff;color:#000"><span style="color:#ff7800">&lt;</span>script type<span style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span><span style="color:#ff7800">></span>
+    <span style="color:#ff7800">var</span> nr_params <span style="color:#ff7800">=</span> {
+        api_key: <span style="color:#409b1c">'API-KEY'</span>
     };
-    (<span style="color:#ff5600">function</span> () {
-        <span style="color:#ff5600">var</span> scr <span style="color:#069;font-weight:700">=</span> <span style="color:#a535ae">document</span>.<span style="color:#45ae34;font-weight:700">createElement</span>(<span style="color:#666">'script'</span>);
-        scr.<span style="color:#b7734c">type</span> <span style="color:#069;font-weight:700">=</span> <span style="color:#666">'text/javascript'</span>;
-        scr.async <span style="color:#069;font-weight:700">=</span> <span style="color:#a535ae">true</span>;
-        scr.<span style="color:#b7734c">src</span> <span style="color:#069;font-weight:700">=</span> <span style="color:#a535ae">document</span>.<span style="color:#b7734c">location</span>.<span style="color:#b7734c">protocol</span> <span style="color:#069;font-weight:700">+</span> <span style="color:#666">'//nurego.bilberrysoft.com/pricing.js'</span>;
-        <span style="color:#ff5600">var</span> nr <span style="color:#069;font-weight:700">=</span> <span style="color:#a535ae">document</span>.<span style="color:#45ae34;font-weight:700">getElementsByTagName</span>(<span style="color:#666">'script'</span>)[<span style="color:#a8017e">0</span>];
-        nr.<span style="color:#b7734c">parentNode</span>.<span style="color:#45ae34;font-weight:700">insertBefore</span>(scr, nr);
+    (<span style="color:#ff7800">function</span> () {
+        <span style="color:#ff7800">var</span> scr <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">createElement</span>(<span style="color:#409b1c">'script'</span>);
+        scr.<span style="color:#3b5bb5">type</span> <span style="color:#ff7800">=</span> <span style="color:#409b1c">'text/javascript'</span>;
+        scr.async <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">true</span>;
+        scr.<span style="color:#3b5bb5">src</span> <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">location</span>.<span style="color:#3b5bb5">protocol</span> <span style="color:#ff7800">+</span> <span style="color:#409b1c">'//nurego.bilberrysoft.com/pricing.js'</span>;
+        <span style="color:#ff7800">var</span> nr <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">getElementsByTagName</span>(<span style="color:#409b1c">'script'</span>)[<span style="color:#3b5bb5">0</span>];
+        nr.<span style="color:#3b5bb5">parentNode</span>.<span style="color:#3b5bb5">insertBefore</span>(scr, nr);
     })();
-&lt;/<span style="color:#016cff">script</span>>
+<span style="color:#ff7800">&lt;</span>/script<span style="color:#ff7800">></span>
 </pre>
 <hr style="height: 0px; border: 1px #eaeaea solid; margin: 30px 0px">
 <h2 style="color: #666666">Default params</h2>
-<pre style="background:#fff;color:#3b3b3b">{
-    api_key: <span style="color:#666">''</span>,
-    element_id: <span style="color:#a535ae">false</span>,
-    theme: <span style="color:#666">'nr-default'</span>,
-    css_url: <span style="color:#666">''</span>,
-    select_url: <span style="color:#666">'/?plan_id='</span>,
-    select_callback: <span style="color:#a535ae">false</span>,
-    label_select: <span style="color:#666">'Monthly cost'</span>,
-    label_select: <span style="color:#666">'Select'</span>,
-    label_feature_on: <span style="color:#666">'&lt;span class="nr-check nr-yes">&lt;/span>'</span>,
-    label_feature_off: <span style="color:#666">'&lt;span class="nr-check nr-no">&lt;/span>'</span>,
-    label_before_price: <span style="color:#666">'$'</span>,
-    label_after_price: <span style="color:#666">''</span>,
+<pre style="background:#fff;color:#000">{
+    element_id: <span style="color:#3b5bb5">null</span>,
+    theme: <span style="color:#409b1c">'nr-default'</span>,
+    css_url: <span style="color:#3b5bb5">null</span>,
+    select_url: <span style="color:#409b1c">'/?plan_id='</span>,
+    select_callback: <span style="color:#3b5bb5">null</span>,
+    label_price: <span style="color:#409b1c">'Monthly cost'</span>,
+    label_select: <span style="color:#409b1c">'Select'</span>,
+    label_feature_on: <span style="color:#409b1c">'&lt;span class="nr-check nr-yes">&lt;/span>'</span>,
+    label_feature_off: <span style="color:#409b1c">'&lt;span class="nr-check nr-no">&lt;/span>'</span>,
+    label_before_price: <span style="color:#409b1c">'$'</span>,
+    label_after_price: <span style="color:#409b1c">''</span>,
+    time_out: <span style="color:#3b5bb5">5</span> <span style="color:#ff7800">*</span> <span style="color:#3b5bb5">1000</span>, <span style="color:#8c868f">//Milliseconds,</span>
+    loading_class: <span style="color:#409b1c">'nr-container nr-loading'</span>,
+    error_class: <span style="color:#409b1c">'nr-notify nr-red'</span>,
+    warning_class: <span style="color:#409b1c">'nr-notify nr-yellow'</span>,
+    empty_class: <span style="color:#409b1c">'nr-container nr-empty'</span>,
+    price_class: <span style="color:#409b1c">'nr-price'</span>,
     ...
-};
+}
 </pre>
 </body>
 </html>
