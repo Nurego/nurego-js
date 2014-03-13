@@ -1,7 +1,7 @@
 
-##Code example
+###Code example
 
-```JavaScript
+```
 <script type="text/javascript">
     var nr_params = {
         api_key: 'API-KEY'
@@ -17,7 +17,7 @@
 </script>
 ```
 
-##Default params
+###Default params
 
 ```JavaScript
 {
@@ -40,5 +40,5 @@
     empty_class: 'nr-container nr-empty',
     price_class: 'nr-price',
     ...
-};
+}
 ```
