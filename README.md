@@ -1,5 +1,5 @@
 
-###Code example
+###Code
 
 ```JavaScript
 <script type="text/javascript">
