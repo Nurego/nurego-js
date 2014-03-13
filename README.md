@@ -4,13 +4,13 @@
 ```JavaScript
 <script type="text/javascript">
     var nr_params = {
-        api_key: 'API-KEY'
+        api_key: '<API_KEY>'
     };
     (function () {
         var scr = document.createElement('script');
         scr.type = 'text/javascript';
         scr.async = true;
-        scr.src = document.location.protocol + '//nurego.bilberrysoft.com/pricing.js';
+        scr.src = document.location.protocol + '//<DOMAIN>/<PATH_TO_PRICING_LIBRARY>';
         var nr = document.getElementsByTagName('script')[0];
         nr.parentNode.insertBefore(scr, nr);
     })();

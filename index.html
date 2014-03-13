@@ -13,13 +13,13 @@
 <h2 style="color: #666666">Code</h2>
 <pre style="background:#fff;color:#000"><span style="color:#ff7800">&lt;</span>script type<span style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span><span style="color:#ff7800">></span>
     <span style="color:#ff7800">var</span> nr_params <span style="color:#ff7800">=</span> {
-        api_key: <span style="color:#409b1c">'API-KEY'</span>
+        api_key: <span style="color:#409b1c">'<API_KEY>'</span>
     };
     (<span style="color:#ff7800">function</span> () {
         <span style="color:#ff7800">var</span> scr <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">createElement</span>(<span style="color:#409b1c">'script'</span>);
         scr.<span style="color:#3b5bb5">type</span> <span style="color:#ff7800">=</span> <span style="color:#409b1c">'text/javascript'</span>;
         scr.async <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">true</span>;
-        scr.<span style="color:#3b5bb5">src</span> <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">location</span>.<span style="color:#3b5bb5">protocol</span> <span style="color:#ff7800">+</span> <span style="color:#409b1c">'//nurego.bilberrysoft.com/pricing.js'</span>;
+        scr.<span style="color:#3b5bb5">src</span> <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">location</span>.<span style="color:#3b5bb5">protocol</span> <span style="color:#ff7800">+</span> <span style="color:#409b1c">'//<DOMAIN>/<PATH_TO_PRICING_LIBRARY>'</span>;
         <span style="color:#ff7800">var</span> nr <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">getElementsByTagName</span>(<span style="color:#409b1c">'script'</span>)[<span style="color:#3b5bb5">0</span>];
         nr.<span style="color:#3b5bb5">parentNode</span>.<span style="color:#3b5bb5">insertBefore</span>(scr, nr);
     })();
