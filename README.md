@@ -1,5 +1,12 @@
+###Code v1 (short)
 
-###Code
+```JavaScript
+<script type="text/javascript">var nr_params = {api_key: '<API_KEY>'};</script>
+<script type="text/javascript" src="<URL_TO_PRICING_LIBRARY>">
+```
+
+
+###Code v2 (normal)
 
 ```JavaScript
 <script type="text/javascript">
