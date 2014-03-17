@@ -1,5 +1,5 @@
 ###Code v1 (short)
-Insert code after <body> tag.
+Insert code after ```JavaScript <body>``` tag.
 ```JavaScript
 <script type="text/javascript">var nr_params = {api_key: '<API_KEY>'};</script>
 <script type="text/javascript" src="<URL_TO_PRICING_LIBRARY>">
@@ -7,7 +7,7 @@ Insert code after <body> tag.
 
 
 ###Code v2 (normal)
-Insert code after <body> tag.
+Insert code after ```JavaScript <body>``` tag.
 ```JavaScript
 <script type="text/javascript">
     var nr_params = {
