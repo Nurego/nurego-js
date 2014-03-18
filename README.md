@@ -6,7 +6,7 @@ Insert code after ```<body>``` tag.
 ```
 
 
-###Inline Code - (async)
+###Inline Code (async)
 Insert code after ```<body>``` tag.
 ```JavaScript
 <script type="text/javascript">
