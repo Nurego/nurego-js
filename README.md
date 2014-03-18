@@ -1,4 +1,4 @@
-###Code v1 (short)
+###One Line (sync)
 Insert code after ```<body>``` tag.
 ```JavaScript
 <script type="text/javascript">var nr_params = {api_key: '<API_KEY>'};</script>
@@ -6,7 +6,7 @@ Insert code after ```<body>``` tag.
 ```
 
 
-###Code v2 (normal)
+###Inline Code - (async)
 Insert code after ```<body>``` tag.
 ```JavaScript
 <script type="text/javascript">
