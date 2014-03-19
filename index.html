@@ -1,32 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>Nurego-js</title>
     <link rel="stylesheet" href="lib/css/themes.css">
 </head>
 <body style="padding: 10px">
 <h2 style="color: #666666">Example</h2>
+
 <div class="nr-default">
-    <table><thead><tr><th></th><td>nurego_free_v1</td><td>Nurego Pro</td></tr></thead><tbody><tr><th class="nr-price">Monthly cost</th><td class="nr-price">$0</td><td class="nr-price">$0.01</td></tr></tbody><tfoot><tr><th></th><td><a href="#">Select</a></td><td><a href="#">Select</a></td></tr></tfoot></table>
+    <table>
+        <thead>
+        <tr>
+            <th></th>
+            <td>nurego_free_v1</td>
+            <td>Nurego Pro</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="nr-price">Monthly cost</th>
+            <td class="nr-price">$0</td>
+            <td class="nr-price">$0.01</td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <th></th>
+            <td><a href="#">Select</a></td>
+            <td><a href="#">Select</a></td>
+        </tr>
+        </tfoot>
+    </table>
 </div>
 <h2 style="color: #666666">One Line (sync)</h2>
-<p style="font-family: sans-serif; color: #666666; font-size: 14px">Insert code after <span style="color:#ff7800">&lt;</span><span style="color:#000">body</span><span style="color:#ff7800">></span> tag.</p>
-<pre style="background:#fff;color:#000"><span style="color:#ff7800">&lt;</span>script type<span style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span><span style="color:#ff7800">></span><span style="color:#ff7800">var</span> nr_params <span style="color:#ff7800">=</span> {api_key: <span style="color:#409b1c">'&lt;API_KEY>'</span>};<span style="color:#ff7800">&lt;</span>/script<span style="color:#ff7800">></span>
-<span style="color:#ff7800">&lt;</span>script type<span style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span> src<span style="color:#ff7800">=</span><span style="color:#409b1c">"&lt;URL_TO_PRICING_LIBRARY>"</span><span style="color:#ff7800">></span>
+
+<p style="font-family: sans-serif; color: #666666; font-size: 14px">Insert code after <span
+        style="color:#ff7800">&lt;</span><span style="color:#000">body</span><span style="color:#ff7800">></span> tag.
+</p>
+<pre style="background:#fff;color:#000"><span style="color:#ff7800">&lt;</span>script type<span
+        style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span><span
+        style="color:#ff7800">></span><span style="color:#ff7800">var</span> nr_params <span
+        style="color:#ff7800">=</span> {api_key: <span style="color:#409b1c">'&lt;API_KEY>'</span>};<span
+        style="color:#ff7800">&lt;</span>/script<span style="color:#ff7800">></span>
+<span style="color:#ff7800">&lt;</span>script type<span style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span> src<span
+            style="color:#ff7800">=</span><span style="color:#409b1c">"&lt;URL_TO_PRICING_LIBRARY>"</span><span
+            style="color:#ff7800">></span>
 </pre>
 <hr style="height: 0px; border: 1px #eaeaea solid; margin: 30px 0px">
 <h2 style="color: #666666">Inline Code (async)</h2>
-<p style="font-family: sans-serif; color: #666666; font-size: 14px">Insert code after <span style="color:#ff7800">&lt;</span><span style="color:#000">body</span><span style="color:#ff7800">></span> tag.</p>
-<pre style="background:#fff;color:#000"><span style="color:#ff7800">&lt;</span>script type<span style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span><span style="color:#ff7800">></span>
+
+<p style="font-family: sans-serif; color: #666666; font-size: 14px">Insert code after <span
+        style="color:#ff7800">&lt;</span><span style="color:#000">body</span><span style="color:#ff7800">></span> tag.
+</p>
+<pre style="background:#fff;color:#000"><span style="color:#ff7800">&lt;</span>script type<span
+        style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span><span
+        style="color:#ff7800">></span>
     <span style="color:#ff7800">var</span> nr_params <span style="color:#ff7800">=</span> {
         api_key: <span style="color:#409b1c">'&lt;API_KEY>'</span>
     };
     (<span style="color:#ff7800">function</span> () {
-        <span style="color:#ff7800">var</span> scr <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">createElement</span>(<span style="color:#409b1c">'script'</span>);
+        <span style="color:#ff7800">var</span> scr <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span
+            style="color:#3b5bb5">createElement</span>(<span style="color:#409b1c">'script'</span>);
         scr.<span style="color:#3b5bb5">type</span> <span style="color:#ff7800">=</span> <span style="color:#409b1c">'text/javascript'</span>;
         scr.async <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">true</span>;
-        scr.<span style="color:#3b5bb5">src</span> <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">location</span>.<span style="color:#3b5bb5">protocol</span> <span style="color:#ff7800">+</span> <span style="color:#409b1c">'//&lt;DOMAIN>/&lt;PATH_TO_PRICING_LIBRARY>'</span>;
-        <span style="color:#ff7800">var</span> nr <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span style="color:#3b5bb5">getElementsByTagName</span>(<span style="color:#409b1c">'script'</span>)[<span style="color:#3b5bb5">0</span>];
+        scr.<span style="color:#3b5bb5">src</span> <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span
+            style="color:#3b5bb5">location</span>.<span style="color:#3b5bb5">protocol</span> <span
+            style="color:#ff7800">+</span> <span
+            style="color:#409b1c">'//&lt;DOMAIN>/&lt;PATH_TO_PRICING_LIBRARY>'</span>;
+        <span style="color:#ff7800">var</span> nr <span style="color:#ff7800">=</span> <span style="color:#3b5bb5">document</span>.<span
+            style="color:#3b5bb5">getElementsByTagName</span>(<span style="color:#409b1c">'script'</span>)[<span
+            style="color:#3b5bb5">0</span>];
         nr.<span style="color:#3b5bb5">parentNode</span>.<span style="color:#3b5bb5">insertBefore</span>(scr, nr);
     })();
 <span style="color:#ff7800">&lt;</span>/script<span style="color:#ff7800">></span>
@@ -45,7 +88,8 @@
     label_feature_off: <span style="color:#409b1c">'&lt;span class="nr-check nr-no">&lt;/span>'</span>,
     label_before_price: <span style="color:#409b1c">'$'</span>,
     label_after_price: <span style="color:#409b1c">''</span>,
-    time_out: <span style="color:#3b5bb5">5</span> <span style="color:#ff7800">*</span> <span style="color:#3b5bb5">1000</span>, <span style="color:#8c868f">//Milliseconds,</span>
+    time_out: <span style="color:#3b5bb5">5</span> <span style="color:#ff7800">*</span> <span
+            style="color:#3b5bb5">1000</span>, <span style="color:#8c868f">//Milliseconds,</span>
     loading_class: <span style="color:#409b1c">'nr-container nr-loading'</span>,
     error_class: <span style="color:#409b1c">'nr-notify nr-red'</span>,
     warning_class: <span style="color:#409b1c">'nr-notify nr-yellow'</span>,
