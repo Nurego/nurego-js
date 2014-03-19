@@ -37,6 +37,10 @@
 <p style="font-family: sans-serif; color: #666666; font-size: 14px">Insert code after <span
         style="color:#ff7800">&lt;</span><span style="color:#000">body</span><span style="color:#ff7800">></span> tag.
 </p>
+<!--
+<script type="text/javascript">var nr_params = {api_key: '<API_KEY>'};</script>
+<script type="text/javascript" src="<URL_TO_PRICING_LIBRARY>">
+-->
 <pre style="background:#fff;color:#000"><span style="color:#ff7800">&lt;</span>script type<span
         style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span><span
         style="color:#ff7800">></span><span style="color:#ff7800">var</span> nr_params <span
@@ -52,6 +56,21 @@
 <p style="font-family: sans-serif; color: #666666; font-size: 14px">Insert code after <span
         style="color:#ff7800">&lt;</span><span style="color:#000">body</span><span style="color:#ff7800">></span> tag.
 </p>
+<!--
+<script type="text/javascript">
+    var nr_params = {
+        api_key: '<API_KEY>'
+    };
+    (function () {
+        var scr = document.createElement('script');
+        scr.type = 'text/javascript';
+        scr.async = true;
+        scr.src = document.location.protocol + '//<DOMAIN>/<PATH_TO_PRICING_LIBRARY>';
+        var nr = document.getElementsByTagName('script')[0];
+        nr.parentNode.insertBefore(scr, nr);
+    })();
+</script>
+-->
 <pre style="background:#fff;color:#000"><span style="color:#ff7800">&lt;</span>script type<span
         style="color:#ff7800">=</span><span style="color:#409b1c">"text/javascript"</span><span
         style="color:#ff7800">></span>
@@ -76,6 +95,28 @@
 </pre>
 <hr style="height: 0px; border: 1px #eaeaea solid; margin: 30px 0px">
 <h2 style="color: #666666">Default params</h2>
+<!--
+{
+    element_id: null,
+    theme: 'nr-default',
+    css_url: null,
+    select_url: '/?plan_id=',
+    select_callback: null,
+    label_price: 'Monthly cost',
+    label_select: 'Select',
+    label_feature_on: '<span class="nr-check nr-yes"></span>',
+    label_feature_off: '<span class="nr-check nr-no"></span>',
+    label_before_price: '$',
+    label_after_price: '',
+    time_out: 5 * 1000, //Milliseconds,
+    loading_class: 'nr-container nr-loading',
+    error_class: 'nr-notify nr-red',
+    warning_class: 'nr-notify nr-yellow',
+    empty_class: 'nr-container nr-empty',
+    price_class: 'nr-price',
+    ...
+}
+-->
 <pre style="background:#fff;color:#000">{
     element_id: <span style="color:#3b5bb5">null</span>,
     theme: <span style="color:#409b1c">'nr-default'</span>,
