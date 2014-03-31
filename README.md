@@ -35,23 +35,23 @@ Nurego.setApiKey('API_KEY');
 You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
 ```JavaScript
 {
-    element_id: null,
-    theme: 'nr-default',
-    css_url: null,
-    select_url: '/?plan_id=',
-    select_callback: null,
-    label_price: 'Monthly cost',
-    label_select: 'Select',
-    label_feature_on: '<span class="nr-check nr-yes"></span>',
-    label_feature_off: '<span class="nr-check nr-no"></span>',
-    label_before_price: '$',
-    label_after_price: '',
-    time_out: 5 * 1000, //Milliseconds,
-    loading_class: 'nr-container nr-loading',
-    error_class: 'nr-notify nr-red',
-    warning_class: 'nr-notify nr-yellow',
-    empty_class: 'nr-container nr-empty',
-    price_class: 'nr-price',
+    element_id: null, //Id of the DOM element. (string or null)
+    theme: 'nr-default', //CSS class for pricing table. (string or null)
+    css_url: null, //Url to custom CSS file. (string or null)
+    select_url: '/?plan_id=', //Url prefix for plan link. (string)
+    select_callback: null, //Callback function after selecting plan. (function or null)
+    label_price: 'Monthly cost', //Label of Price column. (string)
+    label_select: 'Select', //Label on Select button. (string)
+    label_feature_on: '<span class="nr-check nr-yes"></span>', //String for enabled option. (string)
+    label_feature_off: '<span class="nr-check nr-no"></span>', //String for disabled option. (string)
+    label_before_price: '$', //Prefix for price value. (string)
+    label_after_price: '', //Suffix for price value. (string)
+    time_out: 5 * 1000, //Timeout in milliseconds. (integer)
+    loading_class: 'nr-container nr-loading',  //CSS class for loading block. (string)
+    error_class: 'nr-notify nr-red', //CSS class for error block. (string)
+    warning_class: 'nr-notify nr-yellow', //CSS class for waring block. (string)
+    empty_class: 'nr-container nr-empty', //CSS class for empty block. (string)
+    price_class: 'nr-price', //CSS class for price block. (string)
     ...
 }
 ```
