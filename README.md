@@ -8,13 +8,13 @@ Nurego.setApiKey('API_KEY');
 ```
 
 ###Step 2
-After the first step, set your api key. Put this code in ```<body>``` tag.
+After the first step, set your api key. Put this code in ```<body>``` tag. You can get api key form your account.
 ```JavaScript
 <script type="text/javascript">
 Nurego.setApiKey('API_KEY');
 </script>
 ```
-Pricing plans will print automatically in your page. You can get api key form your account.
+Pricing plans will be printing automatically on your page.
 That's all!
 
 ###Advanced
@@ -27,11 +27,11 @@ Nurego.setApiKey('API_KEY');
 </script>
 ...
 <div id="my_block">
-    <!-- Pricing plans will print here. -->
+    <!-- Pricing plans will be here. -->
 </div>
 ```
 
-###Default params
+###Default parameters
 You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
 ```JavaScript
 {
