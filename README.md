@@ -1,30 +1,37 @@
-###One Line (sync)
-Insert code after ```<body>``` tag.
+###Step 1
+First, include Nurego.js in the page. We recommend putting the script tag in the ```<head>``` tag.
 ```JavaScript
-<script type="text/javascript">var nr_params = {api_key: '<API_KEY>'};</script>
-<script type="text/javascript" src="<URL_TO_PRICING_LIBRARY>">
-```
-
-
-###Inline Code (async)
-Insert code after ```<body>``` tag.
-```JavaScript
+<script type="text/javascript" src="https://js.nurego.com/v1/"></script>
 <script type="text/javascript">
-    var nr_params = {
-        api_key: '<API_KEY>'
-    };
-    (function () {
-        var scr = document.createElement('script');
-        scr.type = 'text/javascript';
-        scr.async = true;
-        scr.src = document.location.protocol + '//<DOMAIN>/<PATH_TO_PRICING_LIBRARY>';
-        var nr = document.getElementsByTagName('script')[0];
-        nr.parentNode.insertBefore(scr, nr);
-    })();
+Nurego.setApiKey('YOUR_API_KEY');
 </script>
 ```
 
-###Default params
+###Step 2
+After the first step, set your api key. Put this code in ```<body>``` tag.
+```JavaScript
+<script type="text/javascript">
+Nurego.setApiKey('API_KEY');
+</script>
+```
+Pricing plans will print automatically in your page. You can get api key form your account.
+That's all!
+
+###Advanced
+Some advanced installation configurations are shown here.
+```JavaScript
+<script type="text/javascript">
+//Insert plans into specific block.
+Nurego.setParam('element_id', 'my_block');
+Nurego.setApiKey('API_KEY');
+</script>
+
+<div id="my_block">
+    <!-- Pricing plans will print here. -->
+</idv>
+```
+
+###Default params. You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
 
 ```JavaScript
 {
