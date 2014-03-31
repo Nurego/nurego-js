@@ -18,21 +18,21 @@ Pricing plans will print automatically in your page. You can get api key form yo
 That's all!
 
 ###Advanced
-Some advanced installation configurations are shown here.
+Some advanced installation are shown here.
 ```JavaScript
 <script type="text/javascript">
 //Insert plans into specific block.
 Nurego.setParam('element_id', 'my_block');
 Nurego.setApiKey('API_KEY');
 </script>
-
+...
 <div id="my_block">
     <!-- Pricing plans will print here. -->
-</idv>
+</div>
 ```
 
-###Default params. You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
-
+###Default params.
+You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
 ```JavaScript
 {
     element_id: null,
