@@ -40,7 +40,7 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
     css_url: null, //Url to custom CSS file. (string or null)
     select_url: '/?plan_id=', //Url prefix for plan link. (string)
     select_callback: null, //Callback function after selecting plan. (function or null)
-    label_price: 'Monthly cost', //Label of Price column. (string)
+    label_price: 'Monthly cost', //Label in Price column. (string)
     label_select: 'Select', //Label on Select button. (string)
     label_feature_on: '<span class="nr-check nr-yes"></span>', //String for enabled option. (string)
     label_feature_off: '<span class="nr-check nr-no"></span>', //String for disabled option. (string)
