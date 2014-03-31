@@ -3,7 +3,7 @@ First, include Nurego.js in the page. We recommend putting the script tag in the
 ```JavaScript
 <script type="text/javascript" src="https://js.nurego.com/v1/"></script>
 <script type="text/javascript">
-Nurego.setApiKey('YOUR_API_KEY');
+Nurego.setApiKey('API_KEY');
 </script>
 ```
 
@@ -31,7 +31,7 @@ Nurego.setApiKey('API_KEY');
 </div>
 ```
 
-###Default params.
+###Default params
 You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
 ```JavaScript
 {
