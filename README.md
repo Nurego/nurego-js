@@ -1,10 +1,7 @@
 ###Step 1
 First, include Nurego.js in the page. We recommend putting the script tag in the ```<head>``` tag.
 ```JavaScript
-<script type="text/javascript" src="https://js.nurego.com/v1/"></script>
-<script type="text/javascript">
-Nurego.setApiKey('API_KEY');
-</script>
+<script type="text/javascript" src="http://js.nurego.com/v1/lib/js/nurego.js"></script>
 ```
 
 ###Step 2
@@ -37,7 +34,7 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
 {
     element_id: null, //Id of the DOM element. (string or null)
     theme: 'nr-default', //CSS class for pricing table. (string or null)
-    css_url: null, //Url to custom CSS file. (string or null)
+    css_url: 'http://js.nurego.com/v1/lib/css/themes.css', //Url to custom CSS file. (string or null)
     select_url: '/?plan_id=', //Url prefix for plan link. (string)
     select_callback: null, //Callback function after selecting plan. (function or null)
     label_price: 'Monthly cost', //Label in Price column. (string)
