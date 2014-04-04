@@ -1,18 +1,19 @@
 .nr-default {
 }
 .nr-default table {
-    width: 100%;
-    font-family: Tahoma, Verdana, Segoe, sans-serif;
+    width: auto;
+    font-family:"Lato",Helvetica,Arial,sans-serif;
     border-collapse: collapse;
     background: #fff;
 }
 .nr-default td,
 .nr-default th {
+    min-width: 150px;
     border: 1px solid #e8e8e8;
     vertical-align: middle;
 }
 .nr-default td {
-    color: #373d47;
+    color: #707383;
     font-size: 14px;
     line-height: 18px;
 }
@@ -21,18 +22,18 @@
     border: none;
 }
 .nr-default thead td {
-    height: 90px;
-    background: #f9fafc;
-    font-size: 30px;
-    color: #666;
+    height: 30px;
+    background: #fff;
+    font-size: 11px;
+    color: #9799a2;
     text-transform: uppercase;
     text-align: center;
-    font-weight: normal;
+    font-weight: bold;
 }
 .nr-default tbody th {
     text-align: left;
-    font-size: 14px;
-    padding: 18px 20px 18px 25px;
+    font-size: 12px;
+    padding: 10px 20px 10px 25px;
     font-weight: normal;
 }
 .nr-default tbody td {
@@ -45,29 +46,35 @@
 }
 .nr-default th.nr-price {
     color: #666;
-    height: 38px;
-    background-color: #f2f4f8;
+    height: 32px;
+    background-color: #fff;
     text-align: left;
     font-weight: normal;
 }
 .nr-default td.nr-price {
-    color: #fb6b5b;
-    font-size: 36px;
-    background-color: #f2f4f8;
+    color: #f26522;
+    font-size: 24px;
+    font-weight: bold;
+    background-color: #fff;
 }
 .nr-default tfoot a {
     display: inline-block;
     color: #fff;
-    background: #5dcff3;
-    height: 45px;
-    line-height: 45px;
+    background: #9799A2;
+    height: 32px;
+    line-height: 32px;
     text-align: center;
-    padding: 0 30px;
+    padding: 0 15px;
+    font-size: 10px;
+    text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
+}
+.nr-default tfoot a:hover {
+    background: #959595;
 }
 .nr-default .nr-check {
     width: 16px;
