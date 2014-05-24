@@ -58,8 +58,11 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
 }
 ```
 
-###Don't like our pricing page, feel free to create your own. This is the simple way to query published plans through the JSONP query
+###Don't like our pricing page, feel free to create your own. 
 
+This is the simple way to query published plans through the JSONP query
+
+```HTML
 !DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
@@ -102,3 +105,4 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
 <div class="data"></div>
 </body>
 </html>
+```
