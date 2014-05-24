@@ -1,3 +1,7 @@
+This JS library renders "canonical" pricing page based on the plans published through Nurego service
+
+To use the library, two very simple steps needed
+
 ###Step 1
 First, include Nurego.js in the page. We recommend putting the script tag in the ```<head>``` tag.
 ```JavaScript
@@ -11,7 +15,8 @@ After the first step, set your api key. Put this code in ```<body>``` tag. You c
 Nurego.setApiKey('API_KEY');
 </script>
 ```
-Pricing plans will be printing automatically on your page.
+Pricing plans will be rednered automatically on your page.
+
 That's all!
 
 ###Advanced
@@ -52,3 +57,48 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
     ...
 }
 ```
+
+###Don't like our pricing page, feel free to create your own. This is the simple way to query published plans through the JSONP query
+
+!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+</head>
+
+<body>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var url = 'http://api.nurego.com/v1/offerings?api_key=<YOUR API KEY>';
+
+        $.ajax({
+            url:  url + '&callback=?',
+            type: "GET",
+            dataType: "jsonp",
+            success: getOfferingsCallback
+        });
+
+    });
+
+    function getOfferingsCallback(json) {
+        if(json.data == undefined){
+            $( ".data" ).append( "Error:" + json.error + "<br>");
+        }else{
+            $( ".data" ).append( "<h2>OFFERINGS</h2><br>");
+            $.each(json.data, function( index, value ) {
+                $( ".data" ).append( "offering name:" + value.offering.name + "<br>");
+                $.each(value.plans, function( index, plan ) {
+                    $( ".data" ).append( "  plan - guid:" + plan.plan.guid + "<br>");
+                });
+            });
+        }
+    }
+
+</script>
+<div class="wrapper">
+    Hello
+</div>
+<div class="data"></div>
+</body>
+</html>
