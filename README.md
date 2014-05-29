@@ -15,7 +15,7 @@ After the first step, set your api key. Put this code in ```<body>``` tag. You c
 Nurego.setApiKey('API_KEY');
 </script>
 ```
-Pricing plans will be rednered automatically on your page.
+Pricing plans will be rendered automatically on your page.
 
 That's all!
 
