@@ -9,7 +9,7 @@ First, include Nurego.js in the page. We recommend putting the script tag in the
 ```
 
 ###Step 2
-After the first step, set your api key. Put this code in ```<body>``` tag. You can get api key form your account.
+After the first step, set your api key. Put this code in ```<body>``` tag. You can get api key from your account.
 ```JavaScript
 <script type="text/javascript">
 Nurego.setApiKey('API_KEY');
