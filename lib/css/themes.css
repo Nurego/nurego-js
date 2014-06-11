@@ -1,8 +1,8 @@
 .nr-default {
+    font-family:"Lato",Helvetica,Arial,sans-serif;
 }
 .nr-default table {
     width: auto;
-    font-family:"Lato",Helvetica,Arial,sans-serif;
     border-collapse: collapse;
     background: #fff;
 }
@@ -65,6 +65,8 @@
     line-height: 32px;
     text-align: center;
     padding: 0 15px;
+    margin-left: 5px;
+    margin-right: 5px;
     font-size: 10px;
     text-transform: uppercase;
     font-weight: bold;
@@ -112,4 +114,36 @@
 }
 .nr-default .nr-container.nr-empty {
     background: url("../images/empty.gif") 50% 50% no-repeat;
+}
+
+.nr-signup-div {
+    margin: 20px auto;
+    width: 55%;
+}
+.nr-signup {
+    text-decoration: none;
+    background: transparent;
+    border: 2px solid #dfe1e6;
+    min-width: 120px;
+    font-weight: 400;
+    margin-top: 0.5em;
+    color: #565a6b;
+    text-transform: uppercase;
+    padding: 0.625em 1.125em;
+    font-size: 0.857em;
+    margin-left: 5px;
+}
+
+.nr-signup:hover {
+    color: white;
+    background: #565a6b;
+    border: 2px solid white;
+}
+
+.nr-default .nr-plan-selected {
+    background: #f26522; 
+}
+
+.nr-default .nr-plan-selected:hover {
+    background: #f26522; 
 }
