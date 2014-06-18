@@ -85,14 +85,14 @@ This is the simple way to query published plans through the JSONP query
     });
 
     function getOfferingsCallback(json) {
-        if(json.data == undefined){
+        if(json.plans.data == undefined){
             $( ".data" ).append( "Error:" + json.error + "<br>");
         }else{
             $( ".data" ).append( "<h2>OFFERINGS</h2><br>");
-            $.each(json.data, function( index, value ) {
-                $( ".data" ).append( "offering name:" + value.offering.name + "<br>");
-                $.each(value.plans, function( index, plan ) {
-                    $( ".data" ).append( "  plan - guid:" + plan.plan.guid + "<br>");
+            $.each(json.iplans.data, function( index, plan ) {
+                $( ".data" ).append( "<h4>" + plan.name + "</h4>");
+                $.each(planfeatures.data, function( index, feature ) {
+                    $( ".data" ).append( feature.name + " : " + ((feature.max_unit > 0) ? feature.max_unit : "yes" ) + "<br>");
                 });
             });
         }
