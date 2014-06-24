@@ -45,7 +45,6 @@
 		this.b_error;
 		this.b_empty;
 
-	};
 		/**
 		 * Error handler
 		 * @param {String} e
@@ -89,7 +88,7 @@
 			this.container = document.createElement('div');
 		
 			if (this.theme) {
-				this.container.setAttribute('class', this.theme);
+				this.container.setAttribute('class', this.theme + this.api_key);
 			}
 
 				this.b_loading = document.createElement('div');
@@ -163,7 +162,6 @@
 				}
 			}, this.time_out);
 		};
-
 		/*
 		 * Timeout function to be called by setTimeout
 		 * in Nurego.init(). 
@@ -393,7 +391,7 @@
 		      e.preventDefault();
 		      return false;
 		    })
-		}
+		}.bind(this);
 
 
 
@@ -413,6 +411,7 @@
 	
 			        //Prepare and cache
 			        var data = this.nr_prepareData(response);
+					console.debug( data );
 			        if (data) {
 			            this.nr_cache_set(data);
 			        }
@@ -433,10 +432,9 @@
 		 * function.
 		 */
 		Nurego.prototype.get_offering = function(callback, error) {
-
 			this.init();
 			var data = $.ajax({
-		    url: this.data_url + this.api_key + '&callback=?',
+		    url: this.data_url + this.api_key + '&callback=nr_callback',
 		    type: "GET",
 		    dataType: "jsonp",
 		    });
@@ -444,18 +442,10 @@
 			data.done(callback);
 			data.error(error);
 
-		};
+		}
 
-	/** 
-	 * All in one, auto get and display the pricing table
-	 * Works if the default CSS/location is wanted.
-	 */
-	function fetchOffering(api_key) {
-	
-		var nurego_object = new Nurego(api_key);
-		nurego_object.get_offering(nurego_object.nr_callback, nurego_object.nr_error);
 	};
-	
+
 
 
 
