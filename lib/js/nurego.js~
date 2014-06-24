@@ -118,13 +118,10 @@
 		  		//Check if element exists
 				if (this.element_id) {
 				    var element = document.getElementById(this.element_id);
-					console.log( 'element: ' + element );
 				    if (element) {
 				        element.appendChild(this.container);
 				    }
 				    else {
-						console.log( 'document: ' + document );
-						console.log( 'body: ' + document.body );
 				        document.body.appendChild(this.container);
 				        throw "Element '#" + this.element_id + "' not found.";
 				    }
@@ -332,9 +329,7 @@
 		    table.appendChild(tableFoot);
 
 			// Append table to unique div
-		    // OLD this.container.appendChild(table);
 			unique_container = document.getElementById('pricing_table-' + this.api_key);
-			console.log('Appending table to ' + unique_container.id);
 			unique_container.appendChild(table);		    
 			
 		    // append signup button
@@ -345,8 +340,7 @@
 		    signup.setAttribute('class', 'nr-signup');
 		    signup.innerHTML = "Sign Up";
 		    signup_div.appendChild(signup);
-		    // OLD this.container.appendChild(signup_div);
-			console.log('Appending singup to ' + unique_container.id);
+
 			unique_container.appendChild(table);
 		    
 		    // handle select event
