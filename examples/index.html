@@ -2,11 +2,28 @@
 <html>
 <head>
     <title>Nurego-js</title>
-    <script type="text/javascript" src="http://js.nurego.com/v1/lib/js/nurego.js"></script>
+    <script type="text/javascript" src="nurego-js/lib/js/nurego.js"></script>
+	<!--<script type="text/javascript" src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>-->
+	<script type="text/javascript" src='https://code.jquery.com/jquery-1.11.1.js'></script>
+
+	</script>
 </head>
 <body>
-<script type="text/javascript">
-    Nurego.setApiKey('YOUR API KEY');
-</script>
+<div id="one"> Test </div> 
+
+	<script type="text/javascript">
+	// First nurego
+	var my_offering1 = new Nurego('t30f3a86-b3fc-4d00-ac72-6a204e608c21');
+	my_offering1.get_offering(my_offering1.nr_callback, my_offering1.nr_error);
+	</script>
+
+<div id="two"> Live </div>
+
+	<script type="text/javascript">
+	// Second nurego
+	var my_offering2 = new Nurego('lc14de81-587e-49d8-ba0e-487498ae297a');
+	my_offering2.get_offering(my_offering2.nr_callback, my_offering2.nr_error);
+	</script>	
+
 </body>
 </html>
