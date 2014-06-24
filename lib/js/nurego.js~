@@ -68,21 +68,6 @@
 		    }
 		};
 
-	   /* 
-		* Change Nurego object properties
-		*
-		Nurego.prototype.setParam = function(key, value) {
-
-		   if( this.hasOwnProperty(key)) {
-		       key = value;
-		   } else {
-		       throw "Undefined parameter '" + key + "'.";
-		   } 
-
-		    return true;
-		};*/
-
-
 		/*
 		 * Include CSS, jQuery and externals as well
 		 * as handle initial DOM element creation
