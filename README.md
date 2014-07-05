@@ -9,10 +9,11 @@ First, include Nurego.js in the page. We recommend putting the script tag in the
 ```
 
 ###Step 2
-After the first step, set your api key. Put this code in ```<body>``` tag. You can get api key from your account.
+After the first step, instantiate a Nurego object for each offering you wish to call, and set your api keys. Put this code in ```<body>``` tag. You can get api key from your account.
 ```JavaScript
 <script type="text/javascript">
-Nurego.setApiKey('API_KEY');
+var my_offering = new Nurego('<API KEY>');
+my_offering.get_offering(my_offering.callback, my_offering.nr_error);
 </script>
 ```
 Pricing plans will be rendered automatically on your page.
@@ -24,8 +25,10 @@ Some advanced installation are shown here.
 ```JavaScript
 <script type="text/javascript">
 //Insert plans into specific block.
-Nurego.setParam('element_id', 'my_block');
-Nurego.setApiKey('API_KEY');
+my_offering = new Nurego('<API KEY>');
+my_offering.css_url = '/absolute/path/to/CSS';
+my_offering.element_id = 'id_of_element_to_append_table';
+my_offering.get_offering(my_offering.callback, my_offering.nr_error);
 </script>
 ...
 <div id="my_block">
@@ -34,7 +37,7 @@ Nurego.setApiKey('API_KEY');
 ```
 
 ###Default parameters
-You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
+You can override parameters by using ```Nurego_object_instance.parameter= 'PARAMETER'```.
 ```JavaScript
 {
     element_id: null, //Id of the DOM element. (string or null)
@@ -89,7 +92,7 @@ This is the simple way to query published plans through the JSONP query
             $( ".data" ).append( "Error:" + json.error + "<br>");
         }else{
             $( ".data" ).append( "<h2>OFFERINGS</h2><br>");
-            $.each(json.iplans.data, function( index, plan ) {
+            $.each(json.plans.data, function( index, plan ) {
                 $( ".data" ).append( "<h4>" + plan.name + "</h4>");
                 $.each(planfeatures.data, function( index, feature ) {
                     $( ".data" ).append( feature.name + " : " + ((feature.max_unit > 0) ? feature.max_unit : "yes" ) + "<br>");
