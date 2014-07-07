@@ -27,7 +27,7 @@ Some advanced installation are shown here.
 //Insert plans into specific block.
 my_offering = new Nurego('<API KEY>');
 my_offering.css_url = '/absolute/path/to/CSS';
-my_offering.element_id = 'id_of_element_to_append_table';
+my_offering.element_id = 'my_block';
 my_offering.get_offering(my_offering.callback, my_offering.nr_error);
 </script>
 ...
