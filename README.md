@@ -37,7 +37,7 @@ my_offering.get_offering(my_offering.callback, my_offering.nr_error);
 ```
 
 ###Default parameters
-You can override parameters by using ```Nurego_object_instance.parameter= 'PARAMETER'```.
+You can override parameters by using ```Nurego_object_instance.parameter = 'VALUE'```.
 ```JavaScript
 {
     element_id: null, //Id of the DOM element. (string or null)
