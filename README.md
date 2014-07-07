@@ -12,8 +12,8 @@ First, include Nurego.js in the page. We recommend putting the script tag in the
 After the first step, instantiate a Nurego object for each offering you wish to call, and set your api keys. Put this code in ```<body>``` tag. You can get api key from your account.
 ```JavaScript
 <script type="text/javascript">
-var my_offering = new Nurego('<API KEY>');
-my_offering.get_offering(my_offering.callback, my_offering.nr_error);
+var nurego = new Nurego('<API KEY>');
+nurego.get_offering(nurego.callback, nurego.nr_error);
 </script>
 ```
 Pricing plans will be rendered automatically on your page.
@@ -25,10 +25,10 @@ Some advanced installation are shown here.
 ```JavaScript
 <script type="text/javascript">
 //Insert plans into specific block.
-my_offering = new Nurego('<API KEY>');
-my_offering.css_url = '/absolute/path/to/CSS';
-my_offering.element_id = 'my_block';
-my_offering.get_offering(my_offering.callback, my_offering.nr_error);
+var nurego = new Nurego('<API KEY>');
+nurego.css_url = '/absolute/path/to/CSS';
+nurego.element_id = 'my_block';
+nurego.get_offering(nurego.callback, nurego.nr_error);
 </script>
 ...
 <div id="my_block">
@@ -37,7 +37,7 @@ my_offering.get_offering(my_offering.callback, my_offering.nr_error);
 ```
 
 ###Default parameters
-You can override parameters by using ```Nurego_object_instance.parameter = 'VALUE'```.
+You can override parameters by using ```nurego.parameter = 'VALUE'```.
 ```JavaScript
 {
     element_id: null, //Id of the DOM element. (string or null)
