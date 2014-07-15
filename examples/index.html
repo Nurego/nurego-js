@@ -2,11 +2,27 @@
 <html>
 <head>
     <title>Nurego-js</title>
-    <script type="text/javascript" src="http://js.nurego.com/v1/lib/js/nurego.js"></script>
+    <script type="text/javascript" src="nurego-js/lib/js/nurego.js"></script>
+    <script type="text/javascript" src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+
+    </script>
 </head>
 <body>
-<script type="text/javascript">
-    Nurego.setApiKey('YOUR API KEY');
-</script>
+<div id="one"> Test </div> 
+
+    <script type="text/javascript">
+    // First nurego
+    var nurego = new Nurego('<FIRST API KEY>');
+    nurego.get_offering(nurego.nr_callback, nurego.nr_error);
+    </script>
+
+<div id="two"> Live </div>
+
+    <script type="text/javascript">
+    // Second nurego
+    var nurego2 = new Nurego('<SECOND API KEY>');
+    nurego2.get_offering(nurego2.nr_callback, nurego2.nr_error);
+    </script>   
+
 </body>
 </html>
