@@ -147,3 +147,13 @@
 .nr-default .nr-plan-selected:hover {
     background: #f26522; 
 }
+
+.nr-discount {
+  text-transform:uppercase;
+  padding: 10px 10px 10px 10px !important;
+  background-color: #f26522;
+  color: wheat !important;
+}
+.nr-trial-days {
+  font-size: 10px;
+}
