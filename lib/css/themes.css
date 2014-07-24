@@ -123,7 +123,7 @@
     width: 100%;
     text-align: center;
 }
-.nr-signup {
+.nr-signup, .nr-go-signup {
     text-decoration: none;
     background: transparent;
     border: 2px solid #dfe1e6;
@@ -137,7 +137,7 @@
     margin-left: 5px;
 }
 
-.nr-signup:hover {
+.nr-signup:hover, .nr-go-signup:hover {
     color: white;
     background: #565a6b;
     border: 2px solid white;
