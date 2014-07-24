@@ -107,3 +107,18 @@ This is the simple way to query published plans through the JSONP query
 </html>
 ```
 
+###Signup Integration
+
+By default our signup page performs all steps. But you can configure it to redirect to your own signup page. You can do this by calling:
+
+```
+Nurego.setSignupUrl('YOUR SIGNUP URL');
+```
+
+See examples/signup_url for more details.
+
+###Example: signup
+
+This example shows complete signup flow with Nurego.
+
+###Example: signup_url
