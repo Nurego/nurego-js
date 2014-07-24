@@ -1,5 +1,7 @@
 .nr-default {
     font-family:"Lato",Helvetica,Arial,sans-serif;
+    float: left;
+    margin: 0 auto;
 }
 .nr-default table {
     width: auto;
@@ -117,8 +119,9 @@
 }
 
 .nr-signup-div {
-    margin: 20px auto;
-    width: 55%;
+    margin: 40px auto;
+    width: 100%;
+    text-align: center;
 }
 .nr-signup {
     text-decoration: none;
