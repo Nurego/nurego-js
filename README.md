@@ -32,6 +32,13 @@ Nurego.setApiKey('API_KEY');
     <!-- Pricing plans will be here. -->
 </div>
 ```
+To show plans for a specific distribution channel and/or segment:
+```
+<script type="text/javascript">
+Nurego.setParam('offerings_url', 'http://api.nurego.com/v1/offerings?segment_guid=<SEGMENT_GUID>&distribution_channel=<CHANNEL>&api_key=');
+Nurego.setApiKey('<API_KEY');
+</script>
+```
 
 ###Default parameters
 You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
@@ -60,7 +67,9 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
 
 ###Don't like our pricing page, feel free to create your own. 
 
-This is the simple way to query published plans through the JSONP query
+This is the simple way to query published plans through the JSONP query.
+Include the ```segment_guid``` and ```distribution_channel``` parameters 
+in the url to fetch data for a specific segment and/or distribution channel.
 
 ```HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -73,7 +82,7 @@ This is the simple way to query published plans through the JSONP query
 <script type="text/javascript">
 
     $(document).ready(function () {
-        var url = 'http://api.nurego.com/v1/offerings?api_key=<YOUR API KEY>';
+        var url = 'http://api.nurego.com/v1/offerings?segment_guid=<SEGMENT_GUID>&distribution_channel=<CHANNEL>&api_key=<YOUR API KEY>';
 
         $.ajax({
             url:  url + '&callback=?',
