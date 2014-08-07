@@ -39,6 +39,7 @@ Nurego.setParam('offerings_url', 'http://api.nurego.com/v1/offerings?segment_gui
 Nurego.setApiKey('<API_KEY');
 </script>
 ```
+To learn about segments and distribution channels, have a look at our [documentation](http://nurego.com/documentation).
 
 ###Default parameters
 You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
@@ -70,6 +71,9 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
 This is the simple way to query published plans through the JSONP query.
 Include the ```segment_guid``` and ```distribution_channel``` parameters 
 in the url to fetch data for a specific segment and/or distribution channel.
+
+To learn about creating/managing distribution channels and segments, visit
+our [website](http://nurego.com/documentation).
 
 ```HTML
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
