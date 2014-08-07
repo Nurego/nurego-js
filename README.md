@@ -120,3 +120,22 @@ our [website](http://nurego.com/documentation).
 </html>
 ```
 
+###Signup Integration
+
+By default our signup page performs all steps. But you can configure it to redirect to your own signup page. You can do this by calling:
+
+```
+Nurego.setSignupUrl('YOUR SIGNUP URL');
+```
+
+After user clicks 'Go Sign Up' button, nurego-js will redirect browser to your signup page with plan_id parameter.
+
+See examples/signup_url for more details.
+
+###Example: signup
+
+This example shows complete signup flow with Nurego. It's suitable if you want to let Nurego handle signup process.
+
+###Example: signup_url
+
+This example shows signup flow with your application's signup URL. It's suitable if you want to use your own signup page.
