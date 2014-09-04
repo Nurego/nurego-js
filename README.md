@@ -140,3 +140,6 @@ This example shows complete signup flow with Nurego. It's suitable if you want t
 
 This example shows signup flow with your application's signup URL. It's suitable if you want to use your own signup page.
 
+###Example: update
+
+This example shows update flow with your application's update URL. You can use it as pricing plan table in user's account page.
