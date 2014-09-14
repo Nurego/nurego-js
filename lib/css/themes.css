@@ -1,28 +1,28 @@
-.nr-default {
+.nr-simple-3-tier {
     font-family:"Lato",Helvetica,Arial,sans-serif;
     float: left;
     margin: 0 auto;
 }
-.nr-default table {
+.nr-simple-3-tier table {
     width: auto;
     border-collapse: collapse;
     background: #fff;
 }
-.nr-default td,
-.nr-default th {
+.nr-simple-3-tier td,
+.nr-simple-3-tier th {
     border: 1px solid #e8e8e8;
     vertical-align: middle;
 }
-.nr-default td {
+.nr-simple-3-tier td {
     color: #707383;
     font-size: 14px;
     line-height: 18px;
 }
-.nr-default thead th,
-.nr-default tfoot th {
+.nr-simple-3-tier thead th,
+.nr-simple-3-tier tfoot th {
     border: none;
 }
-.nr-default thead td {
+.nr-simple-3-tier thead td {
     height: 30px;
     background: #fff;
     font-size: 11px;
@@ -32,34 +32,34 @@
     font-weight: bold;
     padding: 0 10px;
 }
-.nr-default tbody th {
+.nr-simple-3-tier tbody th {
     text-align: left;
     font-size: 12px;
     padding: 10px 20px;
     font-weight: normal;
 }
-.nr-default tbody td {
+.nr-simple-3-tier tbody td {
     text-align: center;
     padding: 0 10px;
 }
-.nr-default tfoot td {
+.nr-simple-3-tier tfoot td {
     text-align: center;
     padding: 12px 0;
 }
-.nr-default th.nr-price {
+.nr-simple-3-tier th.nr-price {
     color: #666;
     height: 32px;
     background-color: #fff;
     text-align: left;
     font-weight: normal;
 }
-.nr-default td.nr-price {
+.nr-simple-3-tier td.nr-price {
     color: #f26522;
     font-size: 24px;
     font-weight: bold;
     background-color: #fff;
 }
-.nr-default tfoot a {
+.nr-simple-3-tier tfoot a {
     display: inline-block;
     color: #fff;
     background: #9799A2;
@@ -77,19 +77,19 @@
     -moz-border-radius: 4px;
     border-radius: 4px;
 }
-.nr-default tfoot a:hover {
+.nr-simple-3-tier tfoot a:hover {
     background: #959595;
 }
-.nr-default .nr-check {
+.nr-simple-3-tier .nr-check {
     width: 16px;
     height: 16px;
     display: block;
     margin: 0 auto;
     background: url("../images/ico-sprite.gif") 0 0 no-repeat;
 }
-.nr-default .nr-check.nr-yes { background-position: 0 0; }
-.nr-default .nr-check.nr-no { background-position: -16px 0; }
-.nr-default .nr-notify {
+.nr-simple-3-tier .nr-check.nr-yes { background-position: 0 0; }
+.nr-simple-3-tier .nr-check.nr-no { background-position: -16px 0; }
+.nr-simple-3-tier .nr-notify {
     font-size: 14px;
     font-weight: bold;
     text-align: center;
@@ -99,22 +99,22 @@
     font-family: Tahoma, Verdana, Segoe, sans-serif;
     letter-spacing: 1px;
 }
-.nr-default .nr-notify.nr-red {
+.nr-simple-3-tier .nr-notify.nr-red {
     background: #f2dede;
     color: #a94442;
 }
-.nr-default .nr-notify.nr-yellow {
+.nr-simple-3-tier .nr-notify.nr-yellow {
     background: #fcf8e3;
     color: #986d3b;
 }
-.nr-default .nr-container {
+.nr-simple-3-tier .nr-container {
     height: 304px;
     margin: 0 auto 10px;
 }
-.nr-default .nr-container.nr-loading {
+.nr-simple-3-tier .nr-container.nr-loading {
     background: url("../images/loader.gif") 50% 50% no-repeat;
 }
-.nr-default .nr-container.nr-empty {
+.nr-simple-3-tier .nr-container.nr-empty {
     background: url("../images/empty.gif") 50% 50% no-repeat;
 }
 
@@ -143,11 +143,11 @@
     border: 2px solid white;
 }
 
-.nr-default .nr-plan-selected {
+.nr-simple-3-tier .nr-plan-selected {
     background: #f26522; 
 }
 
-.nr-default .nr-plan-selected:hover {
+.nr-simple-3-tier .nr-plan-selected:hover {
     background: #f26522; 
 }
 

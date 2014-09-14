@@ -46,7 +46,7 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
 ```JavaScript
 {
     element_id: null, //Id of the DOM element. (string or null)
-    theme: 'nr-default', //CSS class for pricing table. (string or null)
+    theme: 'nr-simple-3-tier', //CSS class for pricing table. (string or null)
     css_url: 'http://js.nurego.com/v1/lib/css/themes.css', //Url to custom CSS file. (string or null)
     select_url: '/?plan_id=', //Url prefix for plan link. (string)
     select_callback: null, //Callback function after selecting plan. (function or null)
