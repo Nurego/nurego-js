@@ -1,0 +1,166 @@
+*,
+*:before,
+*:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box; }
+
+html,html a {
+    -webkit-font-smoothing:antialiased;
+    text-shadow:1px 1px 1px rgba(0,0,0,0.004);
+}
+
+/* Default font-size. All em values are calculated according to this. */
+
+html {
+  font-size: 14px;
+}
+
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td,html,body {
+    margin:0;
+    padding:0;
+}
+
+body {
+    -webkit-font-smoothing:antialiased;    
+    background:#fff;
+    font-family:"Lato",Helvetica,Arial,sans-serif;    
+    height:100%;
+    position:relative;
+}
+
+@media only screen and (min-width: 768px) {
+	.nr-large-16{
+		position: relative;
+		width: 100%;
+	}
+
+	.nr-large-8{
+		position: relative;
+		width: 50%;
+	}
+}
+
+.nr-column{
+	position: relative;
+	padding-left: 0.9375em;
+	padding-right: 0.9375em;
+	float: left;
+	margin: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.nr-price{
+	text-align: center;	
+}
+
+.nr-price-plans{
+	background: #565a6b;
+	max-width: 1007px;
+
+}
+
+.nr-price-plans-left{
+	margin-top: 40px;
+	margin-bottom: 40px;
+}
+
+.nr-price-plans-right{
+	margin-top: 40px;
+	margin-bottom: 40px;
+}
+
+.nr-price-plans-right .nr-title{
+	color: #BDFFBD;
+	margin-top: 37px;
+	margin-bottom: 20px;
+	margin-left: 20px;
+	font-weight: lighter;
+	font-size: 2.571em;
+}
+
+.nr-price-plans-right .nr-description{
+	margin-left: 20px;
+	color: white;
+	font-size: 1.125em;
+	line-height: 23px;
+	font-weight: normal;
+	margin-bottom: 40px;
+}
+
+.nr-bg-white{
+	background: white;
+}
+
+.nr-price-value{
+	color: #00BE18;
+	margin-top: 30px;
+	font-size: 3.125em;
+	margin-bottom: 10px;
+	font-weight: lighter;
+}
+
+.nr-price-info{
+		color: #565a6b;
+		font-weight: bold;
+		font-size: 1.286em;
+}
+
+.nr-features{
+	position:relative;
+	margin-bottom: 30px;
+	margin-top: 40px;
+	margin-left: 20px;
+	margin-right: 20px;
+}
+ 
+.nr-ul li{
+	line-height: 20px;
+	margin-bottom: 10px;
+	list-style-type: none;	 
+}
+
+.nr-ul li .nr-feature-info{
+	margin-left: 30px
+}
+
+.nr-ul li .nr-feature-info:before{
+	content: '\e60e';
+	font-family: 'icomoon';
+	position: absolute;
+	left: 0;
+	color: #00BE18;
+	font-size: 15px;
+}
+
+.nr-ul li .nr-feature-info .nr-title{
+	color: black;
+	font-weight: bold;
+	font-size: 1em;
+}
+
+.nr-ul li .nr-feature-info .nr-description{
+	color: #565a6b;
+	font-weight: normal;
+	font-size: 1em;
+}
+
+.nr-bottom{
+	position:absolute;
+	bottom: 10px;
+	text-align: center;
+}
+
+.nr-bottom a{
+	border: 1px solid #BDFFBD;
+	color: #BDFFBD;
+	text-transform: uppercase;
+	padding: 10px 43px;
+	text-decoration: none;
+}
+
+.nr-bottom a:hover{
+	background-color: #BDFFBD;
+	color: #565a6b;
+}

@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Nurego-js</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="../lib/js/easyXDM.debug.js"></script>
     <script type="text/javascript" src="../lib/js/nurego.js"></script>
 </head>
@@ -9,6 +10,7 @@
 <script type="text/javascript">
     Nurego.setApiKey('ld37d8c0-588c-4feb-ac4c-de61306ef036');
     Nurego.setDistributionChannel('MortgageMapp');
+    Nurego.theme.setPricingType(FLAT_RATE);
     
     // load nurego default pricing table
     Nurego.loadPricingTable();
