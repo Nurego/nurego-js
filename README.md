@@ -143,3 +143,7 @@ This example shows signup flow with your application's signup URL. It's suitable
 ###Example: update
 
 This example shows update flow with your application's update URL. You can use it as pricing plan table in user's account page.
+
+###Example: flat_rate_signup
+
+This example shows signup flow with flat rate pricing theme.
