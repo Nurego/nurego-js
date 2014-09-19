@@ -46,8 +46,8 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
 ```JavaScript
 {
     element_id: null, //Id of the DOM element. (string or null)
-    theme: 'nr-default', //CSS class for pricing table. (string or null)
-    css_url: 'http://js.nurego.com/v1/lib/css/themes.css', //Url to custom CSS file. (string or null)
+    theme: 'nr-simple-3-tier', //CSS class for pricing table. (string or null)
+    css_url: 'http://js.nurego.com/v1/lib/css/simple_3_tier.css', //Url to custom CSS file. (string or null)
     select_url: '/?plan_id=', //Url prefix for plan link. (string)
     select_callback: null, //Callback function after selecting plan. (function or null)
     label_price: 'Monthly cost', //Label in Price column. (string)
@@ -143,3 +143,7 @@ This example shows signup flow with your application's signup URL. It's suitable
 ###Example: update
 
 This example shows update flow with your application's update URL. You can use it as pricing plan table in user's account page.
+
+###Example: flat_rate_signup
+
+This example shows signup flow with flat rate pricing theme.

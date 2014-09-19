@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Nurego-js</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script type="text/javascript" src="../lib/js/easyXDM.debug.js"></script>
     <script type="text/javascript" src="../lib/js/nurego.js"></script>
 </head>
@@ -9,6 +10,39 @@
 <script type="text/javascript">
     Nurego.setSignupUrl('YOUR SIGNUP URL');
     Nurego.setApiKey('YOUR API KEY');
+    Nurego.setDistributionChannel('DISTRIBUTION CHANNEL');
+    
+    // load nurego default pricing table
+    Nurego.loadPricingTable();
+    
+    // load your own table, use code
+    /*
+    var offeringsCallback = function(data) {
+        // data contains plan information
+        // plan_eid: plan external ID issued by Nurego for your app
+
+        $("#subscription_planID").empty();
+        var plan_eid = getParameterByName('plan_eid');
+        for (var i = 0; i < data.plans.length; i++) {
+            var plan_opt = $("<option></option>");
+            plan_opt.attr("value", data.plans[i].external_id);
+            
+            if (plan_eid) {
+                if (data.plans[i].id === plan_eid) {
+                    plan_opt.attr("selected", "true");
+                }
+            } else {
+                if (data.plans[i].name === "Premium Annual") {
+                    plan_opt.attr("selected", "true");
+                }
+            }
+            plan_opt.html("$" + data.plans[i].price + " (" + data.plans[i].name + ")");
+            $("#subscription_planID").append(plan_opt);
+        }
+    }
+  
+    Nurego.getOfferings(offeringsCallback);
+    */
 </script>
 </body>
 </html>
