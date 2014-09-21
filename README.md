@@ -45,8 +45,14 @@ To learn about segments and distribution channels, have a look at our [documenta
 You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` function.
 ```JavaScript
 {
+    api_key: null, // nurego API key, see Settings page in your Nurego account
     element_id: null, //Id of the DOM element. (string or null)
-    theme: 'nr-simple-3-tier', //CSS class for pricing table. (string or null)
+    theme: {
+      // name of theme Nurego.theme.SIMPLE_3_TIER or Nurego.theme.FLAT_RATE
+      name: Nurego.theme.SIMPLE_3_TIER,
+      // theme properties
+      properties: {}
+    },
     css_url: 'http://js.nurego.com/v1/lib/css/simple_3_tier.css', //Url to custom CSS file. (string or null)
     select_url: '/?plan_id=', //Url prefix for plan link. (string)
     select_callback: null, //Callback function after selecting plan. (function or null)
@@ -62,6 +68,9 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
     warning_class: 'nr-notify nr-yellow', //CSS class for waring block. (string)
     empty_class: 'nr-container nr-empty', //CSS class for empty block. (string)
     price_class: 'nr-price', //CSS class for price block. (string)
+    signup_url: '', // if this url is set, signup button will redirect to this page with plan_eid paramter
+    update_url: '', // if this url is set, update button will redirect to this page
+    distribution_channel: '', // distribution channel
     ...
 }
 ```
