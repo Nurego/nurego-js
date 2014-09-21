@@ -141,6 +141,8 @@ After user clicks 'Go Sign Up' button, nurego-js will redirect browser to your s
 
 See examples/signup_url for more details.
 
+To run examples, use: sh ./run_server
+
 ###Example: signup
 
 This example shows complete signup flow with Nurego. It's suitable if you want to let Nurego handle signup process.
