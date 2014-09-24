@@ -33,13 +33,6 @@ Nurego.setDistributionChannel('DISTRIBUTION CHANNEL');
     <!-- Pricing plans will be here. -->
 </div>
 ```
-To show plans for a specific distribution channel and/or segment:
-```
-<script type="text/javascript">
-Nurego.setParam('offerings_url', 'http://api.nurego.com/v1/offerings?segment_guid=<SEGMENT_GUID>&distribution_channel=<CHANNEL>&api_key=');
-Nurego.setApiKey('<API_KEY');
-</script>
-```
 To learn about segments and distribution channels, have a look at our [documentation](http://nurego.com/documentation).
 
 ###Default parameters
