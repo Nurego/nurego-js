@@ -26,6 +26,7 @@ Some advanced installation are shown here.
 //Insert plans into specific block.
 Nurego.setParam('element_id', 'my_block');
 Nurego.setApiKey('API_KEY');
+Nurego.setDistributionChannel('DISTRIBUTION CHANNEL');
 </script>
 ...
 <div id="my_block">
