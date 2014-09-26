@@ -73,7 +73,7 @@ body {
 
 .nr-price-plans-right .nr-title{
 	color: #BDFFBD;
-	margin-top: 37px;
+	margin-top: 10px;
 	margin-bottom: 20px;
 	margin-left: 20px;
 	font-weight: lighter;
@@ -122,22 +122,37 @@ body {
 }
 
 .nr-ul li .nr-feature-info{
-	margin-left: 30px
+	margin-left: 100px;
+  margin-bottom: 50px;
 }
 
-.nr-ul li .nr-feature-info:before{
-	content: '\e60e';
-	font-family: 'icomoon';
-	position: absolute;
-	left: 0;
+.nr-ul li .nr-feature-check{
 	color: #00BE18;
 	font-size: 15px;
+}
+
+.nr-feature-price {
+  margin-left: -120px;
+  float: left;
+  font-size: 40px;
+  line-height: 40px;
+  color: #00BE18;
+}
+
+.nr-name-per {
+  font-weight: normal;
 }
 
 .nr-ul li .nr-feature-info .nr-title{
 	color: black;
 	font-weight: bold;
 	font-size: 1em;
+  float: left;
+  width: 100%;
+}
+
+.nr-price-and-title {
+  margin-left: 40px;
 }
 
 .nr-ul li .nr-feature-info .nr-description{
