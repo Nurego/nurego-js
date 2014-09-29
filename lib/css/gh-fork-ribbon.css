@@ -44,8 +44,8 @@
 
   /* Set the geometry. If you fiddle with these you'll also need
      to tweak the top and right values in .github-fork-ribbon. */
-  width: 200px;
-  line-height: 20px;
+  width: 250px;
+  line-height: 30px;
 
   /* Set the layout properties */
   display: inline-block;
@@ -59,8 +59,8 @@
 }
 
 .github-fork-ribbon-wrapper {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   position: absolute;
   overflow: hidden;
   top: 0;
@@ -106,8 +106,8 @@
 }
 
 .github-fork-ribbon-wrapper.left .github-fork-ribbon {
-  top: 42px;
-  left: -43px;
+  top: 52px;
+  left: -53px;
 
   -webkit-transform: rotate(-45deg);
   -moz-transform: rotate(-45deg);
@@ -140,5 +140,6 @@
 }
 
 .nurego-ribbon {
-  background-color: steelblue;
+  background-color: #69be28;
+  font-size: 18px;
 }
