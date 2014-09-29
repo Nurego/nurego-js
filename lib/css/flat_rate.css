@@ -179,3 +179,7 @@ body {
 	background-color: #BDFFBD;
 	color: #565a6b;
 }
+
+#trial-ribbon {
+  display: none;
+}
