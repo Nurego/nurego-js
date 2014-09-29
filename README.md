@@ -5,6 +5,8 @@ To use the library, two very simple steps needed
 ###Step 1
 First, include Nurego.js in the page. We recommend putting the script tag in the ```<head>``` tag.
 ```JavaScript
+<!-- Load jQuery, not necessary if your page already loads -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 <script type="text/javascript" src="http://js.nurego.com/v1/lib/js/nurego.js"></script>
 ```
 
