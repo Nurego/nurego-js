@@ -330,6 +330,10 @@ body {
   font-size: 18px;
 }
 
-a {
-  color: #00BE18;
+.nr-description a {
+  color: #BDFFBD;
+}
+
+.nr-description p {
+  margin-bottom: 20px;
 }
