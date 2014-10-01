@@ -329,3 +329,11 @@ body {
   background-color: #69be28;
   font-size: 18px;
 }
+
+.nr-description a {
+  color: #BDFFBD;
+}
+
+.nr-description p {
+  margin-bottom: 20px;
+}
