@@ -160,3 +160,9 @@
 .nr-trial-days {
   font-size: 10px;
 }
+
+.nr-price-period {
+  font-size: 14px;
+  font-weight: normal;
+  color: #69be28;
+}
