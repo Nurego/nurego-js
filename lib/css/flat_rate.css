@@ -337,3 +337,18 @@ body {
 .nr-description p {
   margin-bottom: 20px;
 }
+
+.section-header {
+  font-size: 20px;
+  font-weight: bold;
+  display: block;
+  width: 100%;
+  float: left;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.cent-symbol {
+  font-size: 26px;
+  margin-top: -5px;
+}
