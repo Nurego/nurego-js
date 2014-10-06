@@ -67,6 +67,12 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
     signup_url: '', // if this url is set, signup button will redirect to this page with plan_eid paramter
     update_url: '', // if this url is set, update button will redirect to this page
     distribution_channel: '', // distribution channel
+    customer_id: '',
+    customer_plan_render: this.Nurego.customerPlan.OFFERINGS_ONLY, // rendering plan and offerings: PLAN_ONLY, OFFERINGS_ONLY, PLAN_OFFERINGS
+    zero_price_alt: 'Pay as You Go', // Zero price text display for flat rate
+    plan_description: '', // Plan description for flat rate, set if you want to display custom description
+    display_cent_symbol: true, // Display cent symbol in case price is less than $1
+    sign_up_button_text: 'Sign Up', // Text on Sign Up button
     ...
 }
 ```
