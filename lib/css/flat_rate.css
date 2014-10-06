@@ -347,3 +347,8 @@ body {
   padding-top: 10px;
   padding-bottom: 10px;
 }
+
+.cent-symbol {
+  font-size: 26px;
+  margin-top: -5px;
+}

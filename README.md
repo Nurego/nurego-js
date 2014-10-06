@@ -137,7 +137,7 @@ By default our signup page performs all steps. But you can configure it to redir
 Nurego.setSignupUrl('YOUR SIGNUP URL');
 ```
 
-After user clicks 'Go Sign Up' button, nurego-js will redirect browser to your signup page with plan_id parameter.
+After user clicks 'Sign Up' button, nurego-js will redirect browser to your signup page with plan_id parameter.
 
 See examples/signup_url for more details.
 
