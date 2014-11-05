@@ -167,6 +167,15 @@ body {
 	text-align: center;
 }
 
+.nr-nurego-cc-require{
+  display: none;
+	position:absolute;
+	bottom: -10px;
+	text-align: right;
+  font-size: 14px;
+  color: white;
+}
+
 .nr-nurego-tag-line{
 	position:absolute;
 	bottom: -30px;

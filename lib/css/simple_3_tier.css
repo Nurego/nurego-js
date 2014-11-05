@@ -168,8 +168,15 @@
 }
 
 .nr-nurego-tag-line{
+  margin-top: 10px;
 	text-align: right;
   font-size: 12px;
+}
+
+.nr-nurego-cc-require{
+  margin-top: 10px;
+	text-align: right;
+  font-size: 14px;
 }
 
 .nr-nurego-tag-line a{
