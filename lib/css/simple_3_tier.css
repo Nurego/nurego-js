@@ -85,7 +85,7 @@
     height: 16px;
     display: block;
     margin: 0 auto;
-    background: url("../images/ico-sprite.gif") 0 0 no-repeat;
+    background: url("../icons-sprite.png") 0 0 no-repeat;
 }
 .simple_3_tier .nr-check.nr-yes { background-position: 0 0; }
 .simple_3_tier .nr-check.nr-no { background-position: -16px 0; }
@@ -168,10 +168,21 @@
 }
 
 .nr-nurego-tag-line{
-	text-align: right;
+  margin-top: 10px;
+    text-align: right;
   font-size: 12px;
+}
+
+.nr-nurego-cc-require{
+  margin-top: 10px;
+    text-align: right;
+  font-size: 14px;
 }
 
 .nr-nurego-tag-line a{
   color: #69be28;
+}
+
+.nr-cc td {
+  font-size: 12px;  
 }
