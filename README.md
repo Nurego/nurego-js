@@ -26,7 +26,7 @@ Some advanced installation are shown here.
 ```JavaScript
 <script type="text/javascript">
 //Insert plans into specific block.
-Nurego.setParam('element_id', 'my_block');
+Nurego.setParam('plan_element_id', 'my_plan');
 Nurego.setApiKey('API_KEY');
 Nurego.setDistributionChannel('DISTRIBUTION CHANNEL');
 </script>
@@ -42,7 +42,8 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
 ```JavaScript
 {
     api_key: null, // nurego API key, see Settings page in your Nurego account
-    element_id: null, //Id of the DOM element. (string or null)
+    plan_element_id: null, //Id of the plan DOM element. (string or null)
+    bills_element_id: null, //Id of the bills listing DOM element. (string or null)
     theme: {
       // name of theme Nurego.theme.SIMPLE_3_TIER or Nurego.theme.FLAT_RATE
       name: Nurego.theme.SIMPLE_3_TIER,
@@ -64,6 +65,8 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
     warning_class: 'nr-notify nr-yellow', //CSS class for waring block. (string)
     empty_class: 'nr-container nr-empty', //CSS class for empty block. (string)
     price_class: 'nr-price', //CSS class for price block. (string)
+    date_from: '', // Bills from date
+    date_to: '', // Bills to date
     signup_url: '', // if this url is set, signup button will redirect to this page with plan_eid paramter
     update_url: '', // if this url is set, update button will redirect to this page
     distribution_channel: '', // distribution channel

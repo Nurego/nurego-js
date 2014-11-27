@@ -30,105 +30,105 @@ body {
 }
 
 @media only screen and (min-width: 768px) {
-	.nr-large-16{
-		position: relative;
-		width: 100%;
-	}
+  .nr-large-16{
+    position: relative;
+    width: 100%;
+  }
 
-	.nr-large-8{
-		position: relative;
-		width: 50%;
-	}
+  .nr-large-8{
+    position: relative;
+    width: 50%;
+  }
 }
 
 .nr-column{
-	position: relative;
-	padding-left: 0.9375em;
-	padding-right: 0.9375em;
-	float: left;
-	margin: 0;
-	padding-top: 0;
-	padding-bottom: 0;
+  position: relative;
+  padding-left: 0.9375em;
+  padding-right: 0.9375em;
+  float: left;
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .nr-price{
-	text-align: center;	
+  text-align: center; 
 }
 
 .nr-price-plans{
-	background: #565a6b;
-	max-width: 1007px;
+  background: #565a6b;
+  max-width: 1007px;
 
 }
 
 .nr-price-plans-left{
-	margin-top: 40px;
-	margin-bottom: 40px;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .nr-price-plans-right{
-	margin-top: 40px;
-	margin-bottom: 40px;
+  margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .nr-price-plans-right .nr-title{
-	color: #BDFFBD;
-	margin-top: 10px;
-	margin-bottom: 20px;
-	margin-left: 20px;
-	font-weight: lighter;
-	font-size: 2.571em;
+  color: #BDFFBD;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  font-weight: lighter;
+  font-size: 2.571em;
 }
 
 .nr-price-plans-right .nr-description{
-	margin-left: 20px;
-	color: white;
-	font-size: 1.125em;
-	line-height: 23px;
-	font-weight: normal;
-	margin-bottom: 40px;
+  margin-left: 20px;
+  color: white;
+  font-size: 1.125em;
+  line-height: 23px;
+  font-weight: normal;
+  margin-bottom: 40px;
 }
 
 .nr-bg-white{
-	background: white;
+  background: white;
 }
 
 .nr-price-value{
-	color: #00BE18;
-	margin-top: 30px;
-	font-size: 3.125em;
-	margin-bottom: 10px;
-	font-weight: lighter;
+  color: #00BE18;
+  margin-top: 30px;
+  font-size: 3.125em;
+  margin-bottom: 10px;
+  font-weight: lighter;
 }
 
 .nr-price-info{
-		color: #565a6b;
-		font-weight: bold;
-		font-size: 1.286em;
+    color: #565a6b;
+    font-weight: bold;
+    font-size: 1.286em;
 }
 
 .nr-features{
-	position:relative;
-	margin-bottom: 30px;
-	margin-top: 40px;
-	margin-left: 20px;
-	margin-right: 20px;
+  position:relative;
+  margin-bottom: 30px;
+  margin-top: 40px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
  
 .nr-ul li{
-	line-height: 20px;
-	margin-bottom: 10px;
-	list-style-type: none;	 
+  line-height: 20px;
+  margin-bottom: 10px;
+  list-style-type: none;   
 }
 
 .nr-ul li .nr-feature-info{
-	margin-left: 100px;
+  margin-left: 100px;
   margin-bottom: 50px;
 }
 
 .nr-ul li .nr-feature-check{
-	color: #00BE18;
-	font-size: 15px;
+  color: #00BE18;
+  font-size: 15px;
 }
 
 .nr-feature-price {
@@ -144,8 +144,8 @@ body {
 }
 
 .nr-ul li .nr-feature-info .nr-title{
-	color: black;
-	font-size: 1.8em;
+  color: black;
+  font-size: 1.8em;
   line-height: 1.2em;
   float: left;
   width: 100%;
@@ -156,28 +156,30 @@ body {
 }
 
 .nr-ul li .nr-feature-info .nr-description{
-	color: #565a6b;
-	font-weight: normal;
-	font-size: 1em;
+  color: #565a6b;
+  font-weight: normal;
+  font-size: 1em;
 }
 
 .nr-bottom{
-  margin-top: 20px;
-	text-align: center;
+  position:absolute;
+  bottom: 40px;
+  text-align: center;
 }
 
 .nr-nurego-cc-require{
   display: none;
-  text-align: center;
+  position:absolute;
+  bottom: -10px;
+  text-align: right;
+  font-size: 14px;
   color: white;
-  font-size: 18px;
-  margin: 0 auto;
 }
 
 .nr-nurego-tag-line{
-	position:absolute;
-	bottom: -30px;
-	text-align: right;
+  position:absolute;
+  bottom: -30px;
+  text-align: right;
   font-size: 12px;
   color: white;
 }
@@ -187,16 +189,16 @@ body {
 }
 
 .nr-bottom a{
-	border: 1px solid #BDFFBD;
-	color: #BDFFBD;
-	text-transform: uppercase;
-	padding: 10px 43px;
-	text-decoration: none;
+  border: 1px solid #BDFFBD;
+  color: #BDFFBD;
+  text-transform: uppercase;
+  padding: 10px 43px;
+  text-decoration: none;
 }
 
 .nr-bottom a:hover{
-	background-color: #BDFFBD;
-	color: #565a6b;
+  background-color: #BDFFBD;
+  color: #565a6b;
 }
 
 #trial-ribbon {
