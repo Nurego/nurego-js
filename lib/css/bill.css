@@ -62,8 +62,13 @@ table.nurego-table td {
   display: none;
 }
 
+.bill-summary .item a {
+  text-decoration: none;
+  color: darkblue;
+}
+
 .bill-summary .item a:hover {
-  color: #ea622c;
+  text-decoration: underline;
 }
 
 .bill-summary span.left {
