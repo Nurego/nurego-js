@@ -62,6 +62,10 @@ table.nurego-table td {
   display: none;
 }
 
+.bill-summary .item a:hover {
+  color: #ea622c;
+}
+
 .bill-summary span.left {
   float: left;
 }
@@ -71,8 +75,8 @@ table.nurego-table td {
 }
 
 .bill-summary .title {
-  font-weight: normal;
-  font-size: 0.857em;
+  font-weight: bold;
+  font-size: 1.2em;
   color: #9799a2;
   line-height: 2em;
   border-bottom: solid 1px #dfe1e6;
