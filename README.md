@@ -31,7 +31,7 @@ Nurego.setApiKey('API_KEY');
 Nurego.setDistributionChannel('DISTRIBUTION CHANNEL');
 </script>
 ...
-<div id="my_block">
+<div id="my_plan">
     <!-- Pricing plans will be here. -->
 </div>
 ```
