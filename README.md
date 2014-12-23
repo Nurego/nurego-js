@@ -73,8 +73,10 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
     customer_id: '',
     customer_plan_render: this.Nurego.customerPlan.OFFERINGS_ONLY, // rendering plan and offerings: PLAN_ONLY, OFFERINGS_ONLY, PLAN_OFFERINGS
     zero_price_alt: 'Pay as You Go', // Zero price text display for flat rate
+    zero_price_simple_tier_alt: 'Free', // Zero price text display for simple 3 tier
     plan_description: '', // Plan description for flat rate, set if you want to display custom description
     display_cent_symbol: true, // Display cent symbol in case price is less than $1
+    display_switcher: true, // Display switcher which lets you switch between Monthly and Yearly plans
     sign_up_button_text: 'Sign Up', // Text on Sign Up button
     ...
 }
@@ -100,7 +102,7 @@ our [website](http://nurego.com/documentation).
 <script type="text/javascript">
 
     $(document).ready(function () {
-        var url = 'http://api.nurego.com/v1/offerings?segment_guid=<SEGMENT_GUID>&distribution_channel=<CHANNEL>&api_key=<YOUR API KEY>';
+        var url = 'http://api.nurego.com/v1/offerings?segment_guid=<SEGMENT_GUID>&distribution_channel=<CHANNEL_ID>&api_key=<YOUR API KEY>';
 
         $.ajax({
             url:  url + '&callback=?',
