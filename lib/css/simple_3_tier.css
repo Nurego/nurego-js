@@ -55,7 +55,7 @@
 }
 .simple_3_tier td.nr-price {
     color: #f26522;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     background-color: #fff;
 }
@@ -229,7 +229,7 @@
     border: 1px solid #DFE1E6; border-radius: 0px;
     position: absolute; top: 0; bottom: 0; left: 35px;
     -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
-    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; 
 }
 
 .monthly-checked .on-offswitch-inner {
@@ -237,12 +237,12 @@
 }
 
 .monthly-checked .on-offswitch-switch {
-    left: 0px;
+    left: 0px; 
 }
 
 .switch-monthly {
     padding-right: 13px;
-    text-align: -webkit-right;
+    text-align: -webkit-right;   
     color: #C59DD7;
     font-size: 11px;
     cursor: pointer;
@@ -295,3 +295,4 @@
     margin-left: 200px;
   }
 }
+
