@@ -189,7 +189,7 @@
 
 
 .on-offswitch {
-    display: none;
+    display: inline-block;
     margin-bottom: 15px;
     position: relative; width: 74px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
@@ -256,8 +256,9 @@
 }
 
 .switcher-full {
-  margin-left: 620px;
-  margin-bottom: 10px;
+    display: none;
+    margin-left: 620px;
+    margin-bottom: 10px;
 }
 
 @media only screen and (max-width: 1260px) {
