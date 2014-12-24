@@ -77,6 +77,7 @@ You can override parameters by using ```Nurego.SetParam(<key>, <value>)``` funct
     plan_description: '', // Plan description for flat rate, set if you want to display custom description
     display_cent_symbol: true, // Display cent symbol in case price is less than $1
     display_switcher: true, // Display switcher which lets you switch between Monthly and Yearly plans
+    display_period: false, // Display monthly/yearly text after plan price when switcher is on
     sign_up_button_text: 'Sign Up', // Text on Sign Up button
     ...
 }
