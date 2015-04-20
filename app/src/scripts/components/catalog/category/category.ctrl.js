@@ -1,5 +1,5 @@
 define(["backbone","text!categoryHTML","utils",
-		"text!../components/catalog/category/category.css",
+		"text!categoryCSS",
 		"categoryModel","absNuregoView","jquery"],
 		function(bb,tmpl,utils,css,categoryModel,absNuregoView,$Nurego){
 
@@ -30,7 +30,7 @@ define(["backbone","text!categoryHTML","utils",
 		  	this.listenToOnce(this.model, "change", this.render);
 		  	
 		  	this.model.fetch({
-		  			dataType:"json",
+		  			dataType:"jsonp",
 		  			error:_.bind(this.modelHttpErrorsHandler,this),
 		  		});
 		    this.addStyle();
