@@ -1,3 +1,3 @@
 # N.js
 
-[Nurego sandbox demo and docs](http://rawgit.com/doronzzz/N.js/master/app/src/index.html)
+[Nurego sandbox demo and docs](http://rawgit.com/Nurego/nurego-js/staging/app/src/index.html)
