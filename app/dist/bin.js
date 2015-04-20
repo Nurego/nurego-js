@@ -10868,4 +10868,3 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
 window.Nurego = Nurego;
 }());
 
-
