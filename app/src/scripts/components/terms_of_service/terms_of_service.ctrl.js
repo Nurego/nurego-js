@@ -1,5 +1,5 @@
 define(["backbone","text!tosHTML","utils",
-		"text!../components/terms_of_service/terms_of_service.css",
+		"text!termsOfServiceCSS",
 		"tosStatusModel","tosModel","absNuregoView","jquery"],
 		function(bb,tmpl,utils,css,tosStatusModel,tosModel,absNuregoView,$Nurego){
 

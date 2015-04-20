@@ -119,7 +119,8 @@ module.exports = function (grunt){
       js: {
         files: ['<%= yeoman.app %>/src/scripts/{,*/}{,*/}*.js',
                 '<%= yeoman.app %>/src/scripts/{,*/}{,*/}*.html',
-                '<%= yeoman.app %>/src/scripts/{,*/}{,*/}{,*/}*.html'],
+                '<%= yeoman.app %>/src/scripts/{,*/}{,*/}{,*/}*.html',
+                '<%= yeoman.app %>/src/scripts/{,*/}{,*/}{,*/}*.js'],
         tasks: ['karma','requirejs:dev'], //'newer:jshint:all'
         options: {
           livereload: '<%= connect.options.livereload %>'

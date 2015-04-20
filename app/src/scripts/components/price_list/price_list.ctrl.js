@@ -1,6 +1,6 @@
 define(["backbone","text!priceListHTML","utils",
-		"text!../components/price_list/price_list.css",
-		"tosModel","absNuregoView","text!priceListSingleTierHTML","jquery"],
+		"text!priceListCSS","tosModel",
+		"absNuregoView","text!priceListSingleTierHTML","jquery"],
 		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
 		var priceList = absNuregoView.extend({
 		  tagName: "div",

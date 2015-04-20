@@ -1,5 +1,5 @@
 define(["backbone","text!registrationHTML",
-		"utils","text!../components/registration/registration.css",
+		"utils","text!registrationCSS",
 		"absNuregoView","jquery"],function(bb,tmpl,utils,css,absNuregoView,$Nurego){
 		var activation = absNuregoView.extend({
 		  tagName: "div",
