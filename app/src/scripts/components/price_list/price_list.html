@@ -1,0 +1,318 @@
+<style>
+	.headers,
+	.tableWrapper{
+		display:flex;
+	}
+
+	.cell {
+		  padding: 8px;
+		  border: 1px solid #E8E8E8;
+		  min-height: 50px;
+		  max-height: 50px;
+		  overflow: hidden;
+		  white-space: nowrap;
+		  overflow: hidden;
+		  text-overflow: ellipsis;
+	}
+
+	.headers div,
+	.tableWrapper div{
+		flex:1;
+		text-align:center;
+		color:#9799A2;
+	}
+
+	.plansHeader .header{
+		text-transform:uppercase;
+		color:#9799A2;
+		font-weight:bold;
+		font-size:14px;
+	}
+
+	.priceRecurrence{
+		color:#8EBE2E;
+		font-size:14px;
+	}
+
+	.planPrice{
+		color:#F26522;
+		font-size:16px;
+		font-weight:bold;
+	}
+
+	.planDiscount{
+		background: #F26522;
+		font-weight: bold;
+	}
+
+	.planDiscount span{
+		color: #fff !important;
+		border:0px;
+		display:block;
+	}
+
+	.nr-check.nr-no {
+		color:#FB6B5B;
+		font-size:16px;
+	}
+
+	.nr-check.nr-yes {
+		color:#92CF5C;
+		font-size:16px;
+	}
+
+	.planCol .features div:nth-of-type(odd),
+	.featuresCol .featureName:nth-of-type(odd){
+		background: #F9F9F9;
+	}
+
+	.subscribeToPlan {
+		background: gray;
+		color: #fff;
+		border: 0px;
+		padding: 6px;
+		font-size: 16px;
+		/*margin: 8px 1px 0px 1px;*/
+	}
+
+	.subscribeToPlan span {
+	    color: white;
+	    font-weight: bold;
+	}
+
+	.subscribeToPlan span:hover {
+	    text-decoration: underline;
+	    cursor: pointer;
+	}
+
+	.noSSO.fillEmail .emailWrapper{
+	  display: block;
+	  position: absolute;
+	  width: 100%;
+	  top: 0px;
+	  background: white;
+	  height: 100%;
+	  padding: 25%;
+	}
+
+	.noSSO.fillEmail.done .emailWrapper, .emailWrapper,
+	.noSSO.fillEmail .nr-nurego-tag-line{
+		display:none;
+	}
+
+	.btn.btn-primary.postNoSSo {
+    	margin-top: 10px;
+	}
+
+	.thankYou{
+		display: none;
+	}
+
+	.done .p1 {
+    	font-size: 28px;
+	}
+	.done .thankYou{
+	  display: block;
+	  position: absolute;
+	  top: 0px;
+	  width: 100%;
+	  text-align: center;
+	  background: rgba(255,255,255,1);
+	  height: 100%;
+	  padding: 10%;
+	}
+
+	.unchecked .subscribeToPlan{
+		opacity:0.35;
+	}
+
+	.checked .subscribeToPlan{
+		opacity:1;
+	}
+
+
+
+</style>
+
+<div class="plansHeader headers">
+			<div class="featuresHeader header cell">
+				
+			</div>
+	{{  for(var plan in plans) { }}		        		
+    		<div class="header cell" title="{{=plans[plan].name}}">
+				{{=plans[plan].name}}
+    		</div>
+
+	{{ 	}	}}
+</div>
+
+<div class="priceHeaders headers">
+			<div class="price header cell">
+				Price
+			</div>
+	{{  for(var plan in plans) { }}		        		
+    		<div class="header cell">
+    		{{	if(plans[plan].features.map["recurring"])	{	}}
+				
+				<span class="planPrice">{{=plans[plan].features.map["recurring"].price}}$</span>
+				<span class="priceRecurrence">/Month</span>
+
+			{{	}else if(plans[plan].price){ }}
+				
+				<span class="planPrice">{{=plans[plan].price}}$</span>
+
+			{{	}else{	}}
+
+				{{  for(var item in plans[plan].features.data) { }}		        		
+
+					{{	if(plans[plan].features.data[item].element_type === "recurring"){	}}
+							<span class="planPrice">{{=plans[plan].features.data[item].price}}$</span>
+					{{	}	}}
+
+				{{	}	}}
+
+			{{	}	}}
+    		</div>
+    		
+	{{ 	}	}}
+</div>
+
+<div class="ccHeaders headers">
+			<div class="price header cell" title="Credit Cards">
+				Credit Cards
+			</div>
+	{{  for(var plan in plans) { }}		        		
+    		
+    		<div class="header cell">
+				{{if (plans[plan].credit_card) { }} 
+				
+					<span class="nr-check nr-yes ion-checkmark"></span>
+
+    			{{	}else{	}}
+
+    				<span class="nr-check nr-no ion-close "></span>
+
+    			{{	}	}}
+
+    		</div>
+
+	{{ 	}	}}
+</div>
+
+
+<div class="tableWrapper">
+			
+			<div class="featuresCol">
+				{{  for(var item in features) { }}
+		        	
+		        	{{	if([features[item]] != 'recurring') {	 }}
+		        		<div class="featureName cell" title="{{=features[item]}}">
+							{{=features[item]}}
+		        		</div>
+		        	{{	}	}}
+
+		        {{  } }}
+	
+			</div>
+
+
+
+			
+	{{  for(var plan in plans) { }}
+			<div class="planCol">
+		        			        		
+
+		        		<div class="features">
+		        			{{  for(var item in features) { }}
+
+
+
+			        			{{	if([features[item]] != 'recurring') {	 }}		        				
+
+
+			        					{{	if(plans[plan].features.map[features[item]].name) {	 }}
+
+			        						{{	if(plans[plan].features.map[features[item]].max_unit) {	 }}
+				        						<div class="featureItem cell">
+					        						<span>
+					        							{{=plans[plan].features.map[features[item]].max_unit}}
+					        						</span>
+						        				</div>
+			        						{{	}else{ 	}}
+
+					        					<div class="featureItem cell">
+					        						<span class="nr-check nr-yes ion-checkmark"></span>
+						        				</div>
+
+					        				{{	}	}}
+
+				        				{{	}	}}
+
+				        				{{	if(plans[plan].features.map[features[item]].missingFeature){	}}
+											<div class="featureItemMissing cell">
+												<span class="nr-check nr-no ion-close "></span>
+				        					</div>
+										{{	}	}}			        						        			
+
+								{{	}	}}
+
+
+
+		        			{{	}	}}
+		        		</div>
+
+		        		<div class="discount">
+		        			
+		        			{{for (item in plans[plan].discounts.data) { }}
+								<div class="header planDiscount cell">
+									<span>{{=plans[plan].discounts.data[item].days_to_apply}} days</span>
+									<span>FREE TRIAL</span>
+					    		</div>
+							{{	}	}}
+		        		</div>
+
+		        		{{	if(!obj.urlParams["preview"]) {	}}
+		        		<div class="subscribeToPlan">
+							<span class="plan-select" data-id="{{=plans[plan].id}}">subscribe</span>
+						</div>
+						{{	}	}}
+			</div>
+	{{  } }}
+
+	
+</div>
+
+
+<div class="emailWrapper">
+	<h4 class="">Please enter your Email:</h4>
+	<input class="form-control email" type="text" placeholder="example@email.com"/>
+	<div class="btn btn-primary postNoSSo">Subscribe</div>
+</div>
+
+{{ if(obj.urlParams["terms-of-service-url"]) {	}}
+	<div class="nr-nurego-tag-line">
+			 <div class="checkbox" id="checkbox">
+			    <label>
+			      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox"> 
+			      By clicking subscribe you agree to the 
+                  <a href="javascript:void(0)" class="terms">Terms of Service</a>
+			    </label>
+			  </div>
+	</div>
+{{	}	}}
+
+<div class="thankYou">
+	<div class="p1">Your registration invite has been sent.</div>
+	<div class="p2">Please check your inbox and use the link inside to sign up</div>
+</div>
+
+<div class="nr-nurego-tag-line">
+	Pricing Table Crafted by <a href="http://www.nurego.com">Nurego</a>
+</div>
+
+
+<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">
+	  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+	  <span class="sr-only">Error:</span>
+	  <span class="txt"></span>
+</div>

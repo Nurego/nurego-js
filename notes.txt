@@ -1,0 +1,74 @@
+jquery 1.10.2 conflict
+______________________________
+
+
+***Date: 07/04/15***
+
+- if element type is feature use the feature name and not the billing element name.
+- fix table with horiz scrolling. and cell alignments.
+- fix checkbox alignment.
+- prints errors with response code. (if error code is 400 print response error).
+
+
+catalog :{
+	catalog,
+	sections
+	single section
+	single item
+}
+
+examples: ibm cloud, cardtap,azure,cloudfoundry catalog.
+
+
+
+
+___________________________________
+
+
+*** add isSSo flag to priceList
+*** pricelist stylesheet.
+*** parse client jsons keep in mind that this parser will be used for html templates.
+_______________________
+
+V* seperate to ingnitor N widgetInjector from the iframe app.
+V* support html directive to inject widget with options <nurego-widget height="" html="res" css="res">
+* injector script
+* js_hub
+* parsers
+* routing
+* default tempaltes
+* cover old api
+V* html resources managment
+* css managment
+
+- move each model to its component folder.
+- base classes for models and views
+* add events publisher to : onWidgetLoad / onSubscribeSelected / onFinishEnd etc..
+* sandbox demo page
+* scss
+* yoeman generator for the workspace
+* mobile
+
+* angular
+* allow iframes and html (with shadowbox polyfill)
+* go over "stories" in povital project managment.
+
+
+- camelCase or camel_case (best practices)
+- css html, do we need to inc version to see default templates changes. 
+  or do we want to allow external loading of resources, or both.
+
+- lodash and 3rd party libs - dont cross the 100kb benchmark.
+- one request benchmarks. (whats the optimal size)
+- replace bower components to vendors (no need since bower is configrable and not in source control)
+
+- check for oAuth client side only.
+- capture widget frame on load to post the clients html overwrite after loading it via ajax from the clients site and saving it to a var.
+
+LOGIN{
+	
+	- ask for server url and pass plan 
+	- redirecto to callback url
+
+}
+
