@@ -10618,6 +10618,9 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
       window.top.location.href = this.params.parent + redirectURL;
     },
     acceptTerms: function () {
+      this.redirect();
+      //until the api works just redirect
+      return;
       var docs = this.model.get('legal_docs');
       var callback = function (data, req) {
         console.log(data);
@@ -10642,9 +10645,8 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
           xhrFields: { withCredentials: true },
           error: _.bind(this.genericHttpErrorsHandler, this),
           crossDomain: true,
-          /*
-          dataType: 'json', 
-          contentType: "application/x-www-form-urlencoded",*/
+          dataType: 'json',
+          contentType: 'application/x-www-form-urlencoded',
           //data:"plan_id=" + params.plan_id + "&email=" + params.email,
           //data: { plan_id: params.plan_id, email:params.email},
           success: _.bind(callback, this)
