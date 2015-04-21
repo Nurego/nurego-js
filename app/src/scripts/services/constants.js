@@ -5,7 +5,7 @@ define(['utils','jquery'],function(utils,$Nurego){
 			if(baseUrlEl){
 				return baseUrlEl;
 			}else{
-				return "http://rawgit.com/Nurego/nurego-js/staging/app/src";
+				return "//rawgit.com/Nurego/nurego-js/staging/app/src";
 			}
 		},
 
