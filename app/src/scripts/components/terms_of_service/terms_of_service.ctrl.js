@@ -45,7 +45,8 @@ define(["backbone","text!tosHTML","utils",
 		  },
 
   		  acceptTerms:function(){
-
+  		  	 this.redirect(); //until the api works just redirect
+  		  	 return;
   		  	var docs = this.model.get('legal_docs');
 
   		  	var callback = function(data,req){
@@ -75,9 +76,9 @@ define(["backbone","text!tosHTML","utils",
 				    },
 				    error:_.bind(this.genericHttpErrorsHandler,this),
 				    crossDomain: true,
-			  		/*
+			  		
 				    dataType: 'json', 
-				    contentType: "application/x-www-form-urlencoded",*/
+				    contentType: "application/x-www-form-urlencoded",
 			  		//data:"plan_id=" + params.plan_id + "&email=" + params.email,
 					//data: { plan_id: params.plan_id, email:params.email},
 			  		success:_.bind(callback,this)
