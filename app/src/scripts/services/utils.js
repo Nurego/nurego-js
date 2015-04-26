@@ -1,5 +1,4 @@
-define(["underscore","jquery"],function(_,jq){
-	
+define(["underscore","jquery"],function(_,jq){	
 	window.$Nurego = jq.noConflict(true);
 	//window.jQuery = ($) ? $ : jQuery;
 	

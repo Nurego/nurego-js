@@ -9,7 +9,7 @@ for (var file in window.__karma__.files) {
 requirejs.config({
   
     // Karma serves files     
-    baseUrl: 'http://localhost:9876',
+    baseUrl: 'http://localhost:9876/base',
     
     paths: {
         'constants': '/app/src/scripts/services/constants'

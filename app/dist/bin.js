@@ -10618,9 +10618,8 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
       window.top.location.href = this.params.parent + redirectURL;
     },
     acceptTerms: function () {
-      this.redirect();
-      //until the api works just redirect
-      return;
+      //this.redirect(); //until the api works just redirect
+      //return;
       var docs = this.model.get('legal_docs');
       var callback = function (data, req) {
         console.log(data);
@@ -10678,7 +10677,7 @@ categoryModel = function (Backbone, constants) {
     },
     url: function () {
       //var str = constants.nuregoApiUrl() + "/legaldocs/";
-      var str = constants.nuregoApiUrl() + '/offerings/catalog';
+      var str = constants.nuregoApiUrl() + '/catalog';
       //var str = "/src/scripts/mockdata/category.json";
       var apiKey = constants.getNuregoApiKey();
       if (apiKey !== 'false') {
