@@ -5,7 +5,8 @@ define(['utils','jquery'],function(utils,$Nurego){
 			if(baseUrlEl){
 				return baseUrlEl;
 			}else{
-				return "//rawgit.com/Nurego/nurego-js/staging/app/src";
+				//return "//rawgit.com/Nurego/nurego-js/staging/app/src"; 
+				return "//rawgit.com/Nurego/nurego-js/production/app/src";
 			}
 		},
 
@@ -38,7 +39,20 @@ define(['utils','jquery'],function(utils,$Nurego){
 		},
 
 		widgetsURL:function(){
-			return this.jsBaseURL() + "/widget.html";
+			var scriptSrc, nuregoScript,url;
+			nuregoScript = $Nurego( "script[rel='nurego']" );
+			if(nuregoScript){
+				scriptSrc = nuregoScript.attr('src');
+				if(scriptSrc.indexOf('staging')){
+					url = "rawgit.com/Nurego/nurego-js/staging/app/src/widget.html";
+				}
+				if(scriptSrc.indexOf('master')){
+					url = "rawgit.com/Nurego/nurego-js/master/app/src/widget.html";
+				}
+			}
+			else{
+				return this.jsBaseURL() + "/widget.html";
+			}
 		}
 	};
 })
