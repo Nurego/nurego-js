@@ -10886,3 +10886,4 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
 }(constants, utils, widgetFactory, loginModel, registrationModel, priceListModel, loginViewCtrl, priceListViewCtrl, registrationViewCtrl, tosViewCtrl, categoryViewCtrl, categoryModel, tosModel, tosStatusModel, text_absNuregoCss, jquery);
 window.Nurego = Nurego;
 }());
+
