@@ -8489,11 +8489,12 @@ constants = function (utils, $Nurego) {
       if (nuregoScript) {
         scriptSrc = nuregoScript.attr('src');
         if (scriptSrc.indexOf('staging')) {
-          url = 'rawgit.com/Nurego/nurego-js/staging/app/src/widget.html';
+          url = '//rawgit.com/Nurego/nurego-js/staging/app/src/widget.html';
         }
         if (scriptSrc.indexOf('master')) {
-          url = 'rawgit.com/Nurego/nurego-js/master/app/src/widget.html';
+          url = '//rawgit.com/Nurego/nurego-js/master/app/src/widget.html';
         }
+        return url;
       } else {
         return this.jsBaseURL() + '/widget.html';
       }
