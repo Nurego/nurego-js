@@ -1,11 +1,11 @@
 // Karma configuration
-// Generated on Tue Feb 24 2015 01:04:07 GMT+0200 (Jerusalem Standard Time)
+// Generated on Wed Apr 01 2015 15:22:35 GMT+0300 (Jerusalem Daylight Time)
 
 module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '',
+    basePath: '../',
 
 
     // frameworks to use
@@ -14,19 +14,29 @@ module.exports = function(config) {
 
 
     // list of files / patterns to load in the browser
+           
     files: [
-      'test-main.js',
-      //'../app/src/scripts/**/*.js',
-      //'../app/src/scripts/app.js',
-      {pattern: 'js/*.js', included: true}
-    ],
+            'test/mainKarma.js', {
+            pattern : 'app/src/scripts/**/**/**/*.js',
+            included : false
+        }, 
+        {
+            pattern : 'app/src/scripts/**/**/*.js',
+            included:false
+        },
+
+        {
+            pattern : 'test/specs/*.js',
+            included: false
+        }
+    ], 
+
 
 
     // list of files to exclude
-    exclude: ['../app/src/scripts/app.js',
-
+    exclude: [
+        'app/scripts/config/config.js',
     ],
-
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
@@ -37,7 +47,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress'],
+    reporters: ['progress','spec'],
 
 
     // web server port
@@ -54,21 +64,20 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: false,
+    autoWatch: true,
 
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS',
-    			//'Chrome',
-    			//'Firefox',
-    			//'IE',
-    			//'Safari'
-    			],
+    browsers: ['PhantomJS'],
 
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true
+    singleRun: false,
+
+    plugins: ["karma-jasmine", "karma-requirejs", 
+    "karma-spec-reporter", 'karma-phantomjs-launcher'],        
+
   });
 };

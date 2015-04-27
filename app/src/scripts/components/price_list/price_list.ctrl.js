@@ -33,6 +33,7 @@ define(["backbone","text!priceListHTML","utils",
 		  	}
 		    this.listenToOnce(this.model, "change", this.render);
 		    this.model.fetch({dataType:"jsonp",error:_.bind(this.modelHttpErrorsHandler,this)});
+		    this.initStyle();
 		    this.addStyle();
 		  },
 		  

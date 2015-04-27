@@ -45,8 +45,8 @@ define(["backbone","text!tosHTML","utils",
 		  },
 
   		  acceptTerms:function(){
-  		  	 this.redirect(); //until the api works just redirect
-  		  	 return;
+  		  	 //this.redirect(); //until the api works just redirect
+  		  	 //return;
   		  	var docs = this.model.get('legal_docs');
 
   		  	var callback = function(data,req){
