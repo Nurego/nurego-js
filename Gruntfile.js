@@ -119,8 +119,9 @@ module.exports = function (grunt){
       js: {
         files: ['<%= yeoman.app %>/src/scripts/{,*/}{,*/}*.js',
                 '<%= yeoman.app %>/src/scripts/{,*/}{,*/}*.html',
-                '<%= yeoman.app %>/src/scripts/{,*/}{,*/}{,*/}*.html'],
-        tasks: ['karma','requirejs:dev'], //'newer:jshint:all'
+                '<%= yeoman.app %>/src/scripts/{,*/}{,*/}{,*/}*.html',
+                '<%= yeoman.app %>/src/scripts/{,*/}{,*/}{,*/}*.js'],
+        tasks: [/*'karma',*/'requirejs:dev'], //'newer:jshint:all'
         options: {
           livereload: '<%= connect.options.livereload %>'
         }
@@ -131,7 +132,7 @@ module.exports = function (grunt){
 //      },
       jsTest: {
         files: ['test/spec/{,*/}{,*/}*.js'],
-        tasks: ['karma'] //'newer:jshint:test',
+        tasks: [/*'karma'*/] //'newer:jshint:test',
       },
       compass: {
         files: ['<%= yeoman.app %>/src/styles/*.{scss,sass}'],
@@ -139,7 +140,7 @@ module.exports = function (grunt){
       },
       gruntfile: {
         files: ['Gruntfile.js'],
-        tasks: ['karma','requirejs:dev'], //'newer:jshint:all'
+        tasks: [/*'karma',*/'requirejs:dev'], //'newer:jshint:all'
       },
       livereload: {
         options: {

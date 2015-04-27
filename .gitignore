@@ -5,3 +5,4 @@ bower_components
 reports
 coverage
 app/src/test.html
+deploy-helper.txt

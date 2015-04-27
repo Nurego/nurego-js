@@ -2,8 +2,9 @@
 	.headers,
 	.tableWrapper{
 		display:flex;
+		display:-webkit-flex;
 	}
-
+ 
 	.cell {
 		  padding: 8px;
 		  border: 1px solid #E8E8E8;
@@ -15,9 +16,14 @@
 		  text-overflow: ellipsis;
 	}
 
+	.nr-nurego-tag-line {
+  		text-align: right;
+	}
+
 	.headers div,
 	.tableWrapper div{
 		flex:1;
+	  	-webkit-flex: 1;
 		text-align:center;
 		color:#9799A2;
 	}
@@ -84,7 +90,7 @@
 	    text-decoration: underline;
 	    cursor: pointer;
 	}
-
+	
 	.noSSO.fillEmail .emailWrapper{
 	  display: block;
 	  position: absolute;
