@@ -15,7 +15,7 @@ define([
 		"tosStatusModel",
 		"text!absNuregoCss",
 		"jquery"
-		],
+		], 
 	function(constants,utils,widgetFactory,loginModel,registrationModel,
 			priceListModel,loginViewCtrl,priceListViewCtrl,registrationViewCtrl,
 			tosViewCtrl,categoryViewCtrl,categoryModel,tosModel,

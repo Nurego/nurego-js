@@ -33,9 +33,27 @@
     <!-- endbower -->
     <!-- endbuild -->
 
-    <script src="../dist/bin.js" type="text/javascript"></script>
-    <script>
-        Nurego.onWidgetLoaded();
+    <!--script src="../dist/bin.js" type="text/javascript"></script-->
+    <script type="text/javascript">
+        //load the right version (master/staging/production);
+        var topUrl,version,url,script,callback;
+        callback = function(){
+            Nurego.onWidgetLoaded();
+        }
+        topUrl = window.location.href;
+        if(topUrl.indexOf('js.nurego.com') != -1){
+            version = topUrl.split('/')[3];
+            url = "//js.nurego.com/"+version+"/bin.js";
+        }else{
+            url = "../dist/bin.js";
+        }
+        script = document.createElement( 'script' );
+        script.type = 'text/javascript';
+        script.rel = "nurego";
+        script.src = url;
+        script.onreadystatechange = callback;
+        script.onload = callback;
+        document.head.appendChild(script);
     </script>
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
 	
