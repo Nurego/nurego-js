@@ -1,12 +1,31 @@
 define(['utils','jquery'],function(utils,$Nurego){
 	return {
 		jsBaseURL:function(){
-			var baseUrlEl = $Nurego("nurego-js-baseurl").attr('url');
+			var scriptSrc, nuregoScript,url,stagingURL,masterURL,baseUrlEl,prodURL,prodVersion;
+			
+			baseUrlEl = $Nurego("nurego-js-baseurl").attr('url');
+			
 			if(baseUrlEl){
 				return baseUrlEl;
 			}else{
-				//return "//rawgit.com/Nurego/nurego-js/staging/app/src"; 
-				return "//rawgit.com/Nurego/nurego-js/production/app/src";
+				
+				nuregoScript = $Nurego( "script[rel='nurego']" );
+				stagingURL = "//rawgit.com/Nurego/nurego-js/staging/app/src";
+				masterURL = "//rawgit.com/Nurego/nurego-js/master/app/src";
+				url = masterURL;
+				
+				if(nuregoScript && typeof(nuregoScript) !== "undefined"){
+					scriptSrc = nuregoScript.attr('src');
+					if(scriptSrc.indexOf('js.nurego.com') !== -1){
+				        version = scriptSrc.split('/')[3];
+				        url = "//js.nurego.com/"+version;
+					}
+					if(scriptSrc.indexOf('staging') !== -1){
+						url = stagingURL;
+					}
+				}
+
+				return url;
 			}
 		},
 
@@ -39,21 +58,7 @@ define(['utils','jquery'],function(utils,$Nurego){
 		},
 
 		widgetsURL:function(){
-			var scriptSrc, nuregoScript,url;
-			nuregoScript = $Nurego( "script[rel='nurego']" );
-			if(nuregoScript){
-				scriptSrc = nuregoScript.attr('src');
-				if(scriptSrc.indexOf('staging')){
-					url = "//rawgit.com/Nurego/nurego-js/staging/app/src/widget.html";
-				}
-				if(scriptSrc.indexOf('master')){
-					url = "//rawgit.com/Nurego/nurego-js/master/app/src/widget.html";
-				}
-				return url;
-			}
-			else{
-				return this.jsBaseURL() + "/widget.html";
-			}
+			return this.jsBaseURL() + "/widget.html";
 		}
 	};
 })
