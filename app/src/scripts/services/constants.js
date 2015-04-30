@@ -14,7 +14,7 @@ define(['utils','jquery'],function(utils,$Nurego){
 				masterURL = "//rawgit.com/Nurego/nurego-js/master/app/src";
 				url = masterURL;
 				
-				if(nuregoScript && typeof(nuregoScript) !== "undefined"){
+				if(nuregoScript && (typeof(nuregoScript) !== "undefined") && nuregoScript.length != 0 ){
 					scriptSrc = nuregoScript.attr('src');
 					if(scriptSrc.indexOf('js.nurego.com') !== -1){
 				        version = scriptSrc.split('/')[3];
