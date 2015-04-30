@@ -121,7 +121,6 @@ define([
 					    if( newNodes !== null ) { // If there are new nodes added
 					    	var $nodes = $Nurego( newNodes ); // jQuery set
 					    	var $childNodes = $Nurego($nodes).find('nurego-widget');
-					    	console.log($childNodes)
 					    	$nodes.each(lookUpWidgets);
 					    	$childNodes.each(lookUpWidgets);
 					    }
