@@ -8458,7 +8458,7 @@ constants = function (utils, $Nurego) {
         stagingURL = '//rawgit.com/Nurego/nurego-js/staging/app/src';
         masterURL = '//rawgit.com/Nurego/nurego-js/master/app/src';
         url = masterURL;
-        if (nuregoScript && typeof nuregoScript !== 'undefined') {
+        if (nuregoScript && typeof nuregoScript !== 'undefined' && nuregoScript.length != 0) {
           scriptSrc = nuregoScript.attr('src');
           if (scriptSrc.indexOf('js.nurego.com') !== -1) {
             version = scriptSrc.split('/')[3];
@@ -10792,46 +10792,67 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
     });
   }, app.initObserver = function () {
     // The node to be monitored
-    var target = $Nurego('body')[0];
-    // Create an observer instance
-    var observer = new MutationObserver(function (mutations) {
-      mutations.forEach(function (mutation) {
-        console.log(mutation);
-        var newNodes = mutation.addedNodes;
-        // DOM NodeList
-        if (newNodes !== null) {
-          // If there are new nodes added
-          var $nodes = $Nurego(newNodes);
-          // jQuery set
-          $nodes.each(function () {
-            var $node = $Nurego(this);
-            if ($node.prop('tagName') === 'NUREGO-WIDGET') {
-              var comps = {};
-              var widgetAttrs = {};
-              _.each(this.attributes, function (node) {
-                if (node.nodeName != 'style') {
-                  widgetAttrs[node.nodeName] = node.value;
-                }
-              });
-              var comp = comps[widgetAttrs.name] = {};
-              comp.element = this;
-              comp.configParams = widgetAttrs;
-              comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
-              console.log(comps);
-              app.init({ components: comps });
+    var callback = function (e) {
+      var $nodes = $Nurego(e.target);
+      // jQuery set
+      $nodes.each(function () {
+        var $node = $Nurego(this);
+        if ($node.prop('tagName') === 'NUREGO-WIDGET') {
+          var comps = {};
+          var widgetAttrs = {};
+          _.each(this.attributes, function (node) {
+            if (node.nodeName != 'style') {
+              widgetAttrs[node.nodeName] = node.value;
             }
           });
+          var comp = comps[widgetAttrs.name] = {};
+          comp.element = this;
+          comp.configParams = widgetAttrs;
+          comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
+          console.log(comps);
+          app.init({ components: comps });
         }
       });
-    });
-    // Configuration of the observer:
-    var config = {
-      attributes: true,
-      childList: true,
-      characterData: true
     };
-    // Pass in the target node, as well as the observer options
-    observer.observe(target, config);
+    document.addEventListener('DOMNodeInsertedIntoDocument', callback, true);  //var target = document;
+                                                                               // Create an observer instance
+                                                                               /*var observer = new MutationObserver(function( mutations ) {
+                                                                               					  mutations.forEach(function( mutation ) {
+                                                                               					  	console.log(mutation);
+                                                                               					    var newNodes = mutation.addedNodes; // DOM NodeList
+                                                                               					    if( newNodes !== null ) { // If there are new nodes added
+                                                                               					    	var $nodes = $Nurego( newNodes ); // jQuery set
+                                                                               					    	$nodes.each(function() {
+                                                                               					    		var $node = $Nurego( this );
+                                                                               					    		if($node.prop('tagName') === "NUREGO-WIDGET"){
+                                                                               					    			var comps = {};
+                                                                               									var widgetAttrs = {};
+                                                                               									_.each(this.attributes,function(node){
+                                                                               										if(node.nodeName != "style"){
+                                                                               											widgetAttrs[node.nodeName] = node.value;
+                                                                               										}
+                                                                               									});
+                                                                               
+                                                                               									var comp = comps[ widgetAttrs.name ] = {};
+                                                                               									comp.element = this;
+                                                                               									comp.configParams = widgetAttrs;
+                                                                               									comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
+                                                                               
+                                                                               									console.log(comps)
+                                                                               									app.init({components:comps});
+                                                                               					    		}
+                                                                               					    	});
+                                                                               					    }
+                                                                               					  });    
+                                                                               					});*/
+                                                                               // Configuration of the observer:
+                                                                               /*var config = { 
+                                                                               	attributes: true, 
+                                                                               	childList: true, 
+                                                                               	characterData: true 
+                                                                               };*/
+                                                                               // Pass in the target node, as well as the observer options
+                                                                               //observer.observe(target, config);
   }, app.onWidgetLoaded = function () {
     var params, thisWidget, widgetModel, widgetView, callback;
     params = lib.utils.URLToArray(window.location.href);
