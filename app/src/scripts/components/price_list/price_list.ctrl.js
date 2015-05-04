@@ -17,6 +17,7 @@ define(["backbone","text!priceListHTML","utils",
 		  	this.params = utils.URLToArray(window.location.href);
 		  	var themes = {
 		  		singleTier:priceListSingleTierHTML,
+		  		single_tier:priceListSingleTierHTML,
 		  		multitier:tmpl
 		  	};
 		  	if(!this.params.preview){

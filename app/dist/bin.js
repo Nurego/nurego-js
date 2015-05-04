@@ -10398,6 +10398,7 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       this.params = utils.URLToArray(window.location.href);
       var themes = {
         singleTier: priceListSingleTierHTML,
+        single_tier: priceListSingleTierHTML,
         multitier: tmpl
       };
       if (!this.params.preview) {
