@@ -10398,6 +10398,7 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       this.params = utils.URLToArray(window.location.href);
       var themes = {
         singleTier: priceListSingleTierHTML,
+        //deprecated : need to remove camelCode and use camel_code;
         single_tier: priceListSingleTierHTML,
         multitier: tmpl
       };
