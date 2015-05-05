@@ -8557,6 +8557,9 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       res += '&parent=' + window.location.origin;
       var indx = 0;
       _.each(opt.configParams, function (val, key) {
+        if (key == 'api-params') {
+          val = '{' + encodeURIComponent(val.substr(1)) + '}';
+        }
         if (key !== 'urlParams') {
           var seperator = '&';
           //(indx === 0) ? "?" : "&";
@@ -10478,8 +10481,7 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
           window.top.location.href = url;
         } else {
           window.top.location.href = parent + url;
-        }
-        console.log(data);  //alert(JSON.stringify(data));
+        }  //alert(JSON.stringify(data));
       };
       $Nurego.ajax({
         url: url,
@@ -10572,10 +10574,19 @@ registrationViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) {
       var email = this.$el.find('input.email').val();
       var pass = this.$el.find('input.pass').val();
       var params = utils.URLToArray(window.location.href);
-      var url = params['registration-url'] + '?registrationId=' + params['registration-id'] + '&password=' + pass;
+      var url = params['registration-url'] + '&password=' + pass;
+      if (typeof params['registration-id'] != 'undefined') {
+        url += '?registrationId=' + params['registration-id'];
+      }
       if (email && email.indexOf('@') != -1) {
         url += '&email=' + encodeURI(email);
       }
+      var params = utils.URLToArray(window.location.href)['api-params'];
+      //get params and chop the first '?' char;
+      var customApiParams = JSON.parse('{"' + decodeURI(params.substr(1, params.length - 2)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
+      _.forEach(customApiParams, function (v, k) {
+        url += '&' + k + '=' + v;
+      });
       window.top.location.href = params.parent + url;
     },
     render: function () {

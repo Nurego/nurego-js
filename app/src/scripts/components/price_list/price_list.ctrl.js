@@ -95,17 +95,18 @@ define(["backbone","text!priceListHTML","utils",
 		  			return;
 		  		}
 		  		url = redirectUrl;
+		  		
 		  		if(redirectUrl.indexOf("?") == -1){
 		  			url += "?registrationId=" + data.id;
 		  		}else{
 		  			url += "&registrationId=" + data.id;
 		  		};
+
 		  		if(redirectUrl.indexOf('http') == 0){
 					window.top.location.href = url;
 		  		}else{
 		  			window.top.location.href = parent + url;
 		  		}
-	  			console.log(data);
 	  			//alert(JSON.stringify(data));
 		  	};
 

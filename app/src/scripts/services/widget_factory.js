@@ -62,6 +62,11 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 			res += "&parent=" + window.location.origin;
 			var indx = 0;
 			_.each(opt.configParams,function(val,key){
+				
+				if(key == "api-params"){
+					val = "{" +encodeURIComponent(val.substr(1))+ "}";
+				}
+
 				if(key !== "urlParams"){
 					var seperator = "&"; //(indx === 0) ? "?" : "&";
 					res += seperator + key + "=" + val;
