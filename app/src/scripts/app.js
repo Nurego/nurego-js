@@ -139,6 +139,23 @@ define([
 					observer.observe(target, config);
 				},
 				
+				app.resizeThisWidget = function(){
+					var size = {
+						h:$(document).height(),
+						w:$(document).width()
+					};
+					window.parent.postMessage('resizeMe',size);
+				},
+
+				app.onWidgetLoadFinish = function(){
+					//call parent frame to resize me.
+					params = lib.utils.URLToArray(window.location.href);
+					var stretch = (params.stretch) ? true : (params.stretch);
+					if(stretch){ 
+						app.resizeThisWidget();
+					}
+				},
+
 				app.onWidgetLoaded = function(){
 					var params,thisWidget,widgetModel,widgetView,callback;
 					params = lib.utils.URLToArray(window.location.href);
