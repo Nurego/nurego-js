@@ -53,7 +53,13 @@ define(["backbone","text!registrationHTML",
 		  		url += "&email=" + encodeURI(email); 
 		  	}
 		  	var params = utils.URLToArray(window.location.href)['api-params']; //get params and chop the first '?' char;
-		  	var customApiParams = JSON.parse('{"' + decodeURI(params.substr(1,params.length-2)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+		  	var customApiParams;
+		  	try {
+		  		customApiParams = JSON.parse(params);
+		  	}catch(e){
+		  		customApiParams = JSON.parse('{"' + decodeURI(params.substr(1,params.length-2)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+		  	}
+
 		  	 _.forEach(customApiParams,function(v,k){
                     url += "&"+k+"="+v;
             });

@@ -64,7 +64,11 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 			_.each(opt.configParams,function(val,key){
 				
 				if(key == "api-params"){
-					val = "{" +encodeURIComponent(val.substr(1))+ "}";
+
+					if(val.indexOf('{') === -1){debugger;
+						val = "{" +encodeURIComponent(val)+ "}";
+						//if this api-param key is a json this will throw
+					}
 				}
 
 				if(key !== "urlParams"){

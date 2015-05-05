@@ -8558,7 +8558,10 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       var indx = 0;
       _.each(opt.configParams, function (val, key) {
         if (key == 'api-params') {
-          val = '{' + encodeURIComponent(val.substr(1)) + '}';
+          if (val.indexOf('{') === -1) {
+            debugger;
+            val = '{' + encodeURIComponent(val) + '}';  //if this api-param key is a json this will throw
+          }
         }
         if (key !== 'urlParams') {
           var seperator = '&';
@@ -10583,7 +10586,12 @@ registrationViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) {
       }
       var params = utils.URLToArray(window.location.href)['api-params'];
       //get params and chop the first '?' char;
-      var customApiParams = JSON.parse('{"' + decodeURI(params.substr(1, params.length - 2)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
+      var customApiParams;
+      try {
+        customApiParams = JSON.parse(params);
+      } catch (e) {
+        customApiParams = JSON.parse('{"' + decodeURI(params.substr(1, params.length - 2)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
+      }
       _.forEach(customApiParams, function (v, k) {
         url += '&' + k + '=' + v;
       });
