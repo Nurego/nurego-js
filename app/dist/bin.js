@@ -8450,8 +8450,13 @@ constants = function (utils, $Nurego) {
   return {
     jsBaseURL: function () {
       var scriptSrc, nuregoScript, url, stagingURL, masterURL, baseUrlEl, prodURL, prodVersion;
-      baseUrlEl = $Nurego('nurego-js-baseurl').attr('url');
-      if (baseUrlEl) {
+      //baseUrlEl = $Nurego("nurego-js-baseurl").attr('url');
+      baseUrlEl = $Nurego('meta[property=\'nrg:js-base-url\']').attr('url');
+      if (_.isUndefined(baseUrlEl)) {
+        baseUrlEl = $Nurego('nurego-js-baseurl').attr('url');
+      }
+      /*<meta property="nrg:js-base-url" url="nurego.com"/>*/
+      if (!_.isUndefined(baseUrlEl)) {
         return baseUrlEl;
       } else {
         nuregoScript = $Nurego('script[rel=\'nurego\']');
@@ -8472,8 +8477,13 @@ constants = function (utils, $Nurego) {
       }
     },
     getNuregoApiKey: function () {
-      //return "l402b7a9-dc19-43fd-89cd-64e8fe101347";
-      var apiKey = $Nurego('nurego-public-customer-id').attr('id');
+      //baseUrlEl = $Nurego("nurego-js-baseurl").attr('url');
+      /*<meta property="nrg:nurego-public-customer-id" id="0000"/>*/
+      //var apiKey = $Nurego("nurego-public-customer-id").attr('id');
+      var apiKey = $Nurego('meta[property=\'nrg:nurego-public-customer-id\']').attr('id');
+      if (_.isUndefined(apiKey)) {
+        apiKey = $Nurego('nurego-public-customer-id').attr('url');
+      }
       var apiKeyParam = utils.URLToArray(window.location.href).apiKey;
       if (apiKey) {
         return apiKey;
@@ -8485,6 +8495,12 @@ constants = function (utils, $Nurego) {
       }
     },
     nuregoApiUrl: function () {
+      /*<meta property="nrg:nurego-api-baseurl" url="staging.nurego.com/v1"/>*/
+      //var apiKey = $Nurego("nurego-public-customer-id").attr('id');
+      var apiKey = $Nurego('meta[property=\'nrg:nurego-api-baseurl\']').attr('id');
+      if (_.isUndefined(apiKey)) {
+        apiKey = $Nurego('nurego-api-baseurl').attr('url');
+      }
       var nuregoApi = $Nurego('nurego-api-baseurl').attr('url');
       var nuregoApiParam = utils.URLToArray(window.location.href).apiBaseUrl;
       if (nuregoApi) {
