@@ -8451,7 +8451,7 @@ constants = function (utils, $Nurego) {
     jsBaseURL: function () {
       var scriptSrc, nuregoScript, url, stagingURL, masterURL, baseUrlEl, prodURL, prodVersion;
       //baseUrlEl = $Nurego("nurego-js-baseurl").attr('url');
-      baseUrlEl = $Nurego('meta[property=\'nrg:js-base-url\']').attr('url');
+      baseUrlEl = $Nurego('meta[property=\'nrg:js-base-url\']').attr('content');
       if (_.isUndefined(baseUrlEl)) {
         baseUrlEl = $Nurego('nurego-js-baseurl').attr('url');
       }
@@ -8480,7 +8480,7 @@ constants = function (utils, $Nurego) {
       //baseUrlEl = $Nurego("nurego-js-baseurl").attr('url');
       /*<meta property="nrg:nurego-public-customer-id" id="0000"/>*/
       //var apiKey = $Nurego("nurego-public-customer-id").attr('id');
-      var apiKey = $Nurego('meta[property=\'nrg:nurego-public-customer-id\']').attr('id');
+      var apiKey = $Nurego('meta[property=\'nrg:nurego-public-customer-id\']').attr('content');
       if (_.isUndefined(apiKey)) {
         apiKey = $Nurego('nurego-public-customer-id').attr('url');
       }
@@ -8497,11 +8497,10 @@ constants = function (utils, $Nurego) {
     nuregoApiUrl: function () {
       /*<meta property="nrg:nurego-api-baseurl" url="staging.nurego.com/v1"/>*/
       //var apiKey = $Nurego("nurego-public-customer-id").attr('id');
-      var apiKey = $Nurego('meta[property=\'nrg:nurego-api-baseurl\']').attr('id');
-      if (_.isUndefined(apiKey)) {
-        apiKey = $Nurego('nurego-api-baseurl').attr('url');
+      var nuregoApi = $Nurego('meta[property=\'nrg:nurego-api-baseurl\']').attr('content');
+      if (_.isUndefined(nuregoApi)) {
+        nuregoApi = $Nurego('nurego-api-baseurl').attr('url');
       }
-      var nuregoApi = $Nurego('nurego-api-baseurl').attr('url');
       var nuregoApiParam = utils.URLToArray(window.location.href).apiBaseUrl;
       if (nuregoApi) {
         return nuregoApi;
