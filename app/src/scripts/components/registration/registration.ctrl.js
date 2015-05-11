@@ -52,12 +52,12 @@ define(["backbone","text!registrationHTML",
 		  	if(email && email.indexOf("@") != -1){
 		  		url += "&email=" + encodeURI(email); 
 		  	}
-		  	var params = utils.URLToArray(window.location.href)['api-params']; //get params and chop the first '?' char;
+		  	var apiParams = utils.URLToArray(window.location.href)['api-params']; //get params and chop the first '?' char;
 		  	var customApiParams;
 		  	try {
-		  		customApiParams = JSON.parse(params);
+		  		customApiParams = JSON.parse(apiParams);
 		  	}catch(e){
-		  		customApiParams = JSON.parse('{"' + decodeURI(params.substr(1,params.length-2)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
+		  		customApiParams = JSON.parse('{"' + decodeURI(apiParams.substr(1,apiParams.length-2)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}');
 		  	}
 
 		  	 _.forEach(customApiParams,function(v,k){
