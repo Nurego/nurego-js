@@ -10592,9 +10592,9 @@ registrationViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) {
       var email = this.$el.find('input.email').val();
       var pass = this.$el.find('input.pass').val();
       var params = utils.URLToArray(window.location.href);
-      var url = params['registration-url'] + '&password=' + pass;
+      var url = params['registration-url'] + '?password=' + pass;
       if (typeof params['registration-id'] != 'undefined') {
-        url += '?registrationId=' + params['registration-id'];
+        url += '&' + 'registrationId=' + params['registration-id'];
       }
       if (email && email.indexOf('@') != -1) {
         url += '&email=' + encodeURI(email);
