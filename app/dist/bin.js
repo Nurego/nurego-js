@@ -8482,7 +8482,7 @@ constants = function (utils, $Nurego) {
       //var apiKey = $Nurego("nurego-public-customer-id").attr('id');
       var apiKey = $Nurego('meta[property=\'nrg:nurego-public-customer-id\']').attr('content');
       if (_.isUndefined(apiKey)) {
-        apiKey = $Nurego('nurego-public-customer-id').attr('url');
+        apiKey = $Nurego('nurego-public-customer-id').attr('id');
       }
       var apiKeyParam = utils.URLToArray(window.location.href).apiKey;
       if (apiKey) {
