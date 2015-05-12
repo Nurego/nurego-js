@@ -2,7 +2,6 @@ define(["backbone","constants"],function(Backbone,constants){
 	
     var tos = Backbone.Model.extend({
         initialize:function(){
-            console.log('terms of service model');
         },
          
         url:function(){

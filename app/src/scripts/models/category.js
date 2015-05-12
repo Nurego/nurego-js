@@ -2,7 +2,7 @@ define(["backbone","constants"],function(Backbone,constants){
 	
     var categoryMod = Backbone.Model.extend({
         initialize:function(){
-            console.log('category model init');
+            //console.log('category model init');
         },
         
         url:function(){

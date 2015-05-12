@@ -56,8 +56,6 @@ define([
 
 				app.init = function(opt){
 					_.forEach(opt.components,function(v,k){
-						console.log(k)
-						console.log(v)
 						lib.widgetFactory.build(k,v);
 					})
 				},
@@ -95,7 +93,6 @@ define([
 					// Create an observer instance
 					var observer = new MutationObserver(function( mutations ) {
 					  mutations.forEach(function( mutation ) {
-					  	console.log(mutation);
 					  	var lookUpWidgets = function(){
 				    		var $node = $Nurego( this );
 				    		if($node.prop('tagName') === "NUREGO-WIDGET"){
@@ -111,8 +108,6 @@ define([
 								comp.element = this;
 								comp.configParams = widgetAttrs;
 								comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
-
-								console.log(comps)
 								app.init({components:comps});
 				    		}
 					    }
@@ -159,7 +154,6 @@ define([
 				app.onWidgetLoaded = function(){
 					var params,thisWidget,widgetModel,widgetView,callback;
 					params = lib.utils.URLToArray(window.location.href);
-					console.log(params)
 					var draw = function(){
 						thisWidget = lib.components[params.widget];
 				    	widgetModel = new thisWidget.model({apiKey:params.apiKey});
@@ -207,7 +201,6 @@ define([
 							comp.configParams = widgetAttrs;
 							comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
 						}
-						console.log(comps)
 						app.init({components:comps});
 					}
 					app.initObserver();

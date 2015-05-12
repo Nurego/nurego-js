@@ -10186,7 +10186,6 @@ widgetFactory = function (_, utils, constants, $Nurego) {
 loginModel = function (Backbone, constants) {
   var loginModel = Backbone.Model.extend({
     initialize: function () {
-      console.log('init login model');
     },
     url: function () {
       return constants.nuregoApiUrl() + '/registrations/url/login_url?api_key=' + constants.getNuregoApiKey();
@@ -10203,7 +10202,6 @@ loginModel = function (Backbone, constants) {
 registrationModel = function (Backbone, constants) {
   var registrationModel = Backbone.Model.extend({
     initialize: function () {
-      console.log('init activationModel');
     },
     url: function () {
       return constants.nuregoApiUrl() + '/registrations/url/login_url?api_key=' + constants.getNuregoApiKey();
@@ -10226,12 +10224,10 @@ priceListModel = function (Backbone, constants) {
   */
   var priceListModel = Backbone.Model.extend({
     initialize: function (opt) {
-      console.log('init pricelist model');
       this.opt = opt;
       this.params = utils.URLToArray(window.location.href);
     },
     url: function () {
-      console.log(this.opt);
       //var key = this.attr.find('apiParams') // {param1:val1,params2:val2}
       var url = constants.nuregoApiUrl() + '/offerings?api_key=' + this.opt.apiKey;
       /*for(val in key){
@@ -10256,8 +10252,6 @@ priceListModel = function (Backbone, constants) {
         return ans;
       }
       function getMissingFeatures(plan_features, featuresArr) {
-        console.log('difference:::');
-        console.log(_.difference(featuresArr, plan_features));
         return _.difference(featuresArr, plan_features);
       }
       function customParser(response) {
@@ -10291,7 +10285,6 @@ priceListModel = function (Backbone, constants) {
         };
       }
       var parsed = customParser(data);
-      console.log(parsed);
       return parsed;
     }
   });
@@ -10372,7 +10365,6 @@ loginViewCtrl = function (bb, loginTmpl, absNuregoView, $Nurego) {
     login: function (e) {
       //var baseURL = this.$el.find('#baseURL').val();
       var endPoint = constants.nuregoApiUrl();
-      console.log('sending req to: ' + endPoint);
       $Nurego.get(endPoint + '/login', function (data) {
         console.log(data);
       });
@@ -10390,7 +10382,6 @@ text_priceListCSS = '/*.simple_3_tier {\r\n    font-family:"Lato",Helvetica,Aria
 tosModel = function (Backbone, constants) {
   var tos = Backbone.Model.extend({
     initialize: function () {
-      console.log('terms of service model');
     },
     url: function () {
       var str = constants.nuregoApiUrl() + '/legaldocs/';
@@ -10625,7 +10616,6 @@ text_termsOfServiceCSS = 'div{\r\n    \r\n}';
 tosStatusModel = function (Backbone, constants) {
   var tosStatus = Backbone.Model.extend({
     initialize: function () {
-      console.log('terms of service model');
     },
     url: function () {
       var str = constants.nuregoApiUrl() + '/legaldocs/status';
@@ -10676,8 +10666,6 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
       //return;
       var docs = this.model.get('legal_docs');
       var callback = function (data, req) {
-        console.log(data);
-        console.log(req);
         this.docs.sent += 1;
         if (this.docs.sent >= this.docs.total) {
           this.redirect();
@@ -10727,7 +10715,6 @@ text_categoryCSS = 'div.myCategoryDiv {\r\n\r\n}';
 categoryModel = function (Backbone, constants) {
   var categoryMod = Backbone.Model.extend({
     initialize: function () {
-      console.log('category model init');
     },
     url: function () {
       //var str = constants.nuregoApiUrl() + "/legaldocs/";
@@ -10822,8 +10809,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
   };
   app.init = function (opt) {
     _.forEach(opt.components, function (v, k) {
-      console.log(k);
-      console.log(v);
       lib.widgetFactory.build(k, v);
     });
   }, app.initObserver = function () {
@@ -10857,7 +10842,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
     // Create an observer instance
     var observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
-        console.log(mutation);
         var lookUpWidgets = function () {
           var $node = $Nurego(this);
           if ($node.prop('tagName') === 'NUREGO-WIDGET') {
@@ -10872,7 +10856,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
             comp.element = this;
             comp.configParams = widgetAttrs;
             comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
-            console.log(comps);
             app.init({ components: comps });
           }
         };
@@ -10913,7 +10896,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
   }, app.onWidgetLoaded = function () {
     var params, thisWidget, widgetModel, widgetView, callback;
     params = lib.utils.URLToArray(window.location.href);
-    console.log(params);
     var draw = function () {
       thisWidget = lib.components[params.widget];
       widgetModel = new thisWidget.model({ apiKey: params.apiKey });
@@ -10956,7 +10938,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
         comp.configParams = widgetAttrs;
         comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
       }
-      console.log(comps);
       app.init({ components: comps });
     }
     app.initObserver();
