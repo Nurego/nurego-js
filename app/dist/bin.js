@@ -10880,9 +10880,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
     };
     // Pass in the target node, as well as the observer options
     observer.observe(target, config);
-    };
-    // Pass in the target node, as well as the observer options
-    observer.observe(target, config);
   }, app.resizeThisWidget = function () {
     var size = {
       h: $(document).height(),
@@ -10896,7 +10893,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
     if (stretch) {
       app.resizeThisWidget();
     }
->>>>>>> origin
   }, app.onWidgetLoaded = function () {
     var params, thisWidget, widgetModel, widgetView, callback;
     params = lib.utils.URLToArray(window.location.href);

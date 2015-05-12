@@ -93,10 +93,6 @@ define([
 					// Create an observer instance
 					var observer = new MutationObserver(function( mutations ) {
 					  mutations.forEach(function( mutation ) {
-<<<<<<< HEAD
-					  	console.log(mutation);
-=======
->>>>>>> origin
 					  	var lookUpWidgets = function(){
 				    		var $node = $Nurego( this );
 				    		if($node.prop('tagName') === "NUREGO-WIDGET"){
@@ -112,11 +108,6 @@ define([
 								comp.element = this;
 								comp.configParams = widgetAttrs;
 								comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
-<<<<<<< HEAD
-
-								console.log(comps)
-=======
->>>>>>> origin
 								app.init({components:comps});
 				    		}
 					    }
@@ -125,10 +116,6 @@ define([
 					    if( newNodes !== null ) { // If there are new nodes added
 					    	var $nodes = $Nurego( newNodes ); // jQuery set
 					    	var $childNodes = $Nurego($nodes).find('nurego-widget');
-<<<<<<< HEAD
-					    	console.log($childNodes)
-=======
->>>>>>> origin
 					    	$nodes.each(lookUpWidgets);
 					    	$childNodes.each(lookUpWidgets);
 					    }
