@@ -16,7 +16,8 @@ define(["backbone","text!priceListHTML","utils",
 		  	//this.__super__.initialize.apply(this);
 		  	this.params = utils.URLToArray(window.location.href);
 		  	var themes = {
-		  		singleTier:priceListSingleTierHTML,
+		  		singleTier:priceListSingleTierHTML,  //deprecated : need to remove camelCode and use camel_code;
+		  		single_tier:priceListSingleTierHTML,
 		  		multitier:tmpl
 		  	};
 		  	if(!this.params.preview){
@@ -94,17 +95,18 @@ define(["backbone","text!priceListHTML","utils",
 		  			return;
 		  		}
 		  		url = redirectUrl;
+		  		
 		  		if(redirectUrl.indexOf("?") == -1){
 		  			url += "?registrationId=" + data.id;
 		  		}else{
 		  			url += "&registrationId=" + data.id;
 		  		};
+
 		  		if(redirectUrl.indexOf('http') == 0){
 					window.top.location.href = url;
 		  		}else{
 		  			window.top.location.href = parent + url;
 		  		}
-	  			console.log(data);
 	  			//alert(JSON.stringify(data));
 		  	};
 

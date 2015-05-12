@@ -8450,8 +8450,13 @@ constants = function (utils, $Nurego) {
   return {
     jsBaseURL: function () {
       var scriptSrc, nuregoScript, url, stagingURL, masterURL, baseUrlEl, prodURL, prodVersion;
-      baseUrlEl = $Nurego('nurego-js-baseurl').attr('url');
-      if (baseUrlEl) {
+      //baseUrlEl = $Nurego("nurego-js-baseurl").attr('url');
+      baseUrlEl = $Nurego('meta[property=\'nrg:js-base-url\']').attr('content');
+      if (_.isUndefined(baseUrlEl)) {
+        baseUrlEl = $Nurego('nurego-js-baseurl').attr('url');
+      }
+      /*<meta property="nrg:js-base-url" url="nurego.com"/>*/
+      if (!_.isUndefined(baseUrlEl)) {
         return baseUrlEl;
       } else {
         nuregoScript = $Nurego('script[rel=\'nurego\']');
@@ -8472,8 +8477,13 @@ constants = function (utils, $Nurego) {
       }
     },
     getNuregoApiKey: function () {
-      //return "l402b7a9-dc19-43fd-89cd-64e8fe101347";
-      var apiKey = $Nurego('nurego-public-customer-id').attr('id');
+      //baseUrlEl = $Nurego("nurego-js-baseurl").attr('url');
+      /*<meta property="nrg:nurego-public-customer-id" id="0000"/>*/
+      //var apiKey = $Nurego("nurego-public-customer-id").attr('id');
+      var apiKey = $Nurego('meta[property=\'nrg:nurego-public-customer-id\']').attr('content');
+      if (_.isUndefined(apiKey)) {
+        apiKey = $Nurego('nurego-public-customer-id').attr('url');
+      }
       var apiKeyParam = utils.URLToArray(window.location.href).apiKey;
       if (apiKey) {
         return apiKey;
@@ -8485,7 +8495,12 @@ constants = function (utils, $Nurego) {
       }
     },
     nuregoApiUrl: function () {
-      var nuregoApi = $Nurego('nurego-api-baseurl').attr('url');
+      /*<meta property="nrg:nurego-api-baseurl" url="staging.nurego.com/v1"/>*/
+      //var apiKey = $Nurego("nurego-public-customer-id").attr('id');
+      var nuregoApi = $Nurego('meta[property=\'nrg:nurego-api-baseurl\']').attr('content');
+      if (_.isUndefined(nuregoApi)) {
+        nuregoApi = $Nurego('nurego-api-baseurl').attr('url');
+      }
       var nuregoApiParam = utils.URLToArray(window.location.href).apiBaseUrl;
       if (nuregoApi) {
         return nuregoApi;
@@ -8557,6 +8572,12 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       res += '&parent=' + window.location.origin;
       var indx = 0;
       _.each(opt.configParams, function (val, key) {
+        if (key == 'api-params') {
+          if (val.indexOf('{') === -1) {
+            debugger;
+            val = '{' + encodeURIComponent(val) + '}';  //if this api-param key is a json this will throw
+          }
+        }
         if (key !== 'urlParams') {
           var seperator = '&';
           //(indx === 0) ? "?" : "&";
@@ -10165,7 +10186,6 @@ widgetFactory = function (_, utils, constants, $Nurego) {
 loginModel = function (Backbone, constants) {
   var loginModel = Backbone.Model.extend({
     initialize: function () {
-      console.log('init login model');
     },
     url: function () {
       return constants.nuregoApiUrl() + '/registrations/url/login_url?api_key=' + constants.getNuregoApiKey();
@@ -10182,7 +10202,6 @@ loginModel = function (Backbone, constants) {
 registrationModel = function (Backbone, constants) {
   var registrationModel = Backbone.Model.extend({
     initialize: function () {
-      console.log('init activationModel');
     },
     url: function () {
       return constants.nuregoApiUrl() + '/registrations/url/login_url?api_key=' + constants.getNuregoApiKey();
@@ -10205,12 +10224,10 @@ priceListModel = function (Backbone, constants) {
   */
   var priceListModel = Backbone.Model.extend({
     initialize: function (opt) {
-      console.log('init pricelist model');
       this.opt = opt;
       this.params = utils.URLToArray(window.location.href);
     },
     url: function () {
-      console.log(this.opt);
       //var key = this.attr.find('apiParams') // {param1:val1,params2:val2}
       var url = constants.nuregoApiUrl() + '/offerings?api_key=' + this.opt.apiKey;
       /*for(val in key){
@@ -10235,8 +10252,6 @@ priceListModel = function (Backbone, constants) {
         return ans;
       }
       function getMissingFeatures(plan_features, featuresArr) {
-        console.log('difference:::');
-        console.log(_.difference(featuresArr, plan_features));
         return _.difference(featuresArr, plan_features);
       }
       function customParser(response) {
@@ -10270,7 +10285,6 @@ priceListModel = function (Backbone, constants) {
         };
       }
       var parsed = customParser(data);
-      console.log(parsed);
       return parsed;
     }
   });
@@ -10351,7 +10365,6 @@ loginViewCtrl = function (bb, loginTmpl, absNuregoView, $Nurego) {
     login: function (e) {
       //var baseURL = this.$el.find('#baseURL').val();
       var endPoint = constants.nuregoApiUrl();
-      console.log('sending req to: ' + endPoint);
       $Nurego.get(endPoint + '/login', function (data) {
         console.log(data);
       });
@@ -10364,12 +10377,11 @@ loginViewCtrl = function (bb, loginTmpl, absNuregoView, $Nurego) {
   });
   return loginViewCtrl;
 }(backbone, text_loginHTML, absNuregoView, jquery);
-text_priceListHTML = '<style>\r\n\t.headers,\r\n\t.tableWrapper{\r\n\t\tdisplay:flex;\r\n\t\tdisplay:-webkit-flex;\r\n\t}\r\n \r\n\t.cell {\r\n\t\t  padding: 8px;\r\n\t\t  border: 1px solid #E8E8E8;\r\n\t\t  min-height: 50px;\r\n\t\t  max-height: 50px;\r\n\t\t  overflow: hidden;\r\n\t\t  white-space: nowrap;\r\n\t\t  overflow: hidden;\r\n\t\t  text-overflow: ellipsis;\r\n\t}\r\n\r\n\t.nr-nurego-tag-line {\r\n  \t\ttext-align: right;\r\n\t}\r\n\r\n\t.headers div,\r\n\t.tableWrapper div{\r\n\t\tflex:1;\r\n\t  \t-webkit-flex: 1;\r\n\t\ttext-align:center;\r\n\t\tcolor:#9799A2;\r\n\t}\r\n\r\n\t.plansHeader .header{\r\n\t\ttext-transform:uppercase;\r\n\t\tcolor:#9799A2;\r\n\t\tfont-weight:bold;\r\n\t\tfont-size:14px;\r\n\t}\r\n\r\n\t.priceRecurrence{\r\n\t\tcolor:#8EBE2E;\r\n\t\tfont-size:14px;\r\n\t}\r\n\r\n\t.planPrice{\r\n\t\tcolor:#F26522;\r\n\t\tfont-size:16px;\r\n\t\tfont-weight:bold;\r\n\t}\r\n\r\n\t.planDiscount{\r\n\t\tbackground: #F26522;\r\n\t\tfont-weight: bold;\r\n\t}\r\n\r\n\t.planDiscount span{\r\n\t\tcolor: #fff !important;\r\n\t\tborder:0px;\r\n\t\tdisplay:block;\r\n\t}\r\n\r\n\t.nr-check.nr-no {\r\n\t\tcolor:#FB6B5B;\r\n\t\tfont-size:16px;\r\n\t}\r\n\r\n\t.nr-check.nr-yes {\r\n\t\tcolor:#92CF5C;\r\n\t\tfont-size:16px;\r\n\t}\r\n\r\n\t.planCol .features div:nth-of-type(odd),\r\n\t.featuresCol .featureName:nth-of-type(odd){\r\n\t\tbackground: #F9F9F9;\r\n\t}\r\n\r\n\t.subscribeToPlan {\r\n\t\tbackground: gray;\r\n\t\tcolor: #fff;\r\n\t\tborder: 0px;\r\n\t\tpadding: 6px;\r\n\t\tfont-size: 16px;\r\n\t\t/*margin: 8px 1px 0px 1px;*/\r\n\t}\r\n\r\n\t.subscribeToPlan span {\r\n\t    color: white;\r\n\t    font-weight: bold;\r\n\t}\r\n\r\n\t.subscribeToPlan span:hover {\r\n\t    text-decoration: underline;\r\n\t    cursor: pointer;\r\n\t}\r\n\t\r\n\t.noSSO.fillEmail .emailWrapper{\r\n\t  display: block;\r\n\t  position: absolute;\r\n\t  width: 100%;\r\n\t  top: 0px;\r\n\t  background: white;\r\n\t  height: 100%;\r\n\t  padding: 25%;\r\n\t}\r\n\r\n\t.noSSO.fillEmail.done .emailWrapper, .emailWrapper,\r\n\t.noSSO.fillEmail .nr-nurego-tag-line{\r\n\t\tdisplay:none;\r\n\t}\r\n\r\n\t.btn.btn-primary.postNoSSo {\r\n    \tmargin-top: 10px;\r\n\t}\r\n\r\n\t.thankYou{\r\n\t\tdisplay: none;\r\n\t}\r\n\r\n\t.done .p1 {\r\n    \tfont-size: 28px;\r\n\t}\r\n\t.done .thankYou{\r\n\t  display: block;\r\n\t  position: absolute;\r\n\t  top: 0px;\r\n\t  width: 100%;\r\n\t  text-align: center;\r\n\t  background: rgba(255,255,255,1);\r\n\t  height: 100%;\r\n\t  padding: 10%;\r\n\t}\r\n\r\n\t.unchecked .subscribeToPlan{\r\n\t\topacity:0.35;\r\n\t}\r\n\r\n\t.checked .subscribeToPlan{\r\n\t\topacity:1;\r\n\t}\r\n\r\n\r\n\r\n</style>\r\n\r\n<div class="plansHeader headers">\r\n\t\t\t<div class="featuresHeader header cell">\r\n\t\t\t\t\r\n\t\t\t</div>\r\n\t{{  for(var plan in plans) { }}\t\t        \t\t\r\n    \t\t<div class="header cell" title="{{=plans[plan].name}}">\r\n\t\t\t\t{{=plans[plan].name}}\r\n    \t\t</div>\r\n\r\n\t{{ \t}\t}}\r\n</div>\r\n\r\n<div class="priceHeaders headers">\r\n\t\t\t<div class="price header cell">\r\n\t\t\t\tPrice\r\n\t\t\t</div>\r\n\t{{  for(var plan in plans) { }}\t\t        \t\t\r\n    \t\t<div class="header cell">\r\n    \t\t{{\tif(plans[plan].features.map["recurring"])\t{\t}}\r\n\t\t\t\t\r\n\t\t\t\t<span class="planPrice">{{=plans[plan].features.map["recurring"].price}}$</span>\r\n\t\t\t\t<span class="priceRecurrence">/Month</span>\r\n\r\n\t\t\t{{\t}else if(plans[plan].price){ }}\r\n\t\t\t\t\r\n\t\t\t\t<span class="planPrice">{{=plans[plan].price}}$</span>\r\n\r\n\t\t\t{{\t}else{\t}}\r\n\r\n\t\t\t\t{{  for(var item in plans[plan].features.data) { }}\t\t        \t\t\r\n\r\n\t\t\t\t\t{{\tif(plans[plan].features.data[item].element_type === "recurring"){\t}}\r\n\t\t\t\t\t\t\t<span class="planPrice">{{=plans[plan].features.data[item].price}}$</span>\r\n\t\t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t{{\t}\t}}\r\n    \t\t</div>\r\n    \t\t\r\n\t{{ \t}\t}}\r\n</div>\r\n\r\n<div class="ccHeaders headers">\r\n\t\t\t<div class="price header cell" title="Credit Cards">\r\n\t\t\t\tCredit Cards\r\n\t\t\t</div>\r\n\t{{  for(var plan in plans) { }}\t\t        \t\t\r\n    \t\t\r\n    \t\t<div class="header cell">\r\n\t\t\t\t{{if (plans[plan].credit_card) { }} \r\n\t\t\t\t\r\n\t\t\t\t\t<span class="nr-check nr-yes ion-checkmark"></span>\r\n\r\n    \t\t\t{{\t}else{\t}}\r\n\r\n    \t\t\t\t<span class="nr-check nr-no ion-close "></span>\r\n\r\n    \t\t\t{{\t}\t}}\r\n\r\n    \t\t</div>\r\n\r\n\t{{ \t}\t}}\r\n</div>\r\n\r\n\r\n<div class="tableWrapper">\r\n\t\t\t\r\n\t\t\t<div class="featuresCol">\r\n\t\t\t\t{{  for(var item in features) { }}\r\n\t\t        \t\r\n\t\t        \t{{\tif([features[item]] != \'recurring\') {\t }}\r\n\t\t        \t\t<div class="featureName cell" title="{{=features[item]}}">\r\n\t\t\t\t\t\t\t{{=features[item]}}\r\n\t\t        \t\t</div>\r\n\t\t        \t{{\t}\t}}\r\n\r\n\t\t        {{  } }}\r\n\t\r\n\t\t\t</div>\r\n\r\n\r\n\r\n\t\t\t\r\n\t{{  for(var plan in plans) { }}\r\n\t\t\t<div class="planCol">\r\n\t\t        \t\t\t        \t\t\r\n\r\n\t\t        \t\t<div class="features">\r\n\t\t        \t\t\t{{  for(var item in features) { }}\r\n\r\n\r\n\r\n\t\t\t        \t\t\t{{\tif([features[item]] != \'recurring\') {\t }}\t\t        \t\t\t\t\r\n\r\n\r\n\t\t\t        \t\t\t\t\t{{\tif(plans[plan].features.map[features[item]].name) {\t }}\r\n\r\n\t\t\t        \t\t\t\t\t\t{{\tif(plans[plan].features.map[features[item]].max_unit) {\t }}\r\n\t\t\t\t        \t\t\t\t\t\t<div class="featureItem cell">\r\n\t\t\t\t\t        \t\t\t\t\t\t<span>\r\n\t\t\t\t\t        \t\t\t\t\t\t\t{{=plans[plan].features.map[features[item]].max_unit}}\r\n\t\t\t\t\t        \t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t        \t\t\t\t</div>\r\n\t\t\t        \t\t\t\t\t\t{{\t}else{ \t}}\r\n\r\n\t\t\t\t\t        \t\t\t\t\t<div class="featureItem cell">\r\n\t\t\t\t\t        \t\t\t\t\t\t<span class="nr-check nr-yes ion-checkmark"></span>\r\n\t\t\t\t\t\t        \t\t\t\t</div>\r\n\r\n\t\t\t\t\t        \t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t\t        \t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t\t        \t\t\t\t{{\tif(plans[plan].features.map[features[item]].missingFeature){\t}}\r\n\t\t\t\t\t\t\t\t\t\t\t<div class="featureItemMissing cell">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class="nr-check nr-no ion-close "></span>\r\n\t\t\t\t        \t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t{{\t}\t}}\t\t\t        \t\t\t\t\t\t        \t\t\t\r\n\r\n\t\t\t\t\t\t\t\t{{\t}\t}}\r\n\r\n\r\n\r\n\t\t        \t\t\t{{\t}\t}}\r\n\t\t        \t\t</div>\r\n\r\n\t\t        \t\t<div class="discount">\r\n\t\t        \t\t\t\r\n\t\t        \t\t\t{{for (item in plans[plan].discounts.data) { }}\r\n\t\t\t\t\t\t\t\t<div class="header planDiscount cell">\r\n\t\t\t\t\t\t\t\t\t<span>{{=plans[plan].discounts.data[item].days_to_apply}} days</span>\r\n\t\t\t\t\t\t\t\t\t<span>FREE TRIAL</span>\r\n\t\t\t\t\t    \t\t</div>\r\n\t\t\t\t\t\t\t{{\t}\t}}\r\n\t\t        \t\t</div>\r\n\r\n\t\t        \t\t{{\tif(!obj.urlParams["preview"]) {\t}}\r\n\t\t        \t\t<div class="subscribeToPlan">\r\n\t\t\t\t\t\t\t<span class="plan-select" data-id="{{=plans[plan].id}}">subscribe</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t{{\t}\t}}\r\n\t\t\t</div>\r\n\t{{  } }}\r\n\r\n\t\r\n</div>\r\n\r\n\r\n<div class="emailWrapper">\r\n\t<h4 class="">Please enter your Email:</h4>\r\n\t<input class="form-control email" type="text" placeholder="example@email.com"/>\r\n\t<div class="btn btn-primary postNoSSo">Subscribe</div>\r\n</div>\r\n\r\n{{ if(obj.urlParams["terms-of-service-url"]) {\t}}\r\n\t<div class="nr-nurego-tag-line">\r\n\t\t\t <div class="checkbox" id="checkbox">\r\n\t\t\t    <label>\r\n\t\t\t      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox"> \r\n\t\t\t      By clicking subscribe you agree to the \r\n                  <a href="javascript:void(0)" class="terms">Terms of Service</a>\r\n\t\t\t    </label>\r\n\t\t\t  </div>\r\n\t</div>\r\n{{\t}\t}}\r\n\r\n<div class="thankYou">\r\n\t<div class="p1">Your registration invite has been sent.</div>\r\n\t<div class="p2">Please check your inbox and use the link inside to sign up</div>\r\n</div>\r\n\r\n<div class="nr-nurego-tag-line">\r\n\tPricing Table Crafted by <a href="http://www.nurego.com">Nurego</a>\r\n</div>\r\n\r\n\r\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t  <span class="sr-only">Error:</span>\r\n\t  <span class="txt"></span>\r\n</div>';
+text_priceListHTML = '<style>\r\n\t.headers,\r\n\t.tableWrapper{\r\n\t\tdisplay:flex;\r\n\t\tdisplay:-webkit-flex;\r\n\t}\r\n \r\n\t.cell {\r\n\t\t  padding: 8px;\r\n\t\t  border: 1px solid #E8E8E8;\r\n\t\t  min-height: 50px;\r\n\t\t  max-height: 50px;\r\n\t\t  overflow: hidden;\r\n\t\t  white-space: nowrap;\r\n\t\t  overflow: hidden;\r\n\t\t  text-overflow: ellipsis;\r\n\t}\r\n\r\n\t.nr-nurego-tag-line {\r\n  \t\ttext-align: right;\r\n\t}\r\n\r\n\t.headers div,\r\n\t.tableWrapper div{\r\n\t\tflex:1;\r\n\t  \t-webkit-flex: 1;\r\n\t\ttext-align:center;\r\n\t\tcolor:#9799A2;\r\n\t}\r\n\r\n\t.plansHeader .header{\r\n\t\ttext-transform:uppercase;\r\n\t\tcolor:#9799A2;\r\n\t\tfont-weight:bold;\r\n\t\tfont-size:14px;\r\n\t}\r\n\r\n\t.priceRecurrence{\r\n\t\tcolor:#8EBE2E;\r\n\t\tfont-size:14px;\r\n\t}\r\n\r\n\t.planPrice{\r\n\t\tcolor:#F26522;\r\n\t\tfont-size:16px;\r\n\t\tfont-weight:bold;\r\n\t}\r\n\r\n\t.planDiscount{\r\n\t\tbackground: #F26522;\r\n\t\tfont-weight: bold;\r\n\t}\r\n\r\n\t.planDiscount span{\r\n\t\tcolor: #fff !important;\r\n\t\tborder:0px;\r\n\t\tdisplay:block;\r\n\t}\r\n\r\n\t.nr-check.nr-no {\r\n\t\tcolor:#FB6B5B;\r\n\t\tfont-size:16px;\r\n\t}\r\n\r\n\t.nr-check.nr-yes {\r\n\t\tcolor:#92CF5C;\r\n\t\tfont-size:16px;\r\n\t}\r\n\r\n\t.planCol .features div:nth-of-type(odd),\r\n\t.featuresCol .featureName:nth-of-type(odd){\r\n\t\tbackground: #F9F9F9;\r\n\t}\r\n\r\n\t.subscribeToPlan {\r\n\t\tbackground: gray;\r\n\t\tcolor: #fff;\r\n\t\tborder: 0px;\r\n\t\tpadding: 6px;\r\n\t\tfont-size: 16px;\r\n\t\t/*margin: 8px 1px 0px 1px;*/\r\n\t}\r\n\r\n\t.subscribeToPlan span {\r\n\t    color: white;\r\n\t    font-weight: bold;\r\n\t}\r\n\r\n\t.subscribeToPlan span:hover {\r\n\t    text-decoration: underline;\r\n\t    cursor: pointer;\r\n\t}\r\n\t\r\n\t.noSSO.fillEmail .emailWrapper{\r\n\t  display: block;\r\n\t  position: absolute;\r\n\t  width: 100%;\r\n\t  top: 0px;\r\n\t  background: white;\r\n\t  height: 100%;\r\n\t  padding: 20px;\r\n\t}\r\n\r\n\t.noSSO.fillEmail.done .emailWrapper, .emailWrapper,\r\n\t.noSSO.fillEmail .nr-nurego-tag-line{\r\n\t\tdisplay:none;\r\n\t}\r\n\r\n\t.btn.btn-primary.postNoSSo {\r\n    \tmargin-top: 10px;\r\n\t}\r\n\r\n\t.thankYou{\r\n\t\tdisplay: none;\r\n\t}\r\n\r\n\t.done .p1 {\r\n    \tfont-size: 28px;\r\n\t}\r\n\t.done .thankYou{\r\n\t  display: block;\r\n\t  position: absolute;\r\n\t  top: 0px;\r\n\t  width: 100%;\r\n\t  text-align: center;\r\n\t  background: rgba(255,255,255,1);\r\n\t  height: 100%;\r\n\t  padding: 10%;\r\n\t}\r\n\r\n\t.unchecked .subscribeToPlan{\r\n\t\topacity:0.35;\r\n\t}\r\n\r\n\t.checked .subscribeToPlan{\r\n\t\topacity:1;\r\n\t}\r\n\r\n\t.noSSO.fillEmail .tableWrapper{\r\n\t\tdisplay:none;\r\n\t}\r\n\r\n\r\n</style>\r\n\r\n<div class="plansHeader headers">\r\n\t\t\t<div class="featuresHeader header cell">\r\n\t\t\t\t\r\n\t\t\t</div>\r\n\t{{  for(var plan in plans) { }}\t\t        \t\t\r\n    \t\t<div class="header cell" title="{{=plans[plan].name}}">\r\n\t\t\t\t{{=plans[plan].name}}\r\n    \t\t</div>\r\n\r\n\t{{ \t}\t}}\r\n</div>\r\n\r\n<div class="priceHeaders headers">\r\n\t\t\t<div class="price header cell">\r\n\t\t\t\tPrice\r\n\t\t\t</div>\r\n\t{{  for(var plan in plans) { }}\t\t        \t\t\r\n    \t\t<div class="header cell">\r\n    \t\t{{\tif(plans[plan].features.map["recurring"])\t{\t}}\r\n\t\t\t\t\r\n\t\t\t\t<span class="planPrice">{{=plans[plan].features.map["recurring"].price}}$</span>\r\n\t\t\t\t<span class="priceRecurrence">/Month</span>\r\n\r\n\t\t\t{{\t}else if(plans[plan].price){ }}\r\n\t\t\t\t\r\n\t\t\t\t<span class="planPrice">{{=plans[plan].price}}$</span>\r\n\r\n\t\t\t{{\t}else{\t}}\r\n\r\n\t\t\t\t{{  for(var item in plans[plan].features.data) { }}\t\t        \t\t\r\n\r\n\t\t\t\t\t{{\tif(plans[plan].features.data[item].element_type === "recurring"){\t}}\r\n\t\t\t\t\t\t\t<span class="planPrice">{{=plans[plan].features.data[item].price}}$</span>\r\n\t\t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t{{\t}\t}}\r\n    \t\t</div>\r\n    \t\t\r\n\t{{ \t}\t}}\r\n</div>\r\n\r\n<div class="ccHeaders headers">\r\n\t\t\t<div class="price header cell" title="Credit Cards">\r\n\t\t\t\tCredit Cards\r\n\t\t\t</div>\r\n\t{{  for(var plan in plans) { }}\t\t        \t\t\r\n    \t\t\r\n    \t\t<div class="header cell">\r\n\t\t\t\t{{if (plans[plan].credit_card) { }} \r\n\t\t\t\t\r\n\t\t\t\t\t<span class="nr-check nr-yes ion-checkmark"></span>\r\n\r\n    \t\t\t{{\t}else{\t}}\r\n\r\n    \t\t\t\t<span class="nr-check nr-no ion-close "></span>\r\n\r\n    \t\t\t{{\t}\t}}\r\n\r\n    \t\t</div>\r\n\r\n\t{{ \t}\t}}\r\n</div>\r\n\r\n\r\n<div class="tableWrapper">\r\n\t\t\t\r\n\t\t\t<div class="featuresCol">\r\n\t\t\t\t{{  for(var item in features) { }}\r\n\t\t        \t\r\n\t\t        \t{{\tif([features[item]] != \'recurring\') {\t }}\r\n\t\t        \t\t<div class="featureName cell" title="{{=features[item]}}">\r\n\t\t\t\t\t\t\t{{=features[item]}}\r\n\t\t        \t\t</div>\r\n\t\t        \t{{\t}\t}}\r\n\r\n\t\t        {{  } }}\r\n\t\r\n\t\t\t</div>\r\n\r\n\r\n\r\n\t\t\t\r\n\t{{  for(var plan in plans) { }}\r\n\t\t\t<div class="planCol">\r\n\t\t        \t\t\t        \t\t\r\n\r\n\t\t        \t\t<div class="features">\r\n\t\t        \t\t\t{{  for(var item in features) { }}\r\n\r\n\r\n\r\n\t\t\t        \t\t\t{{\tif([features[item]] != \'recurring\') {\t }}\t\t        \t\t\t\t\r\n\r\n\r\n\t\t\t        \t\t\t\t\t{{\tif(plans[plan].features.map[features[item]].name) {\t }}\r\n\r\n\t\t\t        \t\t\t\t\t\t{{\tif(plans[plan].features.map[features[item]].max_unit) {\t }}\r\n\t\t\t\t        \t\t\t\t\t\t<div class="featureItem cell">\r\n\t\t\t\t\t        \t\t\t\t\t\t<span>\r\n\t\t\t\t\t        \t\t\t\t\t\t\t{{=plans[plan].features.map[features[item]].max_unit}}\r\n\t\t\t\t\t        \t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t        \t\t\t\t</div>\r\n\t\t\t        \t\t\t\t\t\t{{\t}else{ \t}}\r\n\r\n\t\t\t\t\t        \t\t\t\t\t<div class="featureItem cell">\r\n\t\t\t\t\t        \t\t\t\t\t\t<span class="nr-check nr-yes ion-checkmark"></span>\r\n\t\t\t\t\t\t        \t\t\t\t</div>\r\n\r\n\t\t\t\t\t        \t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t\t        \t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t\t        \t\t\t\t{{\tif(plans[plan].features.map[features[item]].missingFeature){\t}}\r\n\t\t\t\t\t\t\t\t\t\t\t<div class="featureItemMissing cell">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class="nr-check nr-no ion-close "></span>\r\n\t\t\t\t        \t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t{{\t}\t}}\t\t\t        \t\t\t\t\t\t        \t\t\t\r\n\r\n\t\t\t\t\t\t\t\t{{\t}\t}}\r\n\r\n\r\n\r\n\t\t        \t\t\t{{\t}\t}}\r\n\t\t        \t\t</div>\r\n\r\n\t\t        \t\t<div class="discount">\r\n\t\t        \t\t\t\r\n\t\t        \t\t\t{{for (item in plans[plan].discounts.data) { }}\r\n\t\t\t\t\t\t\t\t<div class="header planDiscount cell">\r\n\t\t\t\t\t\t\t\t\t<span>{{=plans[plan].discounts.data[item].days_to_apply}} days</span>\r\n\t\t\t\t\t\t\t\t\t<span>FREE TRIAL</span>\r\n\t\t\t\t\t    \t\t</div>\r\n\t\t\t\t\t\t\t{{\t}\t}}\r\n\t\t        \t\t</div>\r\n\r\n\t\t        \t\t{{\tif(!obj.urlParams["preview"]) {\t}}\r\n\t\t        \t\t<div class="subscribeToPlan">\r\n\t\t\t\t\t\t\t<span class="plan-select" data-id="{{=plans[plan].id}}">subscribe</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t{{\t}\t}}\r\n\t\t\t</div>\r\n\t{{  } }}\r\n\r\n\t\r\n</div>\r\n\r\n\r\n<div class="emailWrapper">\r\n\t<h4 class="">Please enter your Email:</h4>\r\n\t<input class="form-control email" type="text" placeholder="example@email.com"/>\r\n\t<div class="btn btn-primary postNoSSo">Subscribe</div>\r\n</div>\r\n\r\n{{ if(obj.urlParams["terms-of-service-url"]) {\t}}\r\n\t<div class="nr-nurego-tag-line">\r\n\t\t\t <div class="checkbox" id="checkbox">\r\n\t\t\t    <label>\r\n\t\t\t      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox"> \r\n\t\t\t      By clicking subscribe you agree to the \r\n                  <a href="javascript:void(0)" class="terms">Terms of Service</a>\r\n\t\t\t    </label>\r\n\t\t\t  </div>\r\n\t</div>\r\n{{\t}\t}}\r\n\r\n<div class="thankYou">\r\n\t<div class="p1">Your registration invite has been sent.</div>\r\n\t<div class="p2">Please check your inbox and use the link inside to sign up</div>\r\n</div>\r\n\r\n<div class="nr-nurego-tag-line">\r\n\tPricing Table Crafted by <a href="http://www.nurego.com">Nurego</a>\r\n</div>\r\n\r\n\r\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t  <span class="sr-only">Error:</span>\r\n\t  <span class="txt"></span>\r\n</div>';
 text_priceListCSS = '/*.simple_3_tier {\r\n    font-family:"Lato",Helvetica,Arial,sans-serif;\r\n    float: left;\r\n    margin: 0 auto;\r\n}\r\n.simple_3_tier table {\r\n    width: auto;\r\n    border-collapse: collapse;\r\n    background: #fff;\r\n}\r\n.simple_3_tier td,\r\n.simple_3_tier th {\r\n    border: 1px solid #e8e8e8;\r\n    vertical-align: middle;\r\n}\r\n.simple_3_tier td {\r\n    color: #707383;\r\n    font-size: 14px;\r\n    line-height: 18px;\r\n}\r\n.simple_3_tier thead th,\r\n.simple_3_tier tfoot th {\r\n    border: none;\r\n}\r\n.simple_3_tier thead td {\r\n    height: 30px;\r\n    background: #fff;\r\n    font-size: 11px;\r\n    color: #9799a2;\r\n    text-transform: uppercase;\r\n    text-align: center;\r\n    font-weight: bold;\r\n    padding: 0 10px;\r\n}\r\n.simple_3_tier tbody th {\r\n    text-align: left;\r\n    font-size: 12px;\r\n    padding: 10px 20px;\r\n    font-weight: normal;\r\n}\r\n.simple_3_tier tbody td {\r\n    text-align: center;\r\n    padding: 0 10px;\r\n}\r\n.simple_3_tier tfoot td {\r\n    text-align: center;\r\n    padding: 12px 0;\r\n}\r\n.simple_3_tier th.nr-price {\r\n    color: #666;\r\n    height: 32px;\r\n    background-color: #fff;\r\n    text-align: left;\r\n    font-weight: normal;\r\n}\r\n.simple_3_tier td.nr-price {\r\n    color: #f26522;\r\n    font-size: 20px;\r\n    font-weight: bold;\r\n    background-color: #fff;\r\n}\r\n.simple_3_tier tfoot a {\r\n    display: inline-block;\r\n    color: #fff;\r\n    background: #9799A2;\r\n    height: 32px;\r\n    line-height: 32px;\r\n    text-align: center;\r\n    padding: 0 15px;\r\n    margin-left: 5px;\r\n    margin-right: 5px;\r\n    font-size: 10px;\r\n    text-transform: uppercase;\r\n    font-weight: bold;\r\n    text-decoration: none;\r\n    -webkit-border-radius: 4px;\r\n    -moz-border-radius: 4px;\r\n    border-radius: 4px;\r\n}\r\n\r\n.simple_3_tier tfoot a:hover {\r\n    background: #959595;\r\n    text-decoration:underline;\r\n}\r\n\r\n.simple_3_tier .nr-check {\r\n    width: 16px;\r\n    height: 16px;\r\n    display: block;\r\n    margin: 0 auto;\r\n}\r\n\r\n.simple_3_tier .nr-check.nr-yes {font-size:16px; color:#69be28; }\r\n.simple_3_tier .nr-check.nr-no { font-size:16px; color:#f26522;  }\r\n.simple_3_tier .nr-notify {\r\n    font-size: 14px;\r\n    font-weight: bold;\r\n    text-align: center;\r\n    line-height: 18px;\r\n    padding: 20px;\r\n    margin: 0 0 15px;\r\n    font-family: Tahoma, Verdana, Segoe, sans-serif;\r\n    letter-spacing: 1px;\r\n}\r\n.simple_3_tier .nr-notify.nr-red {\r\n    background: #f2dede;\r\n    color: #a94442;\r\n}\r\n.simple_3_tier .nr-notify.nr-yellow {\r\n    background: #fcf8e3;\r\n    color: #986d3b;\r\n}\r\n.simple_3_tier .nr-container {\r\n    height: 304px;\r\n    margin: 0 auto 10px;\r\n}\r\n.simple_3_tier .nr-container.nr-loading {\r\n    background: url("../images/loader.gif") 50% 50% no-repeat;\r\n}\r\n.simple_3_tier .nr-container.nr-empty {\r\n    background: url("../images/empty.gif") 50% 50% no-repeat;\r\n}\r\n\r\n.nr-signup-div {\r\n    margin: 40px auto;\r\n    width: 100%;\r\n    text-align: center;\r\n}\r\n.nr-signup, .nr-go-signup, .nr-go-update {\r\n    text-decoration: none;\r\n    background: transparent;\r\n    border: 2px solid #dfe1e6;\r\n    min-width: 120px;\r\n    font-weight: 400;\r\n    margin-top: 0.5em;\r\n    color: #565a6b;\r\n    text-transform: uppercase;\r\n    padding: 0.625em 1.125em;\r\n    font-size: 0.857em;\r\n    margin-left: 5px;\r\n}\r\n\r\n.nr-signup:hover, .nr-go-signup:hover {\r\n    color: white;\r\n    background: #565a6b;\r\n    border: 2px solid white;\r\n}\r\n\r\n.simple_3_tier .nr-plan-selected {\r\n    background: #f26522; \r\n}\r\n\r\n.simple_3_tier .nr-plan-selected:hover {\r\n    background: #f26522; \r\n}\r\n\r\n.nr-discount {\r\n  text-transform:uppercase;\r\n  padding: 10px 10px 10px 10px !important;\r\n  background-color: #f26522;\r\n  color: wheat !important;\r\n}\r\n.nr-trial-days {\r\n  font-size: 10px;\r\n}\r\n\r\n.nr-price-period {\r\n  font-size: 14px;\r\n  font-weight: normal;\r\n  color: #69be28;\r\n}\r\n\r\n.nr-nurego-tag-line{\r\n  margin-top: 10px;\r\n    text-align: right;\r\n  font-size: 12px;\r\n}\r\n\r\n.nr-nurego-cc-require{\r\n  margin-top: 10px;\r\n    text-align: right;\r\n  font-size: 14px;\r\n}\r\n\r\n.nr-nurego-tag-line a{\r\n  color: #69be28;\r\n}\r\n\r\n.nr-cc td {\r\n  font-size: 12px;  \r\n}\r\n\r\n\r\n.on-offswitch {\r\n    display: inline-block;\r\n    margin-bottom: 15px;\r\n    position: relative; width: 74px;\r\n    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;\r\n}\r\n\r\n.on-offswitch-checkbox {\r\n    display: none;\r\n}\r\n.on-offswitch-label {\r\n    display: block; overflow: hidden; cursor: pointer;\r\n    border: 1px solid #DFE1E6; border-radius: 0px;\r\n}\r\n.on-offswitch-inner {\r\n    display: block; width: 200%; margin-left: -100%;\r\n    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;\r\n    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;\r\n}\r\n.on-offswitch-inner:before, .on-offswitch-inner:after {\r\n    display: block; float: left; width: 50%; height: 7px; padding: 0; line-height: 7px;\r\n    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;\r\n    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;\r\n}\r\n.on-offswitch-inner:before {\r\n    content: "";\r\n    padding-left: 10px;\r\n    background-color: #FFFFFF; color: #FFFFFF;\r\n}\r\n.on-offswitch-inner:after {\r\n    content: "";\r\n    padding-right: 10px;\r\n    background-color: #FFFFFF;\r\n    text-align: right;\r\n}\r\n.on-offswitch-switch {\r\n    display: block; width: 37px; margin: 1px;\r\n    background: #C59DD7;\r\n    border: 1px solid #DFE1E6; border-radius: 0px;\r\n    position: absolute; top: 0; bottom: 0; left: 35px;\r\n    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;\r\n    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; \r\n}\r\n\r\n.monthly-checked .on-offswitch-inner {\r\n    margin-left: 0;\r\n}\r\n\r\n.monthly-checked .on-offswitch-switch {\r\n    left: 0px; \r\n}\r\n\r\n.switch-monthly {\r\n    padding-right: 13px;\r\n    text-align: -webkit-right;   \r\n    color: #C59DD7;\r\n    font-size: 11px;\r\n    cursor: pointer;\r\n}\r\n\r\n.switch-yearly {\r\n    padding-left: 11px;\r\n    color: #6D6D6E;\r\n    font-size: 11px;\r\n    cursor: pointer;\r\n}\r\n\r\n.switcher-full {\r\n    display: none;\r\n    margin-left: 620px;\r\n    margin-bottom: 10px;\r\n}\r\n\r\n@media only screen and (max-width: 1260px) {\r\n  .switcher-full {\r\n    margin-left: 542px;\r\n  }\r\n}\r\n@media only screen and (max-width: 1150px) {\r\n  .switcher-full {\r\n    margin-left: 475px;\r\n  }\r\n}\r\n@media only screen and (max-width: 1050px) {\r\n  .switcher-full {\r\n    margin-left: 455px;\r\n  }\r\n}\r\n@media only screen and (max-width: 1020px) {\r\n  .switcher-full {\r\n    margin-left: 426px;\r\n  }\r\n}\r\n@media only screen and (max-width: 980px) {\r\n  .switcher-full {\r\n    margin-left: 400px;\r\n  }\r\n}\r\n@media only screen and (max-width: 913px) {\r\n  .switcher-full {\r\n    margin-left: 340px;\r\n  }\r\n}\r\n@media only screen and (max-width: 825px) {\r\n  .switcher-full {\r\n    margin-left: 200px;\r\n  }\r\n}\r\n\r\n*/';
 tosModel = function (Backbone, constants) {
   var tos = Backbone.Model.extend({
     initialize: function () {
-      console.log('terms of service model');
     },
     url: function () {
       var str = constants.nuregoApiUrl() + '/legaldocs/';
@@ -10398,6 +10410,8 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       this.params = utils.URLToArray(window.location.href);
       var themes = {
         singleTier: priceListSingleTierHTML,
+        //deprecated : need to remove camelCode and use camel_code;
+        single_tier: priceListSingleTierHTML,
         multitier: tmpl
       };
       if (!this.params.preview) {
@@ -10476,8 +10490,7 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
           window.top.location.href = url;
         } else {
           window.top.location.href = parent + url;
-        }
-        console.log(data);  //alert(JSON.stringify(data));
+        }  //alert(JSON.stringify(data));
       };
       $Nurego.ajax({
         url: url,
@@ -10570,10 +10583,24 @@ registrationViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) {
       var email = this.$el.find('input.email').val();
       var pass = this.$el.find('input.pass').val();
       var params = utils.URLToArray(window.location.href);
-      var url = params['registration-url'] + '?registrationId=' + params['registration-id'] + '&password=' + pass;
+      var url = params['registration-url'] + '?password=' + pass;
+      if (typeof params['registration-id'] != 'undefined') {
+        url += '&' + 'registrationId=' + params['registration-id'];
+      }
       if (email && email.indexOf('@') != -1) {
         url += '&email=' + encodeURI(email);
       }
+      var apiParams = utils.URLToArray(window.location.href)['api-params'];
+      //get params and chop the first '?' char;
+      var customApiParams;
+      try {
+        customApiParams = JSON.parse(apiParams);
+      } catch (e) {
+        customApiParams = JSON.parse('{"' + decodeURI(apiParams.substr(1, apiParams.length - 2)).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
+      }
+      _.forEach(customApiParams, function (v, k) {
+        url += '&' + k + '=' + v;
+      });
       window.top.location.href = params.parent + url;
     },
     render: function () {
@@ -10589,7 +10616,6 @@ text_termsOfServiceCSS = 'div{\r\n    \r\n}';
 tosStatusModel = function (Backbone, constants) {
   var tosStatus = Backbone.Model.extend({
     initialize: function () {
-      console.log('terms of service model');
     },
     url: function () {
       var str = constants.nuregoApiUrl() + '/legaldocs/status';
@@ -10640,8 +10666,6 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
       //return;
       var docs = this.model.get('legal_docs');
       var callback = function (data, req) {
-        console.log(data);
-        console.log(req);
         this.docs.sent += 1;
         if (this.docs.sent >= this.docs.total) {
           this.redirect();
@@ -10691,7 +10715,6 @@ text_categoryCSS = 'div.myCategoryDiv {\r\n\r\n}';
 categoryModel = function (Backbone, constants) {
   var categoryMod = Backbone.Model.extend({
     initialize: function () {
-      console.log('category model init');
     },
     url: function () {
       //var str = constants.nuregoApiUrl() + "/legaldocs/";
@@ -10786,8 +10809,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
   };
   app.init = function (opt) {
     _.forEach(opt.components, function (v, k) {
-      console.log(k);
-      console.log(v);
       lib.widgetFactory.build(k, v);
     });
   }, app.initObserver = function () {
@@ -10821,7 +10842,10 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
     // Create an observer instance
     var observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
+<<<<<<< HEAD
         console.log(mutation);
+=======
+>>>>>>> origin
         var lookUpWidgets = function () {
           var $node = $Nurego(this);
           if ($node.prop('tagName') === 'NUREGO-WIDGET') {
@@ -10836,7 +10860,10 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
             comp.element = this;
             comp.configParams = widgetAttrs;
             comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
+<<<<<<< HEAD
             console.log(comps);
+=======
+>>>>>>> origin
             app.init({ components: comps });
           }
         };
@@ -10858,13 +10885,31 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
       childList: true,
       characterData: true,
       subtree: true
+<<<<<<< HEAD
     };
     // Pass in the target node, as well as the observer options
     observer.observe(target, config);
+=======
+    };
+    // Pass in the target node, as well as the observer options
+    observer.observe(target, config);
+  }, app.resizeThisWidget = function () {
+    var size = {
+      h: $(document).height(),
+      w: $(document).width()
+    };
+    window.parent.postMessage('resizeMe', size);
+  }, app.onWidgetLoadFinish = function () {
+    //call parent frame to resize me.
+    params = lib.utils.URLToArray(window.location.href);
+    var stretch = params.stretch ? true : params.stretch;
+    if (stretch) {
+      app.resizeThisWidget();
+    }
+>>>>>>> origin
   }, app.onWidgetLoaded = function () {
     var params, thisWidget, widgetModel, widgetView, callback;
     params = lib.utils.URLToArray(window.location.href);
-    console.log(params);
     var draw = function () {
       thisWidget = lib.components[params.widget];
       widgetModel = new thisWidget.model({ apiKey: params.apiKey });
@@ -10907,7 +10952,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
         comp.configParams = widgetAttrs;
         comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
       }
-      console.log(comps);
       app.init({ components: comps });
     }
     app.initObserver();

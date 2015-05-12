@@ -50,8 +50,6 @@ define(["backbone","text!tosHTML","utils",
   		  	var docs = this.model.get('legal_docs');
 
   		  	var callback = function(data,req){
-	  			console.log(data);
-	  			console.log(req);
   				this.docs.sent += 1;
   				if(this.docs.sent >= this.docs.total){
   					this.redirect();
