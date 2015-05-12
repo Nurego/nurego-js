@@ -10842,10 +10842,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
     // Create an observer instance
     var observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
-<<<<<<< HEAD
-        console.log(mutation);
-=======
->>>>>>> origin
         var lookUpWidgets = function () {
           var $node = $Nurego(this);
           if ($node.prop('tagName') === 'NUREGO-WIDGET') {
@@ -10860,10 +10856,6 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
             comp.element = this;
             comp.configParams = widgetAttrs;
             comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
-<<<<<<< HEAD
-            console.log(comps);
-=======
->>>>>>> origin
             app.init({ components: comps });
           }
         };
@@ -10885,11 +10877,9 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
       childList: true,
       characterData: true,
       subtree: true
-<<<<<<< HEAD
     };
     // Pass in the target node, as well as the observer options
     observer.observe(target, config);
-=======
     };
     // Pass in the target node, as well as the observer options
     observer.observe(target, config);
