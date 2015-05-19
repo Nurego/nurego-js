@@ -7,13 +7,11 @@ define(["backbone","constants"],function(Backbone,constants){
     */ 
     var priceListModel = Backbone.Model.extend({
         initialize:function(opt){
-            console.log('init pricelist model');
             this.opt = opt;
             this.params = utils.URLToArray(window.location.href);
         },
 
         url:function(){
-        	console.log(this.opt)
             //var key = this.attr.find('apiParams') // {param1:val1,params2:val2}
 
             var url = constants.nuregoApiUrl() + "/offerings?api_key=" + this.opt.apiKey;
@@ -46,9 +44,6 @@ define(["backbone","constants"],function(Backbone,constants){
         	   }
 
         	   function getMissingFeatures(plan_features,featuresArr){
-        	   		console.log('difference:::')
-        	   		console.log(_.difference(featuresArr,plan_features))
-
         	   		return _.difference(featuresArr,plan_features);
         	   		
         	   }
@@ -93,7 +88,6 @@ define(["backbone","constants"],function(Backbone,constants){
 		    }
 
 		    var parsed = customParser(data);
-		    console.log(parsed)
 		    return parsed;
         }
 

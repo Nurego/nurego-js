@@ -21,7 +21,6 @@ define(["backbone","text!loginHTML","absNuregoView","jquery"],function(bb,loginT
 		  login:function(e){
 		  	//var baseURL = this.$el.find('#baseURL').val();
 		  	var endPoint = constants.nuregoApiUrl();
-		  	console.log("sending req to: " + endPoint);
 		  	$Nurego.get(endPoint + "/login",function(data){
 		  		console.log(data);
 		  	})

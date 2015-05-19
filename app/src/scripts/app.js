@@ -56,8 +56,6 @@ define([
 
 				app.init = function(opt){
 					_.forEach(opt.components,function(v,k){
-						console.log(k)
-						console.log(v)
 						lib.widgetFactory.build(k,v);
 					})
 				},
@@ -95,7 +93,6 @@ define([
 					// Create an observer instance
 					var observer = new MutationObserver(function( mutations ) {
 					  mutations.forEach(function( mutation ) {
-					  	console.log(mutation);
 					  	var lookUpWidgets = function(){
 				    		var $node = $Nurego( this );
 				    		if($node.prop('tagName') === "NUREGO-WIDGET"){
@@ -111,8 +108,6 @@ define([
 								comp.element = this;
 								comp.configParams = widgetAttrs;
 								comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
-
-								console.log(comps)
 								app.init({components:comps});
 				    		}
 					    }
@@ -121,7 +116,6 @@ define([
 					    if( newNodes !== null ) { // If there are new nodes added
 					    	var $nodes = $Nurego( newNodes ); // jQuery set
 					    	var $childNodes = $Nurego($nodes).find('nurego-widget');
-					    	console.log($childNodes)
 					    	$nodes.each(lookUpWidgets);
 					    	$childNodes.each(lookUpWidgets);
 					    }
@@ -140,10 +134,26 @@ define([
 					observer.observe(target, config);
 				},
 				
+				app.resizeThisWidget = function(){
+					var size = {
+						h:$(document).height(),
+						w:$(document).width()
+					};
+					window.parent.postMessage('resizeMe',size);
+				},
+
+				app.onWidgetLoadFinish = function(){
+					//call parent frame to resize me.
+					params = lib.utils.URLToArray(window.location.href);
+					var stretch = (params.stretch) ? true : (params.stretch);
+					if(stretch){ 
+						app.resizeThisWidget();
+					}
+				},
+
 				app.onWidgetLoaded = function(){
 					var params,thisWidget,widgetModel,widgetView,callback;
 					params = lib.utils.URLToArray(window.location.href);
-					console.log(params)
 					var draw = function(){
 						thisWidget = lib.components[params.widget];
 				    	widgetModel = new thisWidget.model({apiKey:params.apiKey});
@@ -191,7 +201,6 @@ define([
 							comp.configParams = widgetAttrs;
 							comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
 						}
-						console.log(comps)
 						app.init({components:comps});
 					}
 					app.initObserver();
