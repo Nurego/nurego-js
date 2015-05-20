@@ -8482,7 +8482,7 @@ constants = function (utils, $Nurego) {
       //var apiKey = $Nurego("nurego-public-customer-id").attr('id');
       var apiKey = $Nurego('meta[property=\'nrg:nurego-public-customer-id\']').attr('content');
       if (_.isUndefined(apiKey)) {
-        apiKey = $Nurego('nurego-public-customer-id').attr('url');
+        apiKey = $Nurego('nurego-public-customer-id').attr('id');
       }
       var apiKeyParam = utils.URLToArray(window.location.href).apiKey;
       if (apiKey) {
@@ -10229,6 +10229,7 @@ priceListModel = function (Backbone, constants) {
     },
     url: function () {
       //var key = this.attr.find('apiParams') // {param1:val1,params2:val2}
+      console.log(1);
       var url = constants.nuregoApiUrl() + '/offerings?api_key=' + this.opt.apiKey;
       /*for(val in key){
           url += "&" + key +"=" + val;
@@ -10771,7 +10772,7 @@ categoryViewCtrl = function (bb, tmpl, utils, css, categoryModel, absNuregoView,
   });
   return categoryView;
 }(backbone, text_categoryHTML, utils, text_categoryCSS, categoryModel, absNuregoView, jquery);
-text_absNuregoCss = '/* line 1, ../../../styles/main.scss */\r\nnurego-widget {\r\n  display: block;\r\n  height: 100%;\r\n  width: 100%;\r\n}\r\n\r\n/* line 7, ../../../styles/main.scss */\r\n.alert {\r\n  display: relative;\r\n  z-index: 9999999;\r\n}\r\n\r\n/* line 12, ../../../styles/main.scss */\r\n#checkbox label {\r\n  line-height: 175%;\r\n}\r\n\r\n/******************CHECK BOXES ******************/\r\n';
+text_absNuregoCss = '/* line 1, ../../../styles/main.scss */\r\nnurego-widget {\r\n  display: block;\r\n  height: 100%;\r\n  width: 100%;\r\n  flex:1;\r\n}\r\n\r\n/* line 7, ../../../styles/main.scss */\r\n.alert {\r\n  display: relative;\r\n  z-index: 9999999;\r\n}\r\n\r\n/* line 12, ../../../styles/main.scss */\r\n#checkbox label {\r\n  line-height: 175%;\r\n}\r\n\r\n/******************CHECK BOXES ******************/\r\n';
 Nurego = function (constants, utils, widgetFactory, loginModel, registrationModel, priceListModel, loginViewCtrl, priceListViewCtrl, registrationViewCtrl, tosViewCtrl, categoryViewCtrl, categoryModel, tosModel, tosStatusModel, absNuregoCss, $Nurego) {
   var app, lib;
   app = {};
