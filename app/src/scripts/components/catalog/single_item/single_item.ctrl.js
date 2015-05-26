@@ -1,7 +1,7 @@
-define(["backbone","text!categoryHTML","utils",
+define(["backbone","text!singleItemHTML","utils",
 		"text!categoryCSS",
-		"categoryModel","absNuregoView","jquery"],
-		function(bb,tmpl,utils,css,categoryModel,absNuregoView,$Nurego){
+		"singleItemModel","absNuregoView","jquery"],
+		function(bb,tmpl,utils,css,singleItemModel,absNuregoView,$Nurego){
 
 
 /*
@@ -9,10 +9,10 @@ define(["backbone","text!categoryHTML","utils",
         categoryHTML: '../components/catalog/category/category.html',
         categoryModel: '../models/category',
 */
-
-		var categoryView = absNuregoView.extend(
-{		  tagName: "div",
-		  className: "category_view",
+ 
+		var singleItem = absNuregoView.extend({
+		  tagName: "div",
+		  className: "single_item_view",
 		  template: _.template(tmpl),
 		  events: {
 		    
@@ -48,6 +48,7 @@ define(["backbone","text!categoryHTML","utils",
 		  },
 
 		  render: function(){
+		  	console.log(this.model.toJSON())
 		  	var html = this.template(this.model.toJSON());
 		    this.$el.html(	html );
 		    return this;
@@ -55,5 +56,5 @@ define(["backbone","text!categoryHTML","utils",
 
 		});
 
-		return categoryView;
+		return singleItem;
 })

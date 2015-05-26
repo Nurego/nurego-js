@@ -3,7 +3,7 @@ define(["backbone","constants"],function(Backbone,constants){
         fetch:function(){
             this.name 
         }
-    })
+    }) 
     */ 
     var priceListModel = Backbone.Model.extend({
         initialize:function(opt){
