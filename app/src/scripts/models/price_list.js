@@ -3,7 +3,7 @@ define(["backbone","constants"],function(Backbone,constants){
         fetch:function(){
             this.name 
         }
-    })
+    }) 
     */ 
     var priceListModel = Backbone.Model.extend({
         initialize:function(opt){
@@ -13,7 +13,7 @@ define(["backbone","constants"],function(Backbone,constants){
 
         url:function(){
             //var key = this.attr.find('apiParams') // {param1:val1,params2:val2}
-
+            console.log(1)
             var url = constants.nuregoApiUrl() + "/offerings?api_key=" + this.opt.apiKey;
             /*for(val in key){
                 url += "&" + key +"=" + val;

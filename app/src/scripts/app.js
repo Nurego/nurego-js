@@ -11,6 +11,8 @@ define([
 		"tosViewCtrl",
 		"categoryViewCtrl",
 		"categoryModel",
+		"singleItemCtrl",
+		"singleItemModel",
 		"tosModel",
 		"tosStatusModel",
 		"text!absNuregoCss",
@@ -18,8 +20,8 @@ define([
 		], 
 	function(constants,utils,widgetFactory,loginModel,registrationModel,
 			priceListModel,loginViewCtrl,priceListViewCtrl,registrationViewCtrl,
-			tosViewCtrl,categoryViewCtrl,categoryModel,tosModel,
-			tosStatusModel,absNuregoCss,$Nurego){
+			tosViewCtrl,categoryViewCtrl,categoryModel,singleItemCtrl,singleItemModel,
+			tosModel,tosStatusModel,absNuregoCss,$Nurego){
 				var app,lib;
 				app = {};
 				lib = {
@@ -27,6 +29,10 @@ define([
 					utils:utils,
 					widgetFactory:widgetFactory,
 					components:{
+						single_item:{
+							view:singleItemCtrl,
+							model:singleItemModel
+						},
 						login:{
 							view:loginViewCtrl,
 							model:loginModel
@@ -179,7 +185,6 @@ define([
 						draw();	
 					}
 				}
-
 
 				$Nurego(document).ready(function(){
 					var elems = $Nurego("nurego-widget");

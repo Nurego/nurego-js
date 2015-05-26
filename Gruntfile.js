@@ -19,6 +19,9 @@ module.exports = function (grunt){
   grunt.loadNpmTasks('grunt-plato');
   grunt.loadNpmTasks('grunt-bower-requirejs');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
+  //grunt.loadNpmTasks('grunt-autoprefixer');
+  grunt.loadNpmTasks("grunt-remove-logging");
+
 
 
   // Configurable paths for the application
@@ -38,6 +41,17 @@ module.exports = function (grunt){
     bowerRequirejs:{
       target:{
         rjsConfig: 'app/src/scripts/config/config.js'
+      }
+    },
+
+    removelogging:{
+      dist: {
+        src: "app/dist/bin.js",
+        dist: "app/dist/bin.js",
+        options: {
+          //replaceWith:"0;"
+          // see below for options. this is optional.
+        }
       }
     },
 
@@ -90,6 +104,21 @@ module.exports = function (grunt){
       }
     },
 
+    /*autoprefixer: {
+
+      options: {
+        // Task-specific options go here.
+      },
+
+      // prefix all files
+      multiple_files: [{
+        expand: true,
+        flatten: true,
+        src: '<%= yeoman.app %>/src/scripts/components/login/login.css', // -> src/css/file1.css, src/css/file2.css
+        //dest: 'dest/css/' // -> dest/css/file1.css, dest/css/file2.css
+      }],
+    },
+*/
     plato: {
         complexityreport: {
           files: {
@@ -235,22 +264,6 @@ module.exports = function (grunt){
       },
       server: '.tmp'
     },
-
-    // Add vendor prefixed styles
-    autoprefixer: {
-      options: {
-        browsers: ['last 1 version']
-      },
-      dist: {
-        files: [{
-          expand: true,
-          cwd: '.tmp/styles/',
-          src: '{,*/}*.css',
-          dest: '.tmp/styles/'
-        }]
-      }
-    },
-
     /*
       sass: {
         dist:{
@@ -480,7 +493,7 @@ module.exports = function (grunt){
       //'html2js',
       'bowerRequirejs',
       'concurrent:server',
-      'autoprefixer',
+      //'autoprefixer',
       'connect:livereload',
       'watch'
     ]);
@@ -495,7 +508,7 @@ module.exports = function (grunt){
     'clean:server',
     //'html2js',
     'concurrent:test',
-    'autoprefixer',
+    //'autoprefixer',
     'connect:test',
     'plato:complexityreport',
     'karma'
