@@ -37,7 +37,7 @@ require.config({
         categoryHTML: '../components/catalog/category/category.html',
         categoryModel: '../models/category',
         singleItemCtrl: '../components/catalog/single_item/single_item.ctrl',
-        singleItemHTML:  '../components/catalog/single_item/single_item.html',
+        singleItemHTML: '../components/catalog/single_item/single_item.html',
         singleItemModel: '../models/service_single_item',
         categoryCSS: '../components/catalog/category/category.css',
         absNuregoView: '../components/abstract/abstract.view',

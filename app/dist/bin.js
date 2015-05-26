@@ -10715,7 +10715,10 @@ text_categoryHTML = '<style>\r\n\r\n\t.headerWrapper{\r\n\t\tpadding: 5px;\r\n  
 text_categoryCSS = 'div.myCategoryDiv {\r\n\r\n}';
 categoryModel = function (Backbone, constants) {
   var categoryMod = Backbone.Model.extend({
-    initialize: function () {
+    initialize: function (opt) {
+      //console.log('category model init');
+      this.opt = opt;
+      this.params = utils.URLToArray(window.location.href);
     },
     url: function () {
       //var str = constants.nuregoApiUrl() + "/legaldocs/";
