@@ -21,7 +21,7 @@
     z-index: 1;
     perspective-origin: 663px 30px;
     transform-origin: 663px 30px;
-    background: rgb(68, 68, 68) none repeat scroll 0% 0% / auto padding-box border-box;
+    background: #309E1C;
     border: 0px none rgb(255, 255, 255);
     font: normal normal normal normal 15px/19.9999980926514px 'GE Inspira Sans', sans-serif;
     outline: rgb(255, 255, 255) none 0px;
@@ -390,8 +390,8 @@
 		{{ for(item in obj.data[category].services.data) {  }}
 
 				<div data-id="{{=obj.data[category].services.data[item].id}}" class="category_item singleItem">
-					<div> 
-						<img src="http://www.alberttoledo.com/img/icons/social/github.png" alt="Service Icon" id="IMG_47" />
+					<div>
+						<img src="{{=obj.data[category].services.data[item].icon}}" alt="Service Icon" id="IMG_47" />
 						<h3 id="H3_48">
 							{{=obj.data[category].services.data[item].name}}
 						</h3>

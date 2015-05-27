@@ -24,13 +24,16 @@
 			<div id="DIV_44">
 				<div id="DIV_45">
 					<p id="P_46">
-						<img src="http://www.alberttoledo.com/img/icons/social/github.png" id="IMG_47" alt='' /> <a href="http://predix-asset.grc-pr-apps.ice.ge.com/" id="A_48">View Live Sample</a>
+						<!-- <img src="http://www.alberttoledo.com/img/icons/social/github.png" id="IMG_47" alt='' />  -->
+						<img src="{{=obj.icon}}" id="IMG_47" alt='' /> 
+						<a href="http://predix-asset.grc-pr-apps.ice.ge.com/" id="A_48">View Live Sample</a>
 					</p>
 				</div>
 				<div id="DIV_49">
 					<div id="DIV_50">
 						<p id="P_51">
-							The Predix Asset Service provides asset modeling and data management with real time intelligence, and provides insight into the relationships and connections between independently managed assets. Industrial Internet applications are generally machine-focused. The Asset service enables application developers to import, create, and store asset models that describe machine types, as well as create instance representations for those machines.
+							{{=obj.description}}
+							<!-- The Predix Asset Service provides asset modeling and data management with real time intelligence, and provides insight into the relationships and connections between independently managed assets. Industrial Internet applications are generally machine-focused. The Asset service enables application developers to import, create, and store asset models that describe machine types, as well as create instance representations for those machines. -->
 						</p>
 					</div>
 				</div>
@@ -46,6 +49,11 @@
 
 
 <style>
+
+body , html {
+	overflow:hidden;
+}
+
 #HTML_1 {
     box-sizing: border-box;
     height: 939.171875px;
@@ -1102,5 +1110,5 @@
 }/*#P_94, #P_95*/
 
 
-	
+
 </style>
