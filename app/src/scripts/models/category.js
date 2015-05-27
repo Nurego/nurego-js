@@ -1,8 +1,10 @@
 define(["backbone","constants"],function(Backbone,constants){
 	
     var categoryMod = Backbone.Model.extend({
-        initialize:function(){
+        initialize:function(opt){
             //console.log('category model init');
+            this.opt = opt;
+            this.params = utils.URLToArray(window.location.href);
         },
         
         url:function(){
