@@ -8586,7 +8586,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
         }
       });
       _.each(opt.configParams.urlParams, function (val, key) {
-        if (key !== 'name' && key !== 'widget') {
+        if (key !== 'name' && key !== 'widget' && key !== 'html') {
           var seperator = '&';
           //(indx === 0) ? "?" : "&";
           res += seperator + key + '=' + val;
@@ -10800,7 +10800,7 @@ categoryViewCtrl = function (bb, tmpl, utils, css, categoryModel, absNuregoView,
   });
   return categoryView;
 }(backbone, text_categoryHTML, utils, text_categoryCSS, categoryModel, absNuregoView, jquery);
-text_singleItemHTML = '<div>\r\n\t<h2>{{=obj.name}}</h2>\r\n\t<h5>{{=obj.description}}</h5> \r\n</div>';
+text_singleItemHTML = '<div>\r\n\t<h2>{{=obj.name}}</h2>\r\n\t<h5>{{=obj.description}}</h5> \r\n\thello world\r\n</div>';
 singleItemModel = function (Backbone, constants) {
   var categoryMod = Backbone.Model.extend({
     initialize: function (opt) {

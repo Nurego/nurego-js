@@ -79,7 +79,7 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 			})
 
 			_.each(opt.configParams.urlParams,function(val,key){
-				if(key !== "name" && key !== "widget"){
+				if(key !== "name" && key !== "widget" && key !== "html"){
 					var seperator = "&"; //(indx === 0) ? "?" : "&";
 					res += seperator + key + "=" + val;
 				}
