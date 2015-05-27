@@ -52,6 +52,33 @@
 	    padding-bottom: 35px;
 	    padding: 0px;
 	}
+
+	.widget_wrapper {
+		display: none;
+		position:absolute;
+		top:0px;
+		left:0px;
+		width: 100%;
+		height: 100%;
+		background:white;
+	}
+
+	.close_widget{
+		position: absolute;
+		top:15px;
+		left:15px;
+		font-weight: bold;
+		font-size:18px;
+	}
+
+	.show_item .widget_wrapper {
+		display: block;
+	}
+
+	.widget_holder{
+		margin-top:30px;
+	}
+
 </style>
 
 
@@ -71,7 +98,7 @@
 		<div class="itemsWrapper">
 		{{ for(item in obj.data[category].services.data) {  }}
 
-			<div class="singleItem">
+			<div class="singleItem" data-id="{{=obj.data[category].services.data[item].id}}">
 				<img src="https://cdn1.iconfinder.com/data/icons/logotypes/32/github-128.png" height="45px" width="45px" />
 				<div class="name">
 					{{=obj.data[category].services.data[item].name}}
@@ -93,3 +120,7 @@
 {{ } }}
 
 
+<div class="widget_wrapper">
+	<div class="close_widget">[Back]</div>
+	<div class="widget_holder"></div>
+</div>

@@ -15,7 +15,8 @@ define(["backbone","text!categoryHTML","utils",
 		  className: "category_view",
 		  template: _.template(tmpl),
 		  events: {
-		    
+		    "click .itemsWrapper":"showService",
+		    "click .close_widget":"closeService"
 		  },
 
 		  initialize: function(model,customTmpl){
@@ -42,9 +43,20 @@ define(["backbone","text!categoryHTML","utils",
 		  	$Nurego('body').append(styleEl);
 		  },
 
-		  redirect:function(){
-		  	var redirectURL = this.params['redirect-url'];
-		  	window.top.location.href = this.params.parent + redirectURL;
+		  showService:function(e){debugger;
+		  	this.selectedService = $Nurego(e.target).attr('data-id');
+		  	if(!this.selectedService){
+		  		this.selectedService = $Nurego(e.target).parents('.singleItem').attr('data-id');
+		  	}
+		  	var widget = document.createElement('nurego-widget');
+		  	$Nurego(widget).attr({"name":"single_item","service_id":this.selectedService})
+		  	$Nurego('.widget_holder').append(widget);
+		  	this.$el.addClass('show_item');
+		  },
+
+		  closeService:function(){
+			$Nurego('.widget_holder').html('');
+			this.$el.removeClass('show_item');
 		  },
 
 		  render: function(){
