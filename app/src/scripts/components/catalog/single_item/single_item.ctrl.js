@@ -1,7 +1,7 @@
-define(["backbone","text!categoryHTML","utils",
+define(["backbone","text!singleItemHTML","utils",
 		"text!categoryCSS",
-		"categoryModel","absNuregoView","jquery"],
-		function(bb,tmpl,utils,css,categoryModel,absNuregoView,$Nurego){
+		"singleItemModel","absNuregoView","jquery"],
+		function(bb,tmpl,utils,css,singleItemModel,absNuregoView,$Nurego){
 
 
 /*
@@ -9,14 +9,13 @@ define(["backbone","text!categoryHTML","utils",
         categoryHTML: '../components/catalog/category/category.html',
         categoryModel: '../models/category',
 */
-
-		var categoryView = absNuregoView.extend(
-{		  tagName: "div",
-		  className: "category_view",
+ 
+		var singleItem = absNuregoView.extend({
+		  tagName: "div",
+		  className: "single_item_view",
 		  template: _.template(tmpl),
 		  events: {
-		    "click .itemsWrapper":"showService",
-		    "click .close_widget":"closeService"
+		    
 		  },
 
 		  initialize: function(model,customTmpl){
@@ -43,23 +42,13 @@ define(["backbone","text!categoryHTML","utils",
 		  	$Nurego('body').append(styleEl);
 		  },
 
-		  showService:function(e){debugger;
-		  	this.selectedService = $Nurego(e.target).attr('data-id');
-		  	if(!this.selectedService){
-		  		this.selectedService = $Nurego(e.target).parents('.singleItem').attr('data-id');
-		  	}
-		  	var widget = document.createElement('nurego-widget');
-		  	$Nurego(widget).attr({"name":"single_item","service_id":this.selectedService})
-		  	$Nurego('.widget_holder').append(widget);
-		  	this.$el.addClass('show_item');
-		  },
-
-		  closeService:function(){
-			$Nurego('.widget_holder').html('');
-			this.$el.removeClass('show_item');
+		  redirect:function(){
+		  	var redirectURL = this.params['redirect-url'];
+		  	window.top.location.href = this.params.parent + redirectURL;
 		  },
 
 		  render: function(){
+		  	console.log(this.model.toJSON())
 		  	var html = this.template(this.model.toJSON());
 		    this.$el.html(	html );
 		    return this;
@@ -67,5 +56,5 @@ define(["backbone","text!categoryHTML","utils",
 
 		});
 
-		return categoryView;
+		return singleItem;
 })

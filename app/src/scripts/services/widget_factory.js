@@ -73,14 +73,16 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 
 				if(key !== "urlParams"){
 					var seperator = "&"; //(indx === 0) ? "?" : "&";
-					res += seperator + key + "=" + val;
+						res += seperator + key + "=" + val;
 					indx++;
 				}
 			})
 
 			_.each(opt.configParams.urlParams,function(val,key){
-				var seperator = "&"; //(indx === 0) ? "?" : "&";
-				res += seperator + key + "=" + val;
+				if(key !== "name" && key !== "widget"){
+					var seperator = "&"; //(indx === 0) ? "?" : "&";
+					res += seperator + key + "=" + val;
+				}
 				indx++;
 			})
 

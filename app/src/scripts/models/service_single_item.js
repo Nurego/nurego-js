@@ -9,7 +9,10 @@ define(["backbone","constants"],function(Backbone,constants){
         
         url:function(){
             //var str = constants.nuregoApiUrl() + "/legaldocs/";
-            var str = constants.nuregoApiUrl() + "/catalog";
+            //var str = constants.nuregoApiUrl() + "/catalog";
+            
+            var str = constants.nuregoApiUrl() + "/services/"+this.params['service_id'];
+
             //var str = "/src/scripts/mockdata/category.json";
             var apiKey = constants.getNuregoApiKey();
             if(apiKey !== "false"){
@@ -26,5 +29,5 @@ define(["backbone","constants"],function(Backbone,constants){
     });
 
     return categoryMod;
- 
+
 });
