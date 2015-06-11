@@ -20,6 +20,9 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 			if(typeof(opt.configParams.uid) != "undefined"){
 				iframe.id = opt.configParams.uid;
 			}
+			if(typeof(opt.configParams.name) != "undefined"){
+				iframe.name = opt.configParams.name;
+			}
 			this.decorateIframe(iframe);
 			$Nurego(opt.element).append(iframe);
 		},
