@@ -33,7 +33,7 @@ define(["backbone","text!singleItemHTML","utils",
 		  			dataType:"jsonp",
 		  			error:_.bind(this.modelHttpErrorsHandler,this),
 		  		});
-		  	this.initStyle();
+		  	this.initStyle();	
 		    this.addStyle();
 		  },
 
