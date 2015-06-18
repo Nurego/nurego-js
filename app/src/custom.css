@@ -1,0 +1,15 @@
+.widget_holder {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    z-index: 9999;
+    background-color: white;
+}
+
+.close_widget {
+    position: absolute;   
+    top: 15px;   
+    left: 15px;   
+    font-weight: bold;   
+    font-size: 18px;   
+    z-index: 9999999;
