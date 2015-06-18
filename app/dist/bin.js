@@ -8536,6 +8536,9 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       if (typeof opt.configParams.uid != 'undefined') {
         iframe.id = opt.configParams.uid;
       }
+      if (typeof opt.configParams.fname != 'undefined') {
+        iframe.name = opt.configParams.fname;
+      }
       this.decorateIframe(iframe);
       $Nurego(opt.element).append(iframe);
     },
