@@ -10767,6 +10767,7 @@ categoryViewCtrl = function (bb, tmpl, utils, css, categoryModel, absNuregoView,
         dataType: 'jsonp',
         error: _.bind(this.modelHttpErrorsHandler, this)
       });
+      this.initStyle();
       this.addStyle();
     },
     addStyle: function () {
@@ -10851,6 +10852,7 @@ singleItemCtrl = function (bb, tmpl, utils, css, singleItemModel, absNuregoView,
         dataType: 'jsonp',
         error: _.bind(this.modelHttpErrorsHandler, this)
       });
+      this.initStyle();
       this.addStyle();
     },
     addStyle: function () {

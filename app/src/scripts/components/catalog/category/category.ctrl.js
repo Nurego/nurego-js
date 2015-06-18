@@ -34,6 +34,7 @@ define(["backbone","text!categoryHTML","utils",
 		  			dataType:"jsonp",
 		  			error:_.bind(this.modelHttpErrorsHandler,this),
 		  		});
+		  	this.initStyle();
 		    this.addStyle();
 		  },
 
