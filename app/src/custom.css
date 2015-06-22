@@ -13,4 +13,6 @@
     font-weight: bold;   
     font-size: 18px;   
     z-index: 9999999;
+    background-color: white;
+    padding: 0px 10px;
 }
