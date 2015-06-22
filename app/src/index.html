@@ -1,0 +1,462 @@
+<!doctype html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <title>Nurego JS Library Sandbox</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.2.js"></script>
+	<!-- <nurego-public-customer-id id="l402b7a9-dc19-43fd-89cd-64e8fe101347"> 
+	</nurego-public-customer-id> -->
+	<meta property="nrg:nurego-public-customer-id" content="l402b7a9-dc19-43fd-89cd-64e8fe101347"/>
+	
+	<!--nurego-public-customer-id id="lff49a59-f1fc-47af-8adf-f795d5baa065" type="anat/sasha"> </nurego-public-customer-id-->
+	<!--nurego-js-baseurl url="http://localhost:9000/src"></nurego-js-baseurl--> 
+	<!--nurego-api-baseurl url="http://localhost:31001/myapi/"> </nurego-api-baseurl-->
+
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+
+    <!-- <link rel="stylesheet" href="styles/main.css"> -->
+
+
+    <!-- endbuild -->
+
+    <style>
+    body pre[class*=language-]>code[data-language]{
+    	overflow: auto !important;
+    }
+		/* sidebar */
+		.bs-docs-sidebar {
+		    padding-left: 20px;
+		    /*margin-top: 20px;*/
+		    margin-bottom: 20px;
+		}
+
+		/* all links */
+		.bs-docs-sidebar .nav>li>a {
+		    color: #999;
+		    border-left: 2px solid transparent;
+		    padding: 4px 20px;
+		    font-size: 13px;
+		    font-weight: 400;
+		}
+
+		/* nested links */
+		.bs-docs-sidebar .nav .nav>li>a {
+		    padding-top: 1px;
+		    padding-bottom: 1px;
+		    padding-left: 30px;
+		    font-size: 12px;
+		}
+
+		/* active & hover links */
+		.bs-docs-sidebar .nav>.active>a, 
+		.bs-docs-sidebar .nav>li>a:hover, 
+		.bs-docs-sidebar .nav>li>a:focus {
+		    color: #563d7c;                 
+		    text-decoration: none;          
+		    background-color: transparent;  
+		    border-left-color: #563d7c; 
+		}
+		/* all active links */
+		.bs-docs-sidebar .nav>.active>a, 
+		.bs-docs-sidebar .nav>.active:hover>a,
+		.bs-docs-sidebar .nav>.active:focus>a {
+		    font-weight: 700;
+		}
+		/* nested active links */
+		.bs-docs-sidebar .nav .nav>.active>a, 
+		.bs-docs-sidebar .nav .nav>.active:hover>a,
+		.bs-docs-sidebar .nav .nav>.active:focus>a {
+		    font-weight: 500;
+		}
+
+		/* hide inactive nested list */
+		.bs-docs-sidebar .nav ul.nav {
+		    display: none;           
+		}
+		/* show active nested list */
+		.bs-docs-sidebar .nav>.active>ul.nav {
+		    display: block;           
+		}
+
+		#ribbon{position:fixed;right:0px; top:0px; z-index:99999999;}
+
+		code[class*="language-"].nowrap, pre[class*="language-"].nowrap{
+			white-space: nowrap;
+		}
+
+		.bs-docs-section {
+			margin-bottom:60px;
+		}
+
+		.codeBox {
+		    margin-top: -23px !important;
+		    border-radius: 0px 0px 4px 4px;
+		}
+
+		.well.white{
+			background:rgba(220, 220, 220, 0.05);
+		}
+
+		body .token.tab:not(:empty):before {
+			display: none;
+		}
+
+		body{
+			padding-top:72px;
+		}
+
+		body .hide{
+			display: none;
+		}
+    </style>
+  </head>
+  <body>
+
+  	<nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">
+          <img src="http://www.nurego.com/wp-content/uploads/2014/05/logo.png"/>
+          </a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Components</a></li>
+            <!-- <li><a href="#about">Get started</a></li> -->
+            <li class="hide"><a href="#contact">Coverage Reports</a></li>
+            <li class="hide"><a href="#contact">Plato Reports</a></li>
+            <li class="hide"><a href="#contact">Tests</a></li>
+            <li class="hide"><a href="#contact">Workspace setup</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <!--li><a href="../navbar/">Default</a></li-->
+            
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+
+  
+
+  <a href="https://github.com/Nurego/nurego-js" id="ribbon">
+  
+  <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png">
+
+  </a>
+
+    <!-- build:js(.) scripts/oldieshim.js -->
+    <!--[if lt IE 9]>
+    <script src="bower_components/es5-shim/es5-shim.js"></script>
+    <script src="bower_components/json3/lib/json3.js"></script>
+    <![endif]-->
+    <!-- endbuild -->
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <!--script src="bower_components/requirejs/require.js" data-main="scripts/config/config.js"></script-->
+    <!--script src="scripts/src/app.js" type="text/javascript"></script-->
+    
+
+     <nav class="col-xs-3 bs-docs-sidebar">
+        <ul id="sidebar" class="nav nav-stacked fixed"  data-spy="affix" data-offset-top="0">
+        	<li class="hide">
+                <a href="#gettingStarted">Getting started</a>
+                <ul class="nav nav-stacked">
+                    <li><a href="#gettingStarted1">Register to get token</a></li>
+                    <li><a href="#gettingStarted2">JS API</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#priceList">Price List</a>
+                <ul class="nav nav-stacked">
+                    <li><a href="#priceList1">Price List Directive</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#login">Login</a>
+                <ul class="nav nav-stacked">
+                    <li><a href="#login1">Login Directive</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#registration">Registration</a>
+                <ul class="nav nav-stacked">
+                    <li><a href="#registration1">Registration Directive</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#terms_of_service">Terms of service</a>
+                <ul class="nav nav-stacked">
+                    <li><a href="#terms_of_service1">Terms of service Directive</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#catalog">Catalog Section</a>
+                <ul class="nav nav-stacked">
+                    <li><a href="#catalog1">Catalog Section Directive</a></li>
+                </ul>
+            </li>
+
+
+            
+
+        </ul>
+    </nav>
+
+
+<div class="container" style="width:740px;">
+
+	<!--div id="gettingStarted">
+		<div class="bs-docs-section">
+			<h1 id="gettingStarted1"  class="page-header">Getting started</h1>
+			<p>
+				Start by adding this script to the bottom of you HTML &lt;body&gt;
+			</p>
+
+			<pre class="language-markup nowrap">
+				<code class="nowrap">
+&lt;script src="https://rawgit.com/doronzzz/N.js/master/app/dist/bin.js" type="text/javascript"&gt; 
+&lt;/script&gt;
+			  	</code>
+		  	</pre>
+
+
+			<p>
+		  		To set your Nurego API key
+		  	</p>
+		  	<pre class="language-markup nowrap">
+				<code class="nowrap">
+&lt;nurego-public-customer-id id="000-000-000-000"&gt;
+&lt;/nurego-public-customer-id&gt;
+			  	</code>
+		  	</pre>
+
+
+		  	<p>
+		  		To overwrite the Nurego widgets base url use this directive:
+		  	</p>
+		  	<pre class="language-markup nowrap">
+				<code class="nowrap">
+&lt;nurego-js-baseurl url="http://localhost:31001/"&gt;
+&lt;/nurego-js-baseurl&gt;
+			  	</code>
+		  	</pre>
+
+		  	<p>
+		  		To overwrite the Nurego API Server base url  (staging/prod/local) use this directive:
+		  	</p>
+		  	<pre class="language-markup nowrap">
+				<code class="nowrap">
+&lt;nurego-api-baseurl url="http://localhost:31001/"&gt;
+&lt;/nurego-api-baseurl&gt;
+			  	</code>
+		  	</pre>
+		</div>
+
+		<!--div class="bs-docs-section">
+			<h1 id="gettingStarted2"  class="page-header">Javascript API</h1>
+			<p>
+				How to inject script to bottom of the body HTML..
+				How to inject script to bottom of the body HTML..
+				How to inject script to bottom of the body HTML..
+				How to inject script to bottom of the body HTML..
+			</p>
+		</div-->
+
+	</div-->
+
+	<div class="bs-docs-section" id="priceList">
+		<h1 class="page-header">Nurego Price list</h1>
+		<!--p>
+			Description text.. Description text.. Description text.. 
+			Description text.. Description text.. Description text.. 
+		</p-->
+
+		<h3>1.1) Price List Directive</h3>
+		<div style="height:450px;" id="priceList1" class="well white">
+		    <nurego-widget 
+			    style="width:100%;" 
+			    name="price_list"
+			    redirect-url="/registration"
+			    sso="false"
+			    terms-of-service-url="/terms.html"
+			    css="https://assets-cdn.github.com/assets/github-391b32dc1132ef0837cee6b206cad9c2726c7f495e5047901a7afa551e81d695.css">
+		    </nurego-widget>
+		</div>
+		<pre class="language-markup nowrap codeBox">
+		  <code class="nowrap">
+&lt;nurego-widget name="price_list" html="path/to/html/template.html" terms-of-service-url="/terms.html" redirect-url="/loginSuccess" &gt;
+&lt;/nurego-widget&gt;
+		  </code>
+	  	</pre>
+	</div>
+
+
+	<div class="bs-docs-section" id="login">
+		<h1  class="page-header">2) Nurego login</h1>
+		<!--p>
+			Description text.. Description text.. Description text.. 
+			Description text.. Description text.. Description text.. 
+		</p-->
+		<h3>2.1) Login Directive</h3>
+		<div style="height:300px;" id="login1" class="well white"> 
+		    <nurego-widget name="login"></nurego-widget>
+		</div>
+		<pre class="language-markup nowrap codeBox">
+		  <code class="nowrap">&lt;nurego-widget name="login"&gt;&lt;/nurego-widget&gt;
+		  </code>
+	  	</pre>
+		
+	</div>
+
+
+
+	<div class="bs-docs-section" id="registration">
+		<h1  class="page-header">3) Nurego Activation</h1>
+		<!--p>
+			Description text.. Description text.. Description text.. 
+			Description text.. Description text.. Description text.. 
+		</p-->
+		<h3>3.1) registration Directive</h3>
+		<div style="height:300px;" id="registration1" class="well white"> 
+		    <nurego-widget name="registration" 
+			   registration-url="/register"
+			   request-email="false"
+			   registration-id="000-000"> </nurego-widget>
+		</div>
+		<pre class="language-markup nowrap codeBox">
+		  <code class="nowrap">&lt;nurego-widget name="registration" registration-url="/register" request-email="true" registration-id="0000"&gt;&lt;/nurego-widget&gt;
+		  </code>
+	  	</pre>
+		
+		
+	</div>
+
+
+	<div class="bs-docs-section" id="terms_of_service">
+		<h1  class="page-header">4) Nurego Terms Of Service</h1>
+		<!--p>
+			Description text.. Description text.. Description text.. 
+			Description text.. Description text.. Description text.. 
+		</p-->
+		<h3>4.1)Terms Of Service Directive</h3>
+		<div style="height:300px;" id="terms_of_service1" class="well white"> 
+		    <nurego-widget name="terms_of_service" 
+			   redirect-url="/app.html">
+			 </nurego-widget>
+		</div>
+		<pre class="language-markup nowrap codeBox">
+		  <code class="nowrap">&lt;nurego-widget name="terms_of_service" redirect-url="/app.html" &gt;&lt;/nurego-widget&gt;
+		  </code>
+	  	</pre>
+		
+		
+	</div>
+
+
+		<div class="bs-docs-section" id="catalog">
+		<h1  class="page-header">5) Nurego Catalog Category</h1>
+		<!--p>
+			Description text.. Description text.. Description text.. 
+			Description text.. Description text.. Description text.. 
+		</p-->
+		<h3>5.1) Nurego Catalog Category</h3>
+		<div style="height:300px;" id="catalog1" class="well white"> 
+		    <nurego-widget name="category" >
+			 </nurego-widget>
+		</div>
+		<pre class="language-markup nowrap codeBox">
+		  <code class="nowrap">&lt;nurego-widget name="category" &gt;&lt;/nurego-widget&gt;
+		  </code>
+	  	</pre>
+	</div>
+
+	<div class="bs-docs-section" id="single_item">
+		<h1  class="page-header">6) Nurego Catalog single item</h1>
+		<!--p>
+			Description text.. Description text.. Description text.. 
+			Description text.. Description text.. Description text.. 
+		</p-->
+		<h3>6.1) Nurego Catalog single item</h3>
+		<div style="height:300px;" id="terms_of_service1" class="well white"> 
+		    <nurego-widget name="single_item" service_id="ser_ed89-b138-4dda-971c-7ac91c9a2ad2">
+			 </nurego-widget>
+		</div>
+		<pre class="language-markup nowrap codeBox">
+		  <code class="nowrap">&lt;nurego-widget name="single_item" service_id="ser_ed89-b138-4dda-971c-7ac91c9a2ad2" &gt;&lt;/nurego-widget&gt;
+		  </code>
+	  	</pre>
+	</div>
+
+
+	
+</div>
+    <!--script src="//rawgit.com/Nurego/nurego-js/staging/app/dist/bin.js" type="text/javascript" rel="nurego">
+    </script-->
+
+    <script src="//js.nurego.com/latest/bin.js" type="text/javascript" rel="nurego"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js" type="text/javascript">
+    </script>
+    <script> 
+
+    $(document).ready(function(){
+    	$('body').scrollspy({
+		    target: '.bs-docs-sidebar',
+    		offset: 40
+		});
+    });
+
+/*
+    Nurego.init({
+		"token":"32423423",//String || URL
+		"components":{
+			"priceList":{
+				"element":"#priceList2",
+				"configParams":{
+					"css":"",
+					"html":"",
+					"redirectUrl":"/login"
+				}
+			},
+			"login":{
+				"element":"#login2",
+				"configParams":{
+					"css":"",
+					"html":""
+				}
+			}
+		}
+	})
+*/		
+    </script>
+
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+
+    <!-- endbuild -->
+	</body>
+</html>
