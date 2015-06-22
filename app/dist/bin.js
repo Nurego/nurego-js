@@ -10327,7 +10327,6 @@ absNuregoView = function (bb, utils) {
       }
     },
     modelHttpErrorsHandler: function (model, response, options) {
-      debugger;
       if (this.showErrors && this.showErrors !== 'false') {
         try {
           var el = this.$el.find('.ajaxErrorMsg');

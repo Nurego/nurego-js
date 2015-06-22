@@ -33,7 +33,17 @@ define(["backbone","text!priceListHTML","utils",
 		  		this.template = _.template(themes[this.params.theme])
 		  	}
 		    this.listenToOnce(this.model, "change", this.render);
-		    this.model.fetch({dataType:"jsonp",error:_.bind(this.modelHttpErrorsHandler,this)});
+		    this.model.fetch({
+		    	dataType:"jsonp", 
+		    	error:_.bind(this.modelHttpErrorsHandler,this)
+		    	//error:function(a,b,c){debugger;}
+		    	//complete:function(a,b,c){debugger;},
+		    	/*statusCode:{
+				    404: function() {
+				      alert( "page not found" );
+				    }
+				}*/
+		    }); 
 		    this.initStyle();
 		    this.addStyle();
 		  },
