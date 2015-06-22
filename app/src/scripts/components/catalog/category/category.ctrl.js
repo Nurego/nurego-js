@@ -10,8 +10,8 @@ define(["backbone","text!categoryHTML","utils",
         categoryModel: '../models/category',
 */
 
-		var categoryView = absNuregoView.extend(
-{		  tagName: "div",
+		var categoryView = absNuregoView.extend({
+		  tagName: "div",
 		  className: "category_view",
 		  template: _.template(tmpl),
 		  events: {
@@ -34,6 +34,7 @@ define(["backbone","text!categoryHTML","utils",
 		  			dataType:"jsonp",
 		  			error:_.bind(this.modelHttpErrorsHandler,this),
 		  		});
+		  	this.initStyle();
 		    this.addStyle();
 		  },
 

@@ -19,6 +19,9 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 			iframe.src = compSrc;
 			if(typeof(opt.configParams.uid) != "undefined"){
 				iframe.id = opt.configParams.uid;
+			} 
+			if(typeof(opt.configParams.fname) != "undefined"){
+				iframe.name = opt.configParams.fname;
 			}
 			this.decorateIframe(iframe);
 			$Nurego(opt.element).append(iframe);
@@ -79,7 +82,7 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 			})
 
 			_.each(opt.configParams.urlParams,function(val,key){
-				if(key !== "name" && key !== "widget"){
+				if(key !== "name" && key !== "widget" && key !== "html"){
 					var seperator = "&"; //(indx === 0) ? "?" : "&";
 					res += seperator + key + "=" + val;
 				}
