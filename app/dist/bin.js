@@ -10882,7 +10882,7 @@ singleItemCtrl = function (bb, tmpl, utils, css, singleItemModel, absNuregoView,
   });
   return singleItem;
 }(backbone, text_singleItemHTML, utils, text_categoryCSS, singleItemModel, absNuregoView, jquery);
-text_absNuregoCss = '/* line 1, ../../../styles/main.scss */\r\nnurego-widget {\r\n  display: block;\r\n  height: 100%;\r\n  width: 100%;\r\n  flex:1;\r\n}\r\n\r\n/* line 7, ../../../styles/main.scss */\r\n.alert {\r\n  display: relative;\r\n  z-index: 9999999;\r\n}\r\n\r\n/* line 12, ../../../styles/main.scss */\r\n#checkbox label {\r\n  line-height: 175%;\r\n}\r\n\r\n/******************CHECK BOXES ******************/\r\n';
+text_absNuregoCss = '/* line 1, ../../../styles/main.scss */\r\nnurego-widget {\r\n  display: block;\r\n  height: 100%;\r\n  width: 100%;\r\n  flex:1;\r\n}\r\n\r\n/* line 7, ../../../styles/main.scss */\r\n.alert.ajaxErrorMsg {\r\n  position: relative;\r\n  z-index: 99999999999; \r\n  width: 90%;\r\n  margin: 45px auto;\r\n}\r\n\r\n/* line 12, ../../../styles/main.scss */\r\n#checkbox label {\r\n  line-height: 175%;\r\n}\r\n\r\n/******************CHECK BOXES ******************/\r\n';
 Nurego = function (constants, utils, widgetFactory, loginModel, registrationModel, priceListModel, loginViewCtrl, priceListViewCtrl, registrationViewCtrl, tosViewCtrl, categoryViewCtrl, categoryModel, singleItemCtrl, singleItemModel, tosModel, tosStatusModel, absNuregoCss, $Nurego) {
   var app, lib;
   app = {};
