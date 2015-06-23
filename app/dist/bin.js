@@ -10721,7 +10721,7 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
   });
   return activation;
 }(backbone, text_tosHTML, utils, text_termsOfServiceCSS, tosStatusModel, tosModel, absNuregoView, jquery);
-text_categoryHTML = '<style>\r\n\r\n\t.headerWrapper{\r\n\t\tpadding: 5px;\r\n  \t\ttext-align: center\r\n\t}\r\n\t\r\n\t.itemsWrapper{\r\n\t  display: flex;\r\n\t  display: -webkit-flex;\r\n\t  width: 100%;\r\n\t  text-align: left;\r\n\t  min-height: 185px;\r\n\t}\r\n\r\n\t.singleItem{\r\n\t  flex: 1;\r\n\t  -webkit-flex: 1;\r\n\t  max-width: 225px;\r\n\t  position:relative;\r\n\t  background: #e0e1e4;\r\n\t  border: 0px;\r\n\t  padding: 20px;\r\n\t  font-size: 16px;\r\n\t  margin: 20px;\r\n\t  border-radius: 20px;\r\n\t}\r\n\r\n\t.singleItem img {\r\n\t  position: absolute;\r\n\t  right: 8px;\r\n\t  width: 25px;\r\n\t  height: 25px;\r\n\t  top: 8px;\r\n\t}\r\n\r\n\t.name {\r\n\t    font-size: 18px;\r\n\t    font-weight: bold;\r\n\t    margin-top: 30px;\r\n\t    margin-bottom: 10px;\r\n\t}\r\n\r\n\t.publisher {\r\n\t    font-size: 11px;\r\n\t    font-weight: bold;\r\n\t    margin-bottom: 20px;\r\n\t}\r\n\r\n\t.section {\r\n\t    border-bottom: 2px solid #e0e1e4;\r\n\t    padding-bottom: 35px;\r\n\t    padding: 0px;\r\n\t}\r\n\r\n\t.widget_wrapper {\r\n\t\tdisplay: none;\r\n\t\tposition:absolute;\r\n\t\ttop:0px;\r\n\t\tleft:0px;\r\n\t\twidth: 100%;\r\n\t\theight: 100%;\r\n\t\tbackground:white;\r\n\t}\r\n\r\n\t.close_widget{\r\n\t\tposition: absolute;\r\n\t\ttop:15px;\r\n\t\tleft:15px;\r\n\t\tfont-weight: bold;\r\n\t\tfont-size:18px;\r\n\t}\r\n\r\n\t.show_item .widget_wrapper {\r\n\t\tdisplay: block;\r\n\t}\r\n\r\n\t.widget_holder{\r\n\t\tmargin-top:30px;\r\n\t}\r\n\r\n</style>\r\n\r\n\r\n\r\n\r\n{{ for (category in obj.data ) { }}\r\n\t<div class="section">\r\n\t\t<div class="headerWrapper">\r\n\t\t\t<h1>\r\n\t\t\t\t\t{{=obj.data[category].name}}\r\n\t\t\t</h1>\r\n\t\t\t<h5>\r\n\t\t\t\tDescription text for {{=obj.data[category].name}} goes here\r\n\t\t\t</h5>\r\n\t\t</div>\r\n\t\t\r\n\t\t<div class="itemsWrapper">\r\n\t\t{{ for(item in obj.data[category].services.data) {  }}\r\n\r\n\t\t\t<div class="singleItem" data-id="{{=obj.data[category].services.data[item].id}}">\r\n\t\t\t\t<img src="https://cdn1.iconfinder.com/data/icons/logotypes/32/github-128.png" height="45px" width="45px" />\r\n\t\t\t\t<div class="name">\r\n\t\t\t\t\t{{=obj.data[category].services.data[item].name}}\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class="publisher">\r\n\t\t\t\t\tGE Software\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<div class="desc">\r\n\t\t\t\t\t{{=obj.data[category].services.data[item].description}}\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t{{\t}\t}}\r\n\t\t</div>\r\n\r\n\t</div>\r\n{{ } }}\r\n\r\n\r\n<div class="widget_wrapper">\r\n\t<div class="close_widget">[Back]</div>\r\n\t<div class="widget_holder"></div>\r\n</div>\r\n';
+text_categoryHTML = '<style>\r\n\r\n\t.headerWrapper{\r\n\t\tpadding: 5px;\r\n  \t\ttext-align: center\r\n\t}\r\n\t\r\n\t.itemsWrapper{\r\n\t  display: flex;\r\n\t  display: -webkit-flex;\r\n\t  width: 100%;\r\n\t  text-align: left;\r\n\t  min-height: 185px;\r\n\t}\r\n\r\n\t.singleItem{\r\n\t  flex: 1;\r\n\t  -webkit-flex: 1;\r\n\t  max-width: 225px;\r\n\t  position:relative;\r\n\t  background: #e0e1e4;\r\n\t  border: 0px;\r\n\t  padding: 20px;\r\n\t  font-size: 16px;\r\n\t  margin: 20px;\r\n\t  border-radius: 20px;\r\n\t}\r\n\r\n\t.singleItem img {\r\n\t  position: absolute;\r\n\t  right: 8px;\r\n\t  width: 25px;\r\n\t  height: 25px;\r\n\t  top: 8px;\r\n\t}\r\n\r\n\t.name {\r\n\t    font-size: 18px;\r\n\t    font-weight: bold;\r\n\t    margin-top: 30px;\r\n\t    margin-bottom: 10px;\r\n\t}\r\n\r\n\t.publisher {\r\n\t    font-size: 11px;\r\n\t    font-weight: bold;\r\n\t    margin-bottom: 20px;\r\n\t}\r\n\r\n\t.section {\r\n\t    border-bottom: 2px solid #e0e1e4;\r\n\t    padding-bottom: 35px;\r\n\t    padding: 0px;\r\n\t}\r\n\r\n\t.widget_wrapper {\r\n\t\tdisplay: none;\r\n\t\tposition:absolute;\r\n\t\ttop:0px;\r\n\t\tleft:0px;\r\n\t\twidth: 100%;\r\n\t\theight: 100%;\r\n\t\tbackground:white;\r\n\t}\r\n\r\n\t.close_widget{\r\n\t\tposition: absolute;\r\n\t\ttop:15px;\r\n\t\tleft:15px;\r\n\t\tfont-weight: bold;\r\n\t\tfont-size:18px;\r\n\t}\r\n\r\n\t.show_item .widget_wrapper {\r\n\t\tdisplay: block;\r\n\t}\r\n\r\n\t.widget_holder{\r\n\t\tmargin-top:0px !important;\r\n\t}\r\n\r\n</style>\r\n\r\n\r\n\r\n\r\n{{ for (category in obj.data ) { }}\r\n\t<div class="section">\r\n\t\t<div class="headerWrapper">\r\n\t\t\t<h1>\r\n\t\t\t\t\t{{=obj.data[category].name}}\r\n\t\t\t</h1>\r\n\t\t\t<h5>\r\n\t\t\t\tDescription text for {{=obj.data[category].name}} goes here\r\n\t\t\t</h5>\r\n\t\t</div>\r\n\t\t\r\n\t\t<div class="itemsWrapper">\r\n\t\t{{ for(item in obj.data[category].services.data) {  }}\r\n\r\n\t\t\t<div class="singleItem" data-id="{{=obj.data[category].services.data[item].id}}">\r\n\t\t\t\t<img src="https://cdn1.iconfinder.com/data/icons/logotypes/32/github-128.png" height="45px" width="45px" />\r\n\t\t\t\t<div class="name">\r\n\t\t\t\t\t{{=obj.data[category].services.data[item].name}}\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class="publisher">\r\n\t\t\t\t\tGE Software\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<div class="desc">\r\n\t\t\t\t\t{{=obj.data[category].services.data[item].description}}\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t{{\t}\t}}\r\n\t\t</div>\r\n\r\n\t</div>\r\n{{ } }}\r\n\r\n\r\n<div class="widget_wrapper">\r\n\t<div class="close_widget">[Back]</div>\r\n\t<div class="widget_holder"></div>\r\n</div>\r\n';
 text_categoryCSS = 'div.myCategoryDiv {\r\n\r\n}';
 categoryModel = function (Backbone, constants) {
   var categoryMod = Backbone.Model.extend({
@@ -10760,7 +10760,7 @@ categoryViewCtrl = function (bb, tmpl, utils, css, categoryModel, absNuregoView,
     className: 'category_view',
     template: _.template(tmpl),
     events: {
-      'click .itemsWrapper': 'showService',
+      'click .singleItem': 'showService',
       'click .close_widget': 'closeService'
     },
     initialize: function (model, customTmpl) {
@@ -10784,7 +10784,7 @@ categoryViewCtrl = function (bb, tmpl, utils, css, categoryModel, absNuregoView,
       $Nurego('body').append(styleEl);
     },
     showService: function (e) {
-      debugger;
+      $Nurego('body').css({ 'overflow': 'hidden' });
       this.selectedService = $Nurego(e.target).attr('data-id');
       if (!this.selectedService) {
         this.selectedService = $Nurego(e.target).parents('.singleItem').attr('data-id');
@@ -10798,6 +10798,7 @@ categoryViewCtrl = function (bb, tmpl, utils, css, categoryModel, absNuregoView,
       this.$el.addClass('show_item');
     },
     closeService: function () {
+      $Nurego('body').css({ 'overflow': 'auto' });
       $Nurego('.widget_holder').html('');
       this.$el.removeClass('show_item');
     },

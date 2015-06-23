@@ -15,7 +15,7 @@ define(["backbone","text!categoryHTML","utils",
 		  className: "category_view",
 		  template: _.template(tmpl),
 		  events: {
-		    "click .itemsWrapper":"showService",
+		    "click .singleItem":"showService",
 		    "click .close_widget":"closeService"
 		  },
 
@@ -44,7 +44,8 @@ define(["backbone","text!categoryHTML","utils",
 		  	$Nurego('body').append(styleEl);
 		  },
 
-		  showService:function(e){debugger;
+		  showService:function(e){
+		  	$Nurego("body").css({"overflow":"hidden"});
 		  	this.selectedService = $Nurego(e.target).attr('data-id');
 		  	if(!this.selectedService){
 		  		this.selectedService = $Nurego(e.target).parents('.singleItem').attr('data-id');
@@ -56,6 +57,7 @@ define(["backbone","text!categoryHTML","utils",
 		  },
 
 		  closeService:function(){
+		  	$Nurego("body").css({"overflow":"auto"});
 			$Nurego('.widget_holder').html('');
 			this.$el.removeClass('show_item');
 		  },
