@@ -1,5 +1,4 @@
 <style>
-
 	.headerWrapper{
 		padding: 5px;
   		text-align: center
@@ -79,6 +78,25 @@
 		margin-top:0px !important;
 	}
 
+	.widget_holder {
+	    position: fixed;
+	    height: 100%;
+	    width: 100%;
+	    z-index: 99999;
+	    background-color: white;
+	}
+
+	.close_widget {
+	    position: absolute;   
+	    top: 15px;   
+	    left: 15px;   
+	    font-weight: bold;   
+	    font-size: 18px;   
+	    z-index: 9999999;
+	    background-color: white;
+	    padding: 0px 10px;
+	}
+
 </style>
 
 
@@ -119,6 +137,11 @@
 	</div>
 {{ } }}
 
+<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">
+	  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+	  <span class="sr-only">Error:</span>
+	  <span class="txt"></span>
+</div>
 
 <div class="widget_wrapper">
 	<div class="close_widget">[Back]</div>
