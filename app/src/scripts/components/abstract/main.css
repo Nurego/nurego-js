@@ -9,7 +9,7 @@ nurego-widget {
 /* line 7, ../../../styles/main.scss */
 .alert.ajaxErrorMsg {
   position: relative;
-  z-index: 99999999999; 
+  z-index: 99999999999; 	
   width: 90%;
   margin: 45px auto;
 }
