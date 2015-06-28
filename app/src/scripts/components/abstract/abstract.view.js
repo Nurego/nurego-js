@@ -15,6 +15,10 @@ define(["backbone","utils"],function(bb,utils){
 		  	}  
 		  },
 
+		  hideErrors:function(){
+				this.$el.find('.ajaxErrorMsg').hide();
+		  },
+
 		  errorMsgHandler:function(response){
 			if(this.showErrors !== "false"){
 					try{

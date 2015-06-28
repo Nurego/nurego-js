@@ -74,6 +74,7 @@ define(["backbone","text!priceListHTML","utils",
 		  },
 
 		  postRegistration:function(){
+		  	this.hideErrors();
 		  	var plan = this.selectedPlan;
 		  	var baseURL = constants.nuregoApiUrl();
 		  	var legal_doc_id = (this.tosModel) ? this.tosModel.get('id') : null; // need to get this from a model
