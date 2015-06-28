@@ -10316,6 +10316,9 @@ absNuregoView = function (bb, utils) {
         document.getElementsByTagName('head')[0].appendChild(link);
       }
     },
+    hideErrors: function () {
+      this.$el.find('.ajaxErrorMsg').hide();
+    },
     errorMsgHandler: function (response) {
       if (this.showErrors !== 'false') {
         try {
@@ -10464,6 +10467,7 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       this.$el.addClass('fillEmail');
     },
     postRegistration: function () {
+      this.hideErrors();
       var plan = this.selectedPlan;
       var baseURL = constants.nuregoApiUrl();
       var legal_doc_id = this.tosModel ? this.tosModel.get('id') : null;
