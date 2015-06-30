@@ -7,9 +7,11 @@ nurego-widget {
 }
 
 /* line 7, ../../../styles/main.scss */
-.alert {
-  display: relative;
-  z-index: 9999999;
+.alert.ajaxErrorMsg {
+  position: relative;
+  z-index: 99999999999; 	
+  width: 90%;
+  margin: 45px auto;
 }
 
 /* line 12, ../../../styles/main.scss */

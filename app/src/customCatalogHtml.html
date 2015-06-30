@@ -1,0 +1,68 @@
+
+<header id="HEADER_13">
+	<nav id="NAV_14">
+		<div id="DIV_15">
+			<div id="DIV_16">
+				<div id="DIV_17">
+					<a href="/" id="A_18">Predix</a>
+				</div>
+				<ul id="UL_20">
+					<li id="LI_21">
+						<a href="/catalog" id="A_22">Catalog</a>
+					</li>
+					<li id="LI_23">
+						<a href="http://webhelp.grc-pr-apps.ice.ge.com/" id="A_24">Learn</a>
+					</li>
+					<li id="LI_25">
+						<a href="/community" id="A_26">Community</a>
+					</li>
+					<li id="LI_27">
+						<a href="/support" id="A_28">Support</a>
+					</li>
+				</ul>
+				<div id="DIV_29">
+					<div id="DIV_30">
+						<a href="/logout" id="A_32">Logout</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</nav>
+</header>
+
+<div class="widget_wrapper">
+	<div class="close_widget">[Back]</div>
+	<div class="widget_holder"></div>
+</div>
+
+
+{{ for (category in obj.data ) { }}
+	<div class="section">
+		<div class="headerWrapper">
+			<h1>
+					{{=obj.data[category].name}}
+			</h1>
+			<h5>
+				{{=obj.data[category].description}}
+			</h5>
+		</div>
+		
+		<div class="itemsWrapper">
+		{{ for(item in obj.data[category].services.data) {  }}
+
+				<div data-id="{{=obj.data[category].services.data[item].id}}" class="category_item singleItem">
+					<div>
+						<img src="{{=obj.data[category].services.data[item].icon}}" alt="Service Icon" id="IMG_47" />
+						<h3 id="H3_48">
+							{{=obj.data[category].services.data[item].name}}
+						</h3>
+						<small id="SMALL_49">{{=obj.data[category].services.data[item].author}}</small>
+					</div>
+				</div>
+
+		{{	}	}}
+		</div>
+
+	</div>
+{{ } }}
+

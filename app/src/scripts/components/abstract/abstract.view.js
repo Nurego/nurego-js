@@ -12,34 +12,38 @@ define(["backbone","utils"],function(bb,utils){
 				link.setAttribute('type', 'text/css');
 				link.setAttribute('href', this.params.css);
 				document.getElementsByTagName('head')[0].appendChild(link);
-		  	} 
+		  	}  
+		  },
+
+		  hideErrors:function(){
+				this.$el.find('.ajaxErrorMsg').hide();
 		  },
 
 		  errorMsgHandler:function(response){
-		  	if(this.showErrors && this.showErrors !== "false"){
-			  	try{
-			  		var el = this.$el.find('.ajaxErrorMsg');
-					el.find('.txt').text(response.error.message);
-					el.show();
-			  	}catch(e){}
-		  	}
+			if(this.showErrors !== "false"){
+					try{
+						var el = this.$el.find('.ajaxErrorMsg');
+						el.find('.txt').text(xhr.responseJSON.error.message);
+						el.show();
+				  	}catch(e){}
+			}
 		  },
 
 		  modelHttpErrorsHandler:function(model,response,options){
-		  	if(this.showErrors && this.showErrors !== "false"){
-		  		try{
+			if(this.showErrors !== "false"){
+				try{
 					var el = this.$el.find('.ajaxErrorMsg');
-					el.find('.txt').text(response.responseText);
+					el.find('.txt').text(xhr.responseJSON.error.message);
 					el.show();
 			  	}catch(e){}
-		  	}
+			}
 		  },
 
 		  genericHttpErrorsHandler:function(xhr,textStatus,errorThrown){
-		  	if(this.showErrors && this.showErrors !== "false"){
+		  	if(this.showErrors !== "false"){
 				try{
 					var el = this.$el.find('.ajaxErrorMsg');
-					el.find('.txt').text(errorThrown);
+					el.find('.txt').text(xhr.responseJSON.error.message);
 					el.show();
 			  	}catch(e){}
 			}
@@ -47,6 +51,5 @@ define(["backbone","utils"],function(bb,utils){
 
 
 		});
-
 		return absNuregoView;
 });
