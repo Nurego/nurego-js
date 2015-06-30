@@ -73,6 +73,14 @@ define(["backbone","text!priceListHTML","utils",
 		  	this.$el.addClass('fillEmail');
 		  },
 
+		validateEmail:function (email){
+		    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+		    if(!re.test(email)) {
+		    	this.$el.find('.emailWrapper').addClass('has-error');
+		    }
+		    return re.test(email);
+		},
+
 		  postRegistration:function(){
 		  	this.hideErrors();
 		  	var plan = this.selectedPlan;
@@ -84,7 +92,10 @@ define(["backbone","text!priceListHTML","utils",
 		  	};
 
 		  	var url = baseURL+'/registrations?api_key=' + constants.getNuregoApiKey()+ "&plan_id=" + plan;
-		  	if(this.$el.hasClass('noSSO') && email.indexOf("@") != -1){
+		  	if(this.$el.hasClass('noSSO')){
+		  		if(!this.validateEmail(email)){
+		  			return false; //invalid email, stop here. 
+		  		}
 		  		url += "&email=" + encodeURIComponent(email); 
 		  		params.email =  encodeURIComponent(email);
 		  	}
