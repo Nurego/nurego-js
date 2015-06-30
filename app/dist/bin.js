@@ -3,7 +3,7 @@
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
-var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, registrationModel, priceListModel, text, text_loginHTML, absNuregoView, loginViewCtrl, text_priceListHTML, text_priceListCSS, tosModel, text_priceListSingleTierHTML, priceListViewCtrl, text_registrationHTML, text_registrationCSS, registrationViewCtrl, text_tosHTML, text_termsOfServiceCSS, tosStatusModel, tosViewCtrl, text_categoryHTML, text_categoryCSS, categoryModel, categoryViewCtrl, text_singleItemHTML, singleItemModel, singleItemCtrl, text_absNuregoCss, Nurego;
+var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, registrationModel, priceListModel, text, text_loginHTML, text_absHTML, absNuregoView, loginViewCtrl, text_priceListHTML, text_priceListCSS, tosModel, text_priceListSingleTierHTML, priceListViewCtrl, text_registrationHTML, text_registrationCSS, registrationViewCtrl, text_tosHTML, text_termsOfServiceCSS, tosStatusModel, tosViewCtrl, text_categoryHTML, text_categoryCSS, categoryModel, categoryViewCtrl, text_singleItemHTML, singleItemModel, singleItemCtrl, text_absNuregoCss, Nurego;
 (function () {
   // Baseline setup
   // --------------
@@ -10301,7 +10301,8 @@ text = {
   }
 };
 text_loginHTML = '<div>\r\n\twelcome {{=user.name}} - {{=user.last}}\r\n\t<input class="form-control" type="text" placeholder="username"/>\r\n\t<input class="form-control" type="text" placeholder="password"/>\r\n\r\n\t<br/>\r\n\t<div>\r\n\t\t<button class="button btn btn-primary">Login</button>\r\n\t</div>\r\n</div>\r\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t  <span class="sr-only">Error:</span>\r\n\t  <span class="txt"></span>\r\n</div>';
-absNuregoView = function (bb, utils) {
+text_absHTML = '<div>\r\n\r\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t\t  <span class="sr-only">Error:</span>\r\n\t\t  <span class="txt"></span>\r\n\t</div>\r\n\r\n\r\n</div>';
+absNuregoView = function (bb, utils, absErrorTmpl) {
   var absNuregoView = Backbone.View.extend({
     initialize: function (model, customTmpl) {
       this.showErrors = utils.URLToArray(window.location.href)['show-errors'];
@@ -10319,6 +10320,11 @@ absNuregoView = function (bb, utils) {
     hideErrors: function () {
       this.$el.find('.ajaxErrorMsg').hide();
     },
+    renderWithError: function () {
+      this.absTemplate = _.template(absErrorTmpl);
+      this.$el.html(this.absTemplate());
+      return this.$el;
+    },
     errorMsgHandler: function (response) {
       if (this.showErrors !== 'false') {
         try {
@@ -10332,8 +10338,10 @@ absNuregoView = function (bb, utils) {
     modelHttpErrorsHandler: function (model, response, options) {
       if (this.showErrors !== 'false') {
         try {
-          var el = this.$el.find('.ajaxErrorMsg');
-          el.find('.txt').text(xhr.responseJSON.error.message);
+          if (response.statusText === 'error') {
+            var el = this.renderWithError().find('.ajaxErrorMsg');
+            el.find('.txt').text('There seems to be a problem, please check you are using a vaild Nurego Key and try again');
+          }
           el.show();
         } catch (e) {
         }
@@ -10351,7 +10359,7 @@ absNuregoView = function (bb, utils) {
     }
   });
   return absNuregoView;
-}(backbone, utils);
+}(backbone, utils, text_absHTML);
 loginViewCtrl = function (bb, loginTmpl, absNuregoView, $Nurego) {
   var loginViewCtrl = absNuregoView.extend({
     tagName: 'div',
