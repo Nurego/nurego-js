@@ -74,11 +74,16 @@ define(["backbone","text!priceListHTML","utils",
 		  },
 
 		validateEmail:function (email){
-		    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-		    if(!re.test(email)) {
+		    //var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+		    var valid = (email.indexOf("@") != -1 && email.indexOf(".") != -1);
+		    //if(!re.test(email)) {
+		    if(!valid){
 		    	this.$el.find('.emailWrapper').addClass('has-error');
-		    }
-		    return re.test(email);
+		    	return false;
+		    }else{
+		    	return true;
+		    } 
+		    //return re.test(email);
 		},
 
 		  postRegistration:function(){
@@ -87,7 +92,7 @@ define(["backbone","text!priceListHTML","utils",
 		  	var baseURL = constants.nuregoApiUrl();
 		  	var legal_doc_id = (this.tosModel) ? this.tosModel.get('id') : null; // need to get this from a model
 		  	var email = this.$el.find('input.email').val()
-		  	var params = {
+		  	var params = {	
 		  		plan_id:plan
 		  	};
 

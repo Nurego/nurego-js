@@ -10475,11 +10475,15 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       this.$el.addClass('fillEmail');
     },
     validateEmail: function (email) {
-      var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-      if (!re.test(email)) {
+      //var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+      var valid = email.indexOf('@') != -1 && email.indexOf('.') != -1;
+      //if(!re.test(email)) {
+      if (!valid) {
         this.$el.find('.emailWrapper').addClass('has-error');
-      }
-      return re.test(email);
+        return false;
+      } else {
+        return true;
+      }  //return re.test(email);
     },
     postRegistration: function () {
       this.hideErrors();
