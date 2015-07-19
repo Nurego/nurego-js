@@ -40,7 +40,7 @@ define(["backbone","utils","text!absHTML"],function(bb,utils,absErrorTmpl){
 					
 					if(response.statusText === "error"){
 						var el = this.renderWithError().find('.ajaxErrorMsg');
-						el.find('.txt').text("There seems to be a problem, please check you are using a vaild Nurego Key and try again");
+						el.find('.txt').text("There seems to be a problem, please check you are using a valid Nurego Key and try again");
 					}
 					el.show();
 			  	}catch(e){}

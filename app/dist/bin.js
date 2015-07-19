@@ -10340,7 +10340,7 @@ absNuregoView = function (bb, utils, absErrorTmpl) {
         try {
           if (response.statusText === 'error') {
             var el = this.renderWithError().find('.ajaxErrorMsg');
-            el.find('.txt').text('There seems to be a problem, please check you are using a vaild Nurego Key and try again');
+            el.find('.txt').text('There seems to be a problem, please check you are using a valid Nurego Key and try again');
           }
           el.show();
         } catch (e) {
@@ -10677,7 +10677,7 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
       if (customTmpl) {
         this.template = _.template(customTmpl);
       }
-      if (this.params['preRegistration'] === 'true') {
+      if (this.params['preRegistration'] === 'true' || this.params['pre-registration'] === 'true') {
         this.model = model;
       } else {
         this.model = new tosStatusModel();

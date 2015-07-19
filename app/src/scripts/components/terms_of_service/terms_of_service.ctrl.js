@@ -19,7 +19,7 @@ define(["backbone","text!tosHTML","utils",
 		  		this.template = _.template(customTmpl);
 		  	}
 		  	
-		  	if(this.params['preRegistration'] === "true"){
+		  	if(this.params['preRegistration'] === "true" || this.params['pre-registration'] === "true"){
 		  		this.model = model;
 		  	}else{
 		  		this.model = new tosStatusModel();
