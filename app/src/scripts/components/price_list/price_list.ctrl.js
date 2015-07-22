@@ -68,21 +68,29 @@ define(["backbone","text!priceListHTML","utils",
 		  	styleEl.innerHTML = css;
 		  	$Nurego('body').append(styleEl);
 		  }, 
-
+ 
 		  registerWithSSo:function(){
 		  	this.$el.addClass('fillEmail');
 		  },
 
 		validateEmail:function (email){
-		    //var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-		    var valid = (email.indexOf("@") != -1 && email.indexOf(".") != -1);
+		    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+		    //var valid = (email.indexOf("@") != -1 && email.indexOf(".") != -1);
+		    //var re = /^@((?:[\w-]\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+		    var valid = false;
+		    if(email.indexOf('+') != -1){
+		    	valid = re.test("a" +	email.substr(email.indexOf("@"))	);	
+		    }else{
+		    	valid = re.test(	email	);	
+		    }
+		    
 		    //if(!re.test(email)) {
 		    if(!valid){
 		    	this.$el.find('.emailWrapper').addClass('has-error');
 		    	return false;
 		    }else{
 		    	return true;
-		    } 
+		    }
 		    //return re.test(email);
 		},
 

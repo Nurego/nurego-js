@@ -90,7 +90,15 @@
 	    text-decoration: underline;
 	    cursor: pointer;
 	}
-	
+		
+	.emailWrapper .invalidEmail{
+		display: none;
+	}
+
+	.emailWrapper.has-error .invalidEmail{
+		display: block;
+	}
+
 	.noSSO.fillEmail .emailWrapper{
 	  display: block;
 	  position: absolute;
@@ -296,6 +304,14 @@
 	<h4 class="">Please enter your Email:</h4>
 	<input class="form-control email" type="text" placeholder="example@email.com"/>
 	<div class="btn btn-primary postNoSSo">Subscribe</div>
+
+	<div class="alert alert-danger invalidEmail" role="alert">
+		  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+		  <span class="sr-only"></span>
+		  <span class="txt">Error:Invalid Email address, please try again.</span>
+	</div>
+
+
 </div>
 
 {{ if(obj.urlParams["terms-of-service-url"]) {	}}
