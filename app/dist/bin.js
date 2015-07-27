@@ -10530,10 +10530,10 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
         } else {
           url += '&registrationId=' + data.id;
         }
-        if (redirectUrl.indexOf('http') == 0) {
-          window.top.location.href = url;
-        } else {
+        if (redirectUrl.indexOf('http') == -1) {
           window.top.location.href = parent + url;
+        } else {
+          window.top.location.href = url;
         }  //alert(JSON.stringify(data));
       };
       $Nurego.ajax({

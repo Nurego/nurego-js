@@ -137,10 +137,10 @@ define(["backbone","text!priceListHTML","utils",
 		  			url += "&registrationId=" + data.id;
 		  		};
 
-		  		if(redirectUrl.indexOf('http') == 0){
-					window.top.location.href = url;
+		  		if(redirectUrl.indexOf('http') == -1){
+					window.top.location.href = parent + url;
 		  		}else{
-		  			window.top.location.href = parent + url;
+		  			window.top.location.href = url;
 		  		}
 	  			//alert(JSON.stringify(data));
 		  	};
