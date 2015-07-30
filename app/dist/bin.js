@@ -10456,7 +10456,14 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       this.addStyle();
     },
     openTerms: function () {
-      var url = this.params.parent + this.params['terms-of-service-url'];
+      var url = this.params['terms-of-service-url'];
+      if (url.indexOf('http') != -1) {
+        //Doron: Absolute URL
+        url = redirectURL;
+      } else {
+        //Doron: Relative URL
+        url = this.params.parent + url;
+      }
       var flag = 'preRegistration=true';
       if (url.indexOf('?') === -1) {
         url += '?' + flag;
