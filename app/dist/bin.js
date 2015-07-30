@@ -10457,14 +10457,11 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
     },
     openTerms: function () {
       var url = this.params['terms-of-service-url'];
-      if (url.indexOf('http') != -1) {
+      if (url.indexOf('http') == -1) {
         //Doron: Absolute URL
-        url = redirectURL;
-      } else {
-        //Doron: Relative URL
-        url = this.params.parent + url;
+        url = this.params.parent + url;  //Doron: Relative URL
       }
-      var flag = 'preRegistration=true';
+      var flag = 'pre_registration=true';
       if (url.indexOf('?') === -1) {
         url += '?' + flag;
       } else {
