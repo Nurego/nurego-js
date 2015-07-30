@@ -19,7 +19,7 @@ define(["backbone","text!tosHTML","utils",
 		  		this.template = _.template(customTmpl);
 		  	}
 		  	
-		  	if(this.params['preRegistration'] === "true"){
+		  	if(this.params['preRegistration'] === "true" || this.params['pre-registration'] === "true"){
 		  		this.model = model;
 		  	}else{
 		  		this.model = new tosStatusModel();
@@ -41,7 +41,11 @@ define(["backbone","text!tosHTML","utils",
 
 		  redirect:function(){
 		  	var redirectURL = this.params['redirect-url'];
-		  	window.top.location.href = this.params.parent + redirectURL;
+		  	if(redirectURL.indexOf('http') != -1){//Doron: Absolute URL
+		  		window.top.location.href = redirectURL;
+		  	}else{//Doron: Relative URL
+		  		window.top.location.href = this.params.parent + redirectURL;
+		  	}
 		  },
 
   		  acceptTerms:function(){
