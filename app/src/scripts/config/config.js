@@ -40,6 +40,7 @@ require.config({
         singleItemHTML: '../components/catalog/single_item/single_item.html',
         singleItemModel: '../models/service_single_item',
         categoryCSS: '../components/catalog/category/category.css',
+        absHTML: '../components/abstract/abstract.html',
         absNuregoView: '../components/abstract/abstract.view',
         absNuregoCss: '../components/abstract/main.css',
         Nurego: '../app',

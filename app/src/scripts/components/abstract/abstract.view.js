@@ -1,4 +1,4 @@
-define(["backbone","utils"],function(bb,utils){
+define(["backbone","utils","text!absHTML"],function(bb,utils,absErrorTmpl){
 		var absNuregoView = Backbone.View.extend({
 		  initialize: function(model,customTmpl){
 		  	this.showErrors = utils.URLToArray(window.location.href)['show-errors'];
@@ -19,6 +19,11 @@ define(["backbone","utils"],function(bb,utils){
 				this.$el.find('.ajaxErrorMsg').hide();
 		  },
 
+		  renderWithError:function(){
+		  	this.absTemplate = _.template(absErrorTmpl);
+		  	this.$el.html(this.absTemplate());
+		  	return this.$el;
+		  },
 		  errorMsgHandler:function(response){
 			if(this.showErrors !== "false"){
 					try{
@@ -32,8 +37,11 @@ define(["backbone","utils"],function(bb,utils){
 		  modelHttpErrorsHandler:function(model,response,options){
 			if(this.showErrors !== "false"){
 				try{
-					var el = this.$el.find('.ajaxErrorMsg');
-					el.find('.txt').text(xhr.responseJSON.error.message);
+					
+					if(response.statusText === "error"){
+						var el = this.renderWithError().find('.ajaxErrorMsg');
+						el.find('.txt').text("There seems to be a problem, please check you are using a valid Nurego Key and try again");
+					}
 					el.show();
 			  	}catch(e){}
 			}
