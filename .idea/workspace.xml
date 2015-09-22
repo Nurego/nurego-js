@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="052599e3-ac38-4f57-9d2a-0c9ff16ec0c7" name="Default" comment="" />
+    <list default="true" id="052599e3-ac38-4f57-9d2a-0c9ff16ec0c7" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/version.txt" afterPath="$PROJECT_DIR$/version.txt" />
+    </list>
     <ignored path="nurego-js.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path=".idea/dataSources.local.xml" />
