@@ -64,7 +64,7 @@ module.exports = function (grunt){
                 outputFile = data.path,
                 cleanedCode = amdclean.clean({
                   'filePath': outputFile,
-                  'globalModules':["NuregoWidgts"]
+                  'globalModules':["NuregoWidgets"]
                 });
 
               fs.writeFileSync(outputFile, cleanedCode);

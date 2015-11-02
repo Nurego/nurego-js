@@ -11354,5 +11354,5 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
   });
   return app;
 }(constants, utils, widgetFactory, loginModel, registrationModel, priceListModel, loginViewCtrl, priceListViewCtrl, registrationViewCtrl, tosViewCtrl, categoryViewCtrl, categoryModel, singleItemCtrl, singleItemModel, tosModel, tosStatusModel, text_absNuregoCss, jquery);
-window.NuregoWidgts = NuregoWidgts;
+window.NuregoWidgets = NuregoWidgets;
 }());

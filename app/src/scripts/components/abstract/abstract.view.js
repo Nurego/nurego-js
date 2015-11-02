@@ -3,7 +3,7 @@ define(["backbone","utils","text!absHTML"],function(bb,utils,absErrorTmpl){
 		  initialize: function(model,customTmpl){
 		  	this.showErrors = utils.URLToArray(window.location.href)['show-errors'];
 		  	this.params = utils.URLToArray(window.location.href);
-		  }, 
+		  },  
 
 		  initStyle:function(){
 		  	if(this.params.css){
@@ -12,7 +12,7 @@ define(["backbone","utils","text!absHTML"],function(bb,utils,absErrorTmpl){
 				link.setAttribute('type', 'text/css');
 				link.setAttribute('href', this.params.css);
 				document.getElementsByTagName('head')[0].appendChild(link);
-		  	}  
+		  	}
 		  },
 
 		  hideErrors:function(){
@@ -37,7 +37,7 @@ define(["backbone","utils","text!absHTML"],function(bb,utils,absErrorTmpl){
 		  modelHttpErrorsHandler:function(model,response,options){
 			if(this.showErrors !== "false"){
 				try{
-					
+
 					if(response.statusText === "error"){
 						var el = this.renderWithError().find('.ajaxErrorMsg');
 						el.find('.txt').text("There seems to be a problem, please check you are using a valid Nurego Key and try again");
