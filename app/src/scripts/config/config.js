@@ -43,7 +43,7 @@ require.config({
         absHTML: '../components/abstract/abstract.html',
         absNuregoView: '../components/abstract/abstract.view',
         absNuregoCss: '../components/abstract/main.css',
-        Nurego: '../app',
+        NuregoWidgets: '../app',
         almond: '../../bower_components/almond/almond',
         prism: '../../bower_components/prism/prism',
         'jquery-icheck': '../../bower_components/jquery-icheck/icheck.min',

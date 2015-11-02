@@ -3,7 +3,7 @@
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
-var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, registrationModel, priceListModel, text, text_loginHTML, text_absHTML, absNuregoView, loginViewCtrl, text_priceListHTML, text_priceListCSS, tosModel, text_priceListSingleTierHTML, priceListViewCtrl, text_registrationHTML, text_registrationCSS, registrationViewCtrl, text_tosHTML, text_termsOfServiceCSS, tosStatusModel, tosViewCtrl, text_categoryHTML, text_categoryCSS, categoryModel, categoryViewCtrl, text_singleItemHTML, singleItemModel, singleItemCtrl, text_absNuregoCss, Nurego;
+var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, registrationModel, priceListModel, text, text_loginHTML, text_absHTML, absNuregoView, loginViewCtrl, text_priceListHTML, text_priceListCSS, tosModel, text_priceListSingleTierHTML, priceListViewCtrl, text_registrationHTML, text_registrationCSS, registrationViewCtrl, text_tosHTML, text_termsOfServiceCSS, tosStatusModel, tosViewCtrl, text_categoryHTML, text_categoryCSS, categoryModel, categoryViewCtrl, text_singleItemHTML, singleItemModel, singleItemCtrl, text_absNuregoCss, NuregoWidgets;
 (function () {
   // Baseline setup
   // --------------
@@ -11178,7 +11178,7 @@ singleItemCtrl = function (bb, tmpl, utils, css, singleItemModel, absNuregoView,
   return singleItem;
 }(backbone, text_singleItemHTML, utils, text_categoryCSS, singleItemModel, absNuregoView, jquery);
 text_absNuregoCss = '/* line 1, ../../../styles/main.scss */\nnurego-widget {\n  display: block;\n  height: 100%;\n  width: 100%;\n  flex:1;\n}\n\n/* line 7, ../../../styles/main.scss */\n.alert.ajaxErrorMsg {\n  position: relative;\n  z-index: 99999999999; \t\n  width: 90%;\n  margin: 45px auto;\n}\n\n/* line 12, ../../../styles/main.scss */\n#checkbox label {\n  line-height: 175%;\n}\n\n/******************CHECK BOXES ******************/\n';
-Nurego = function (constants, utils, widgetFactory, loginModel, registrationModel, priceListModel, loginViewCtrl, priceListViewCtrl, registrationViewCtrl, tosViewCtrl, categoryViewCtrl, categoryModel, singleItemCtrl, singleItemModel, tosModel, tosStatusModel, absNuregoCss, $Nurego) {
+NuregoWidgets = function (constants, utils, widgetFactory, loginModel, registrationModel, priceListModel, loginViewCtrl, priceListViewCtrl, registrationViewCtrl, tosViewCtrl, categoryViewCtrl, categoryModel, singleItemCtrl, singleItemModel, tosModel, tosStatusModel, absNuregoCss, $Nurego) {
   var app, lib;
   app = {};
   lib = {

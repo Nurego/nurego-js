@@ -76,7 +76,7 @@ module.exports = function (grunt){
               //requireLib: 'app/src/bower_components/requirejs/require'
               //requireLib: '../../bower_components/requirejs/require'
             },
-            include: ["Nurego"],
+            include: ["NuregoWidgets"],
             //include:["requireLib"],
             stubModules: ['text'],
             //findNestedDependencies: true,
