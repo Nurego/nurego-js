@@ -64,7 +64,7 @@ module.exports = function (grunt){
                 outputFile = data.path,
                 cleanedCode = amdclean.clean({
                   'filePath': outputFile,
-                  'globalModules':["Nurego"]
+                  'globalModules':["NuregoWidgts"]
                 });
 
               fs.writeFileSync(outputFile, cleanedCode);
@@ -418,7 +418,7 @@ module.exports = function (grunt){
       //}
     //},
 
-    
+
     // Copies remaining files to places other tasks can use
     copy: {
       dist: {

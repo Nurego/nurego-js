@@ -1380,7 +1380,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
   }
 }.call(this));
 /*!
- * jQuery JavaScript Library v2.1.3
+ * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
  *
  * Includes Sizzle.js
@@ -1390,7 +1390,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
  * Released under the MIT license
  * http://jquery.org/license
  *
- * Date: 2014-12-18T15:11Z
+ * Date: 2015-04-28T16:01Z
  */
 (function (global, factory) {
   if (typeof module === 'object' && typeof module.exports === 'object') {
@@ -1427,7 +1427,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
   var support = {};
   var
     // Use the correct document accordingly with window argument (sandbox)
-    document = window.document, version = '2.1.3',
+    document = window.document, version = '2.1.4',
     // Define a local copy of jQuery
     jQuery = function (selector, context) {
       // The jQuery object is actually just the init constructor 'enhanced'
@@ -1767,7 +1767,11 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
     class2type['[object ' + name + ']'] = name.toLowerCase();
   });
   function isArraylike(obj) {
-    var length = obj.length, type = jQuery.type(obj);
+    // Support: iOS 8.2 (not reproducible in simulator)
+    // `in` check used to prevent JIT error (gh-2145)
+    // hasOwn isn't used here due to false negatives
+    // regarding Nodelist length in IE
+    var length = 'length' in obj && obj.length, type = jQuery.type(obj);
     if (type === 'function' || jQuery.isWindow(obj)) {
       return false;
     }
@@ -8601,12 +8605,15 @@ widgetFactory = function (_, utils, constants, $Nurego) {
   };
   return widgetsFactory;
 }(underscore, utils, constants, jquery);
-//     Backbone.js 1.1.2
-//     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     Backbone.js 1.2.3
+//     (c) 2010-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Backbone may be freely distributed under the MIT license.
 //     For all details and documentation:
 //     http://backbonejs.org
-(function (root, factory) {
+(function (factory) {
+  // Establish the root object, `window` (`self`) in the browser, or `global` on the server.
+  // We use `self` instead of `window` for `WebWorker` support.
+  var root = typeof self == 'object' && self.self == self && self || typeof global == 'object' && global.global == global && global;
   // Set up Backbone appropriately for the environment. Start with AMD.
   if (true) {
     backbone = function (_, $, exports) {
@@ -8616,24 +8623,25 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       return exports;
     }(underscore, jquery, {});
   } else if (typeof exports !== 'undefined') {
-    var _ = underscore;
-    factory(root, exports, _);  // Finally, as a browser global.
+    var _ = underscore, $;
+    try {
+      $ = jquery;
+    } catch (e) {
+    }
+    factory(root, exports, _, $);  // Finally, as a browser global.
   } else {
     root.Backbone = factory(root, {}, root._, root.jQuery || root.Zepto || root.ender || root.$);
   }
-}(this, function (root, Backbone, _, $) {
+}(function (root, Backbone, _, $) {
   // Initial Setup
   // -------------
   // Save the previous value of the `Backbone` variable, so that it can be
   // restored later on, if `noConflict` is used.
   var previousBackbone = root.Backbone;
-  // Create local references to array methods we'll want to use later.
-  var array = [];
-  var push = array.push;
-  var slice = array.slice;
-  var splice = array.splice;
+  // Create a local reference to a common array method we'll want to use later.
+  var slice = Array.prototype.slice;
   // Current version of the library. Keep in sync with `package.json`.
-  Backbone.VERSION = '1.1.2';
+  Backbone.VERSION = '1.2.3';
   // For Backbone's purposes, jQuery, Zepto, Ender, or My Library (kidding) owns
   // the `$` variable.
   Backbone.$ = $;
@@ -8648,15 +8656,72 @@ widgetFactory = function (_, utils, constants, $Nurego) {
   // set a `X-Http-Method-Override` header.
   Backbone.emulateHTTP = false;
   // Turn on `emulateJSON` to support legacy servers that can't deal with direct
-  // `application/json` requests ... will encode the body as
+  // `application/json` requests ... this will encode the body as
   // `application/x-www-form-urlencoded` instead and will send the model in a
   // form param named `model`.
   Backbone.emulateJSON = false;
+  // Proxy Backbone class methods to Underscore functions, wrapping the model's
+  // `attributes` object or collection's `models` array behind the scenes.
+  //
+  // collection.filter(function(model) { return model.get('age') > 10 });
+  // collection.each(this.addView);
+  //
+  // `Function#apply` can be slow so we use the method's arg count, if we know it.
+  var addMethod = function (length, method, attribute) {
+    switch (length) {
+    case 1:
+      return function () {
+        return _[method](this[attribute]);
+      };
+    case 2:
+      return function (value) {
+        return _[method](this[attribute], value);
+      };
+    case 3:
+      return function (iteratee, context) {
+        return _[method](this[attribute], cb(iteratee, this), context);
+      };
+    case 4:
+      return function (iteratee, defaultVal, context) {
+        return _[method](this[attribute], cb(iteratee, this), defaultVal, context);
+      };
+    default:
+      return function () {
+        var args = slice.call(arguments);
+        args.unshift(this[attribute]);
+        return _[method].apply(_, args);
+      };
+    }
+  };
+  var addUnderscoreMethods = function (Class, methods, attribute) {
+    _.each(methods, function (length, method) {
+      if (_[method])
+        Class.prototype[method] = addMethod(length, method, attribute);
+    });
+  };
+  // Support `collection.sortBy('attr')` and `collection.findWhere({id: 1})`.
+  var cb = function (iteratee, instance) {
+    if (_.isFunction(iteratee))
+      return iteratee;
+    if (_.isObject(iteratee) && !instance._isModel(iteratee))
+      return modelMatcher(iteratee);
+    if (_.isString(iteratee))
+      return function (model) {
+        return model.get(iteratee);
+      };
+    return iteratee;
+  };
+  var modelMatcher = function (attrs) {
+    var matcher = _.matches(attrs);
+    return function (model) {
+      return matcher(model.attributes);
+    };
+  };
   // Backbone.Events
   // ---------------
   // A module that can be mixed in to *any object* in order to provide it with
-  // custom events. You may bind with `on` or remove with `off` callback
-  // functions to an event; `trigger`-ing an event fires all callbacks in
+  // a custom event channel. You may bind a callback to an event with `on` or
+  // remove with `off`; `trigger`-ing an event fires all callbacks in
   // succession.
   //
   //     var object = {};
@@ -8664,139 +8729,224 @@ widgetFactory = function (_, utils, constants, $Nurego) {
   //     object.on('expand', function(){ alert('expanded'); });
   //     object.trigger('expand');
   //
-  var Events = Backbone.Events = {
-    // Bind an event to a `callback` function. Passing `"all"` will bind
-    // the callback to all events fired.
-    on: function (name, callback, context) {
-      if (!eventsApi(this, 'on', name, [
-          callback,
-          context
-        ]) || !callback)
-        return this;
-      this._events || (this._events = {});
-      var events = this._events[name] || (this._events[name] = []);
-      events.push({
+  var Events = Backbone.Events = {};
+  // Regular expression used to split event strings.
+  var eventSplitter = /\s+/;
+  // Iterates over the standard `event, callback` (as well as the fancy multiple
+  // space-separated events `"change blur", callback` and jQuery-style event
+  // maps `{event: callback}`).
+  var eventsApi = function (iteratee, events, name, callback, opts) {
+    var i = 0, names;
+    if (name && typeof name === 'object') {
+      // Handle event maps.
+      if (callback !== void 0 && 'context' in opts && opts.context === void 0)
+        opts.context = callback;
+      for (names = _.keys(name); i < names.length; i++) {
+        events = eventsApi(iteratee, events, names[i], name[names[i]], opts);
+      }
+    } else if (name && eventSplitter.test(name)) {
+      // Handle space separated event names by delegating them individually.
+      for (names = name.split(eventSplitter); i < names.length; i++) {
+        events = iteratee(events, names[i], callback, opts);
+      }
+    } else {
+      // Finally, standard events.
+      events = iteratee(events, name, callback, opts);
+    }
+    return events;
+  };
+  // Bind an event to a `callback` function. Passing `"all"` will bind
+  // the callback to all events fired.
+  Events.on = function (name, callback, context) {
+    return internalOn(this, name, callback, context);
+  };
+  // Guard the `listening` argument from the public API.
+  var internalOn = function (obj, name, callback, context, listening) {
+    obj._events = eventsApi(onApi, obj._events || {}, name, callback, {
+      context: context,
+      ctx: obj,
+      listening: listening
+    });
+    if (listening) {
+      var listeners = obj._listeners || (obj._listeners = {});
+      listeners[listening.id] = listening;
+    }
+    return obj;
+  };
+  // Inversion-of-control versions of `on`. Tell *this* object to listen to
+  // an event in another object... keeping track of what it's listening to
+  // for easier unbinding later.
+  Events.listenTo = function (obj, name, callback) {
+    if (!obj)
+      return this;
+    var id = obj._listenId || (obj._listenId = _.uniqueId('l'));
+    var listeningTo = this._listeningTo || (this._listeningTo = {});
+    var listening = listeningTo[id];
+    // This object is not listening to any other events on `obj` yet.
+    // Setup the necessary references to track the listening callbacks.
+    if (!listening) {
+      var thisId = this._listenId || (this._listenId = _.uniqueId('l'));
+      listening = listeningTo[id] = {
+        obj: obj,
+        objId: id,
+        id: thisId,
+        listeningTo: listeningTo,
+        count: 0
+      };
+    }
+    // Bind callbacks on obj, and keep track of them on listening.
+    internalOn(obj, name, callback, this, listening);
+    return this;
+  };
+  // The reducing API that adds a callback to the `events` object.
+  var onApi = function (events, name, callback, options) {
+    if (callback) {
+      var handlers = events[name] || (events[name] = []);
+      var context = options.context, ctx = options.ctx, listening = options.listening;
+      if (listening)
+        listening.count++;
+      handlers.push({
         callback: callback,
         context: context,
-        ctx: context || this
+        ctx: context || ctx,
+        listening: listening
       });
+    }
+    return events;
+  };
+  // Remove one or many callbacks. If `context` is null, removes all
+  // callbacks with that function. If `callback` is null, removes all
+  // callbacks for the event. If `name` is null, removes all bound
+  // callbacks for all events.
+  Events.off = function (name, callback, context) {
+    if (!this._events)
       return this;
-    },
-    // Bind an event to only be triggered a single time. After the first time
-    // the callback is invoked, it will be removed.
-    once: function (name, callback, context) {
-      if (!eventsApi(this, 'once', name, [
-          callback,
-          context
-        ]) || !callback)
-        return this;
-      var self = this;
-      var once = _.once(function () {
-        self.off(name, once);
+    this._events = eventsApi(offApi, this._events, name, callback, {
+      context: context,
+      listeners: this._listeners
+    });
+    return this;
+  };
+  // Tell this object to stop listening to either specific events ... or
+  // to every object it's currently listening to.
+  Events.stopListening = function (obj, name, callback) {
+    var listeningTo = this._listeningTo;
+    if (!listeningTo)
+      return this;
+    var ids = obj ? [obj._listenId] : _.keys(listeningTo);
+    for (var i = 0; i < ids.length; i++) {
+      var listening = listeningTo[ids[i]];
+      // If listening doesn't exist, this object is not currently
+      // listening to obj. Break out early.
+      if (!listening)
+        break;
+      listening.obj.off(name, callback, this);
+    }
+    if (_.isEmpty(listeningTo))
+      this._listeningTo = void 0;
+    return this;
+  };
+  // The reducing API that removes a callback from the `events` object.
+  var offApi = function (events, name, callback, options) {
+    if (!events)
+      return;
+    var i = 0, listening;
+    var context = options.context, listeners = options.listeners;
+    // Delete all events listeners and "drop" events.
+    if (!name && !callback && !context) {
+      var ids = _.keys(listeners);
+      for (; i < ids.length; i++) {
+        listening = listeners[ids[i]];
+        delete listeners[listening.id];
+        delete listening.listeningTo[listening.objId];
+      }
+      return;
+    }
+    var names = name ? [name] : _.keys(events);
+    for (; i < names.length; i++) {
+      name = names[i];
+      var handlers = events[name];
+      // Bail out if there are no events stored.
+      if (!handlers)
+        break;
+      // Replace events if there are any remaining.  Otherwise, clean up.
+      var remaining = [];
+      for (var j = 0; j < handlers.length; j++) {
+        var handler = handlers[j];
+        if (callback && callback !== handler.callback && callback !== handler.callback._callback || context && context !== handler.context) {
+          remaining.push(handler);
+        } else {
+          listening = handler.listening;
+          if (listening && --listening.count === 0) {
+            delete listeners[listening.id];
+            delete listening.listeningTo[listening.objId];
+          }
+        }
+      }
+      // Update tail event if the list has any events.  Otherwise, clean up.
+      if (remaining.length) {
+        events[name] = remaining;
+      } else {
+        delete events[name];
+      }
+    }
+    if (_.size(events))
+      return events;
+  };
+  // Bind an event to only be triggered a single time. After the first time
+  // the callback is invoked, its listener will be removed. If multiple events
+  // are passed in using the space-separated syntax, the handler will fire
+  // once for each event, not once for a combination of all events.
+  Events.once = function (name, callback, context) {
+    // Map the event into a `{event: once}` object.
+    var events = eventsApi(onceMap, {}, name, callback, _.bind(this.off, this));
+    return this.on(events, void 0, context);
+  };
+  // Inversion-of-control versions of `once`.
+  Events.listenToOnce = function (obj, name, callback) {
+    // Map the event into a `{event: once}` object.
+    var events = eventsApi(onceMap, {}, name, callback, _.bind(this.stopListening, this, obj));
+    return this.listenTo(obj, events);
+  };
+  // Reduces the event callbacks into a map of `{event: onceWrapper}`.
+  // `offer` unbinds the `onceWrapper` after it has been called.
+  var onceMap = function (map, name, callback, offer) {
+    if (callback) {
+      var once = map[name] = _.once(function () {
+        offer(name, once);
         callback.apply(this, arguments);
       });
       once._callback = callback;
-      return this.on(name, once, context);
-    },
-    // Remove one or many callbacks. If `context` is null, removes all
-    // callbacks with that function. If `callback` is null, removes all
-    // callbacks for the event. If `name` is null, removes all bound
-    // callbacks for all events.
-    off: function (name, callback, context) {
-      var retain, ev, events, names, i, l, j, k;
-      if (!this._events || !eventsApi(this, 'off', name, [
-          callback,
-          context
-        ]))
-        return this;
-      if (!name && !callback && !context) {
-        this._events = void 0;
-        return this;
-      }
-      names = name ? [name] : _.keys(this._events);
-      for (i = 0, l = names.length; i < l; i++) {
-        name = names[i];
-        if (events = this._events[name]) {
-          this._events[name] = retain = [];
-          if (callback || context) {
-            for (j = 0, k = events.length; j < k; j++) {
-              ev = events[j];
-              if (callback && callback !== ev.callback && callback !== ev.callback._callback || context && context !== ev.context) {
-                retain.push(ev);
-              }
-            }
-          }
-          if (!retain.length)
-            delete this._events[name];
-        }
-      }
+    }
+    return map;
+  };
+  // Trigger one or many events, firing all bound callbacks. Callbacks are
+  // passed the same arguments as `trigger` is, apart from the event name
+  // (unless you're listening on `"all"`, which will cause your callback to
+  // receive the true name of the event as the first argument).
+  Events.trigger = function (name) {
+    if (!this._events)
       return this;
-    },
-    // Trigger one or many events, firing all bound callbacks. Callbacks are
-    // passed the same arguments as `trigger` is, apart from the event name
-    // (unless you're listening on `"all"`, which will cause your callback to
-    // receive the true name of the event as the first argument).
-    trigger: function (name) {
-      if (!this._events)
-        return this;
-      var args = slice.call(arguments, 1);
-      if (!eventsApi(this, 'trigger', name, args))
-        return this;
-      var events = this._events[name];
-      var allEvents = this._events.all;
+    var length = Math.max(0, arguments.length - 1);
+    var args = Array(length);
+    for (var i = 0; i < length; i++)
+      args[i] = arguments[i + 1];
+    eventsApi(triggerApi, this._events, name, void 0, args);
+    return this;
+  };
+  // Handles triggering the appropriate event callbacks.
+  var triggerApi = function (objEvents, name, cb, args) {
+    if (objEvents) {
+      var events = objEvents[name];
+      var allEvents = objEvents.all;
+      if (events && allEvents)
+        allEvents = allEvents.slice();
       if (events)
         triggerEvents(events, args);
       if (allEvents)
-        triggerEvents(allEvents, arguments);
-      return this;
-    },
-    // Tell this object to stop listening to either specific events ... or
-    // to every object it's currently listening to.
-    stopListening: function (obj, name, callback) {
-      var listeningTo = this._listeningTo;
-      if (!listeningTo)
-        return this;
-      var remove = !name && !callback;
-      if (!callback && typeof name === 'object')
-        callback = this;
-      if (obj)
-        (listeningTo = {})[obj._listenId] = obj;
-      for (var id in listeningTo) {
-        obj = listeningTo[id];
-        obj.off(name, callback, this);
-        if (remove || _.isEmpty(obj._events))
-          delete this._listeningTo[id];
-      }
-      return this;
+        triggerEvents(allEvents, [name].concat(args));
     }
-  };
-  // Regular expression used to split event strings.
-  var eventSplitter = /\s+/;
-  // Implement fancy features of the Events API such as multiple event
-  // names `"change blur"` and jQuery-style event maps `{change: action}`
-  // in terms of the existing API.
-  var eventsApi = function (obj, action, name, rest) {
-    if (!name)
-      return true;
-    // Handle event maps.
-    if (typeof name === 'object') {
-      for (var key in name) {
-        obj[action].apply(obj, [
-          key,
-          name[key]
-        ].concat(rest));
-      }
-      return false;
-    }
-    // Handle space separated event names.
-    if (eventSplitter.test(name)) {
-      var names = name.split(eventSplitter);
-      for (var i = 0, l = names.length; i < l; i++) {
-        obj[action].apply(obj, [names[i]].concat(rest));
-      }
-      return false;
-    }
-    return true;
+    return objEvents;
   };
   // A difficult-to-believe, but optimized internal dispatch function for
   // triggering events. Tries to keep the usual cases speedy (most internal
@@ -8826,24 +8976,6 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       return;
     }
   };
-  var listenMethods = {
-    listenTo: 'on',
-    listenToOnce: 'once'
-  };
-  // Inversion-of-control versions of `on` and `once`. Tell *this* object to
-  // listen to an event in another object ... keeping track of what it's
-  // listening to.
-  _.each(listenMethods, function (implementation, method) {
-    Events[method] = function (obj, name, callback) {
-      var listeningTo = this._listeningTo || (this._listeningTo = {});
-      var id = obj._listenId || (obj._listenId = _.uniqueId('l'));
-      listeningTo[id] = obj;
-      if (!callback && typeof name === 'object')
-        callback = this;
-      obj[implementation](name, callback, this);
-      return this;
-    };
-  });
   // Aliases for backwards compatibility.
   Events.bind = Events.on;
   Events.unbind = Events.off;
@@ -8861,7 +8993,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
   var Model = Backbone.Model = function (attributes, options) {
     var attrs = attributes || {};
     options || (options = {});
-    this.cid = _.uniqueId('c');
+    this.cid = _.uniqueId(this.cidPrefix);
     this.attributes = {};
     if (options.collection)
       this.collection = options.collection;
@@ -8881,6 +9013,9 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // The default name for the JSON `id` attribute is `"id"`. MongoDB and
     // CouchDB users may want to set this to `"_id"`.
     idAttribute: 'id',
+    // The prefix is used to create the client id which is used to identify models locally.
+    // You may want to override this if you're experiencing name clashes with model ids.
+    cidPrefix: 'c',
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.
     initialize: function () {
@@ -8907,14 +9042,18 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     has: function (attr) {
       return this.get(attr) != null;
     },
+    // Special-cased proxy to underscore's `_.matches` method.
+    matches: function (attrs) {
+      return !!_.iteratee(attrs, this)(this.attributes);
+    },
     // Set a hash of model attributes on the object, firing `"change"`. This is
     // the core primitive operation of a model, updating the data and notifying
     // anyone who needs to know about the change in state. The heart of the beast.
     set: function (key, val, options) {
-      var attr, attrs, unset, changes, silent, changing, prev, current;
       if (key == null)
         return this;
       // Handle both `"key", value` and `{key: value}` -style arguments.
+      var attrs;
       if (typeof key === 'object') {
         attrs = key;
         options = val;
@@ -8926,36 +9065,37 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       if (!this._validate(attrs, options))
         return false;
       // Extract attributes and options.
-      unset = options.unset;
-      silent = options.silent;
-      changes = [];
-      changing = this._changing;
+      var unset = options.unset;
+      var silent = options.silent;
+      var changes = [];
+      var changing = this._changing;
       this._changing = true;
       if (!changing) {
         this._previousAttributes = _.clone(this.attributes);
         this.changed = {};
       }
-      current = this.attributes, prev = this._previousAttributes;
-      // Check for changes of `id`.
-      if (this.idAttribute in attrs)
-        this.id = attrs[this.idAttribute];
+      var current = this.attributes;
+      var changed = this.changed;
+      var prev = this._previousAttributes;
       // For each `set` attribute, update or delete the current value.
-      for (attr in attrs) {
+      for (var attr in attrs) {
         val = attrs[attr];
         if (!_.isEqual(current[attr], val))
           changes.push(attr);
         if (!_.isEqual(prev[attr], val)) {
-          this.changed[attr] = val;
+          changed[attr] = val;
         } else {
-          delete this.changed[attr];
+          delete changed[attr];
         }
         unset ? delete current[attr] : current[attr] = val;
       }
+      // Update the `id`.
+      this.id = this.get(this.idAttribute);
       // Trigger all relevant attribute changes.
       if (!silent) {
         if (changes.length)
           this._pending = options;
-        for (var i = 0, l = changes.length; i < l; i++) {
+        for (var i = 0; i < changes.length; i++) {
           this.trigger('change:' + changes[i], this, current[changes[i]], options);
         }
       }
@@ -9002,14 +9142,15 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     changedAttributes: function (diff) {
       if (!diff)
         return this.hasChanged() ? _.clone(this.changed) : false;
-      var val, changed = false;
       var old = this._changing ? this._previousAttributes : this.attributes;
+      var changed = {};
       for (var attr in diff) {
-        if (_.isEqual(old[attr], val = diff[attr]))
+        var val = diff[attr];
+        if (_.isEqual(old[attr], val))
           continue;
-        (changed || (changed = {}))[attr] = val;
+        changed[attr] = val;
       }
-      return changed;
+      return _.size(changed) ? changed : false;
     },
     // Get the previous value of an attribute, recorded at the time the last
     // `"change"` event was fired.
@@ -9023,20 +9164,18 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     previousAttributes: function () {
       return _.clone(this._previousAttributes);
     },
-    // Fetch the model from the server. If the server's representation of the
-    // model differs from its current attributes, they will be overridden,
-    // triggering a `"change"` event.
+    // Fetch the model from the server, merging the response with the model's
+    // local attributes. Any changed attributes will trigger a "change" event.
     fetch: function (options) {
-      options = options ? _.clone(options) : {};
-      if (options.parse === void 0)
-        options.parse = true;
+      options = _.extend({ parse: true }, options);
       var model = this;
       var success = options.success;
       options.success = function (resp) {
-        if (!model.set(model.parse(resp, options), options))
+        var serverAttrs = options.parse ? model.parse(resp, options) : resp;
+        if (!model.set(serverAttrs, options))
           return false;
         if (success)
-          success(model, resp, options);
+          success.call(options.context, model, resp, options);
         model.trigger('sync', model, resp, options);
       };
       wrapError(this, options);
@@ -9046,56 +9185,56 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // If the server returns an attributes hash that differs, the model's
     // state will be `set` again.
     save: function (key, val, options) {
-      var attrs, method, xhr, attributes = this.attributes;
       // Handle both `"key", value` and `{key: value}` -style arguments.
+      var attrs;
       if (key == null || typeof key === 'object') {
         attrs = key;
         options = val;
       } else {
         (attrs = {})[key] = val;
       }
-      options = _.extend({ validate: true }, options);
+      options = _.extend({
+        validate: true,
+        parse: true
+      }, options);
+      var wait = options.wait;
       // If we're not waiting and attributes exist, save acts as
       // `set(attr).save(null, opts)` with validation. Otherwise, check if
       // the model will be valid when the attributes, if any, are set.
-      if (attrs && !options.wait) {
+      if (attrs && !wait) {
         if (!this.set(attrs, options))
           return false;
       } else {
         if (!this._validate(attrs, options))
           return false;
       }
-      // Set temporary attributes if `{wait: true}`.
-      if (attrs && options.wait) {
-        this.attributes = _.extend({}, attributes, attrs);
-      }
       // After a successful server-side save, the client is (optionally)
       // updated with the server-side state.
-      if (options.parse === void 0)
-        options.parse = true;
       var model = this;
       var success = options.success;
+      var attributes = this.attributes;
       options.success = function (resp) {
         // Ensure attributes are restored during synchronous saves.
         model.attributes = attributes;
-        var serverAttrs = model.parse(resp, options);
-        if (options.wait)
-          serverAttrs = _.extend(attrs || {}, serverAttrs);
-        if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
+        var serverAttrs = options.parse ? model.parse(resp, options) : resp;
+        if (wait)
+          serverAttrs = _.extend({}, attrs, serverAttrs);
+        if (serverAttrs && !model.set(serverAttrs, options))
           return false;
-        }
         if (success)
-          success(model, resp, options);
+          success.call(options.context, model, resp, options);
         model.trigger('sync', model, resp, options);
       };
       wrapError(this, options);
-      method = this.isNew() ? 'create' : options.patch ? 'patch' : 'update';
-      if (method === 'patch')
+      // Set temporary attributes if `{wait: true}` to properly find new ids.
+      if (attrs && wait)
+        this.attributes = _.extend({}, attributes, attrs);
+      var method = this.isNew() ? 'create' : options.patch ? 'patch' : 'update';
+      if (method === 'patch' && !options.attrs)
         options.attrs = attrs;
-      xhr = this.sync(method, this, options);
+      var xhr = this.sync(method, this, options);
       // Restore attributes.
-      if (attrs && options.wait)
-        this.attributes = attributes;
+      this.attributes = attributes;
       return xhr;
     },
     // Destroy this model on the server if it was already persisted.
@@ -9105,24 +9244,27 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       options = options ? _.clone(options) : {};
       var model = this;
       var success = options.success;
+      var wait = options.wait;
       var destroy = function () {
+        model.stopListening();
         model.trigger('destroy', model, model.collection, options);
       };
       options.success = function (resp) {
-        if (options.wait || model.isNew())
+        if (wait)
           destroy();
         if (success)
-          success(model, resp, options);
+          success.call(options.context, model, resp, options);
         if (!model.isNew())
           model.trigger('sync', model, resp, options);
       };
+      var xhr = false;
       if (this.isNew()) {
-        options.success();
-        return false;
+        _.defer(options.success);
+      } else {
+        wrapError(this, options);
+        xhr = this.sync('delete', this, options);
       }
-      wrapError(this, options);
-      var xhr = this.sync('delete', this, options);
-      if (!options.wait)
+      if (!wait)
         destroy();
       return xhr;
     },
@@ -9133,7 +9275,8 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       var base = _.result(this, 'urlRoot') || _.result(this.collection, 'url') || urlError();
       if (this.isNew())
         return base;
-      return base.replace(/([^\/])$/, '$1/') + encodeURIComponent(this.id);
+      var id = this.get(this.idAttribute);
+      return base.replace(/[^\/]$/, '$&/') + encodeURIComponent(id);
     },
     // **parse** converts a response into the hash of attributes to be `set` on
     // the model. The default implementation is just to pass the response along.
@@ -9150,7 +9293,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     },
     // Check if the model is currently in a valid state.
     isValid: function (options) {
-      return this._validate({}, _.extend(options || {}, { validate: true }));
+      return this._validate({}, _.defaults({ validate: true }, options));
     },
     // Run validation against the next complete set of model attributes,
     // returning `true` if all is well. Otherwise, fire an `"invalid"` event.
@@ -9165,27 +9308,24 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       return false;
     }
   });
-  // Underscore methods that we want to implement on the Model.
-  var modelMethods = [
-    'keys',
-    'values',
-    'pairs',
-    'invert',
-    'pick',
-    'omit'
-  ];
+  // Underscore methods that we want to implement on the Model, mapped to the
+  // number of arguments they take.
+  var modelMethods = {
+    keys: 1,
+    values: 1,
+    pairs: 1,
+    invert: 1,
+    pick: 0,
+    omit: 0,
+    chain: 1,
+    isEmpty: 1
+  };
   // Mix in each Underscore method as a proxy to `Model#attributes`.
-  _.each(modelMethods, function (method) {
-    Model.prototype[method] = function () {
-      var args = slice.call(arguments);
-      args.unshift(this.attributes);
-      return _[method].apply(_, args);
-    };
-  });
+  addUnderscoreMethods(Model, modelMethods, 'attributes');
   // Backbone.Collection
   // -------------------
   // If models tend to represent a single row of data, a Backbone Collection is
-  // more analagous to a table full of data ... or a small slice or page of that
+  // more analogous to a table full of data ... or a small slice or page of that
   // table, or a collection of rows that belong together for a particular reason
   // -- all of the messages in this particular folder, all of the documents
   // belonging to this particular author, and so on. Collections maintain
@@ -9214,6 +9354,18 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     add: true,
     remove: false
   };
+  // Splices `insert` into `array` at index `at`.
+  var splice = function (array, insert, at) {
+    at = Math.min(Math.max(at, 0), array.length);
+    var tail = Array(array.length - at);
+    var length = insert.length;
+    for (var i = 0; i < tail.length; i++)
+      tail[i] = array[i + at];
+    for (i = 0; i < length; i++)
+      array[i + at] = insert[i];
+    for (i = 0; i < tail.length; i++)
+      array[i + length + at] = tail[i];
+  };
   // Define the Collection's inheritable methods.
   _.extend(Collection.prototype, Events, {
     // The default model for a collection is just a **Backbone.Model**.
@@ -9234,124 +9386,122 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     sync: function () {
       return Backbone.sync.apply(this, arguments);
     },
-    // Add a model, or list of models to the set.
+    // Add a model, or list of models to the set. `models` may be Backbone
+    // Models or raw JavaScript objects to be converted to Models, or any
+    // combination of the two.
     add: function (models, options) {
       return this.set(models, _.extend({ merge: false }, options, addOptions));
     },
     // Remove a model, or a list of models from the set.
     remove: function (models, options) {
+      options = _.extend({}, options);
       var singular = !_.isArray(models);
       models = singular ? [models] : _.clone(models);
-      options || (options = {});
-      var i, l, index, model;
-      for (i = 0, l = models.length; i < l; i++) {
-        model = models[i] = this.get(models[i]);
-        if (!model)
-          continue;
-        delete this._byId[model.id];
-        delete this._byId[model.cid];
-        index = this.indexOf(model);
-        this.models.splice(index, 1);
-        this.length--;
-        if (!options.silent) {
-          options.index = index;
-          model.trigger('remove', model, this, options);
-        }
-        this._removeReference(model, options);
-      }
-      return singular ? models[0] : models;
+      var removed = this._removeModels(models, options);
+      if (!options.silent && removed)
+        this.trigger('update', this, options);
+      return singular ? removed[0] : removed;
     },
     // Update a collection by `set`-ing a new list of models, adding new ones,
     // removing models that are no longer present, and merging models that
     // already exist in the collection, as necessary. Similar to **Model#set**,
     // the core operation for updating the data contained by the collection.
     set: function (models, options) {
+      if (models == null)
+        return;
       options = _.defaults({}, options, setOptions);
-      if (options.parse)
+      if (options.parse && !this._isModel(models))
         models = this.parse(models, options);
       var singular = !_.isArray(models);
-      models = singular ? models ? [models] : [] : _.clone(models);
-      var i, l, id, model, attrs, existing, sort;
+      models = singular ? [models] : models.slice();
       var at = options.at;
-      var targetModel = this.model;
+      if (at != null)
+        at = +at;
+      if (at < 0)
+        at += this.length + 1;
+      var set = [];
+      var toAdd = [];
+      var toRemove = [];
+      var modelMap = {};
+      var add = options.add;
+      var merge = options.merge;
+      var remove = options.remove;
+      var sort = false;
       var sortable = this.comparator && at == null && options.sort !== false;
       var sortAttr = _.isString(this.comparator) ? this.comparator : null;
-      var toAdd = [], toRemove = [], modelMap = {};
-      var add = options.add, merge = options.merge, remove = options.remove;
-      var order = !sortable && add && remove ? [] : false;
       // Turn bare objects into model references, and prevent invalid models
       // from being added.
-      for (i = 0, l = models.length; i < l; i++) {
-        attrs = models[i] || {};
-        if (attrs instanceof Model) {
-          id = model = attrs;
-        } else {
-          id = attrs[targetModel.prototype.idAttribute || 'id'];
-        }
+      var model;
+      for (var i = 0; i < models.length; i++) {
+        model = models[i];
         // If a duplicate is found, prevent it from being added and
         // optionally merge it into the existing model.
-        if (existing = this.get(id)) {
-          if (remove)
-            modelMap[existing.cid] = true;
-          if (merge) {
-            attrs = attrs === model ? model.attributes : attrs;
+        var existing = this.get(model);
+        if (existing) {
+          if (merge && model !== existing) {
+            var attrs = this._isModel(model) ? model.attributes : model;
             if (options.parse)
               attrs = existing.parse(attrs, options);
             existing.set(attrs, options);
-            if (sortable && !sort && existing.hasChanged(sortAttr))
-              sort = true;
+            if (sortable && !sort)
+              sort = existing.hasChanged(sortAttr);
+          }
+          if (!modelMap[existing.cid]) {
+            modelMap[existing.cid] = true;
+            set.push(existing);
           }
           models[i] = existing;  // If this is a new, valid model, push it to the `toAdd` list.
         } else if (add) {
-          model = models[i] = this._prepareModel(attrs, options);
-          if (!model)
-            continue;
-          toAdd.push(model);
-          this._addReference(model, options);
+          model = models[i] = this._prepareModel(model, options);
+          if (model) {
+            toAdd.push(model);
+            this._addReference(model, options);
+            modelMap[model.cid] = true;
+            set.push(model);
+          }
         }
-        // Do not add multiple models with the same `id`.
-        model = existing || model;
-        if (order && (model.isNew() || !modelMap[model.id]))
-          order.push(model);
-        modelMap[model.id] = true;
       }
-      // Remove nonexistent models if appropriate.
+      // Remove stale models.
       if (remove) {
-        for (i = 0, l = this.length; i < l; ++i) {
-          if (!modelMap[(model = this.models[i]).cid])
+        for (i = 0; i < this.length; i++) {
+          model = this.models[i];
+          if (!modelMap[model.cid])
             toRemove.push(model);
         }
         if (toRemove.length)
-          this.remove(toRemove, options);
+          this._removeModels(toRemove, options);
       }
       // See if sorting is needed, update `length` and splice in new models.
-      if (toAdd.length || order && order.length) {
+      var orderChanged = false;
+      var replace = !sortable && add && remove;
+      if (set.length && replace) {
+        orderChanged = this.length != set.length || _.some(this.models, function (model, index) {
+          return model !== set[index];
+        });
+        this.models.length = 0;
+        splice(this.models, set, 0);
+        this.length = this.models.length;
+      } else if (toAdd.length) {
         if (sortable)
           sort = true;
-        this.length += toAdd.length;
-        if (at != null) {
-          for (i = 0, l = toAdd.length; i < l; i++) {
-            this.models.splice(at + i, 0, toAdd[i]);
-          }
-        } else {
-          if (order)
-            this.models.length = 0;
-          var orderedModels = order || toAdd;
-          for (i = 0, l = orderedModels.length; i < l; i++) {
-            this.models.push(orderedModels[i]);
-          }
-        }
+        splice(this.models, toAdd, at == null ? this.length : at);
+        this.length = this.models.length;
       }
       // Silently sort the collection if appropriate.
       if (sort)
         this.sort({ silent: true });
       // Unless silenced, it's time to fire all appropriate add/sort events.
       if (!options.silent) {
-        for (i = 0, l = toAdd.length; i < l; i++) {
-          (model = toAdd[i]).trigger('add', model, this, options);
+        for (i = 0; i < toAdd.length; i++) {
+          if (at != null)
+            options.index = at + i;
+          model = toAdd[i];
+          model.trigger('add', model, this, options);
         }
-        if (sort || order && order.length)
+        if (sort || orderChanged)
           this.trigger('sort', this, options);
+        if (toAdd.length || toRemove.length)
+          this.trigger('update', this, options);
       }
       // Return the added (or merged) model (or models).
       return singular ? models[0] : models;
@@ -9361,8 +9511,8 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // any granular `add` or `remove` events. Fires `reset` when finished.
     // Useful for bulk operations and optimizations.
     reset: function (models, options) {
-      options || (options = {});
-      for (var i = 0, l = this.models.length; i < l; i++) {
+      options = options ? _.clone(options) : {};
+      for (var i = 0; i < this.models.length; i++) {
         this._removeReference(this.models[i], options);
       }
       options.previousModels = this.models;
@@ -9379,8 +9529,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // Remove a model from the end of the collection.
     pop: function (options) {
       var model = this.at(this.length - 1);
-      this.remove(model, options);
-      return model;
+      return this.remove(model, options);
     },
     // Add a model to the beginning of the collection.
     unshift: function (model, options) {
@@ -9389,8 +9538,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // Remove a model from the beginning of the collection.
     shift: function (options) {
       var model = this.at(0);
-      this.remove(model, options);
-      return model;
+      return this.remove(model, options);
     },
     // Slice out a sub-array of models from the collection.
     slice: function () {
@@ -9400,24 +9548,19 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     get: function (obj) {
       if (obj == null)
         return void 0;
-      return this._byId[obj] || this._byId[obj.id] || this._byId[obj.cid];
+      var id = this.modelId(this._isModel(obj) ? obj.attributes : obj);
+      return this._byId[obj] || this._byId[id] || this._byId[obj.cid];
     },
     // Get the model at the given index.
     at: function (index) {
+      if (index < 0)
+        index += this.length;
       return this.models[index];
     },
     // Return models with matching attributes. Useful for simple cases of
     // `filter`.
     where: function (attrs, first) {
-      if (_.isEmpty(attrs))
-        return first ? void 0 : [];
-      return this[first ? 'find' : 'filter'](function (model) {
-        for (var key in attrs) {
-          if (attrs[key] !== model.get(key))
-            return false;
-        }
-        return true;
-      });
+      return this[first ? 'find' : 'filter'](attrs);
     },
     // Return the first model with matching attributes. Useful for simple cases
     // of `find`.
@@ -9428,14 +9571,18 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // normal circumstances, as the set will maintain sort order as each item
     // is added.
     sort: function (options) {
-      if (!this.comparator)
+      var comparator = this.comparator;
+      if (!comparator)
         throw new Error('Cannot sort a set without a comparator');
       options || (options = {});
+      var length = comparator.length;
+      if (_.isFunction(comparator))
+        comparator = _.bind(comparator, this);
       // Run sort based on type of `comparator`.
-      if (_.isString(this.comparator) || this.comparator.length === 1) {
-        this.models = this.sortBy(this.comparator, this);
+      if (length === 1 || _.isString(comparator)) {
+        this.models = this.sortBy(comparator);
       } else {
-        this.models.sort(_.bind(this.comparator, this));
+        this.models.sort(comparator);
       }
       if (!options.silent)
         this.trigger('sort', this, options);
@@ -9449,16 +9596,14 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // collection when they arrive. If `reset: true` is passed, the response
     // data will be passed through the `reset` method instead of `set`.
     fetch: function (options) {
-      options = options ? _.clone(options) : {};
-      if (options.parse === void 0)
-        options.parse = true;
+      options = _.extend({ parse: true }, options);
       var success = options.success;
       var collection = this;
       options.success = function (resp) {
         var method = options.reset ? 'reset' : 'set';
         collection[method](resp, options);
         if (success)
-          success(collection, resp, options);
+          success.call(options.context, collection, resp, options);
         collection.trigger('sync', collection, resp, options);
       };
       wrapError(this, options);
@@ -9469,17 +9614,19 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // wait for the server to agree.
     create: function (model, options) {
       options = options ? _.clone(options) : {};
-      if (!(model = this._prepareModel(model, options)))
+      var wait = options.wait;
+      model = this._prepareModel(model, options);
+      if (!model)
         return false;
-      if (!options.wait)
+      if (!wait)
         this.add(model, options);
       var collection = this;
       var success = options.success;
-      options.success = function (model, resp) {
-        if (options.wait)
-          collection.add(model, options);
+      options.success = function (model, resp, callbackOpts) {
+        if (wait)
+          collection.add(model, callbackOpts);
         if (success)
-          success(model, resp, options);
+          success.call(callbackOpts.context, model, resp, callbackOpts);
       };
       model.save(null, options);
       return model;
@@ -9491,7 +9638,14 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     },
     // Create a new collection with an identical list of models as this one.
     clone: function () {
-      return new this.constructor(this.models);
+      return new this.constructor(this.models, {
+        model: this.model,
+        comparator: this.comparator
+      });
+    },
+    // Define how to uniquely identify models in the collection.
+    modelId: function (attrs) {
+      return attrs[this.model.prototype.idAttribute || 'id'];
     },
     // Private method to reset all internal state. Called when the collection
     // is first initialized or reset.
@@ -9503,8 +9657,11 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // Prepare a hash of attributes (or other model) to be added to this
     // collection.
     _prepareModel: function (attrs, options) {
-      if (attrs instanceof Model)
+      if (this._isModel(attrs)) {
+        if (!attrs.collection)
+          attrs.collection = this;
         return attrs;
+      }
       options = options ? _.clone(options) : {};
       options.collection = this;
       var model = new this.model(attrs, options);
@@ -9513,17 +9670,44 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       this.trigger('invalid', this, model.validationError, options);
       return false;
     },
+    // Internal method called by both remove and set.
+    _removeModels: function (models, options) {
+      var removed = [];
+      for (var i = 0; i < models.length; i++) {
+        var model = this.get(models[i]);
+        if (!model)
+          continue;
+        var index = this.indexOf(model);
+        this.models.splice(index, 1);
+        this.length--;
+        if (!options.silent) {
+          options.index = index;
+          model.trigger('remove', model, this, options);
+        }
+        removed.push(model);
+        this._removeReference(model, options);
+      }
+      return removed.length ? removed : false;
+    },
+    // Method for checking whether an object should be considered a model for
+    // the purposes of adding to the collection.
+    _isModel: function (model) {
+      return model instanceof Model;
+    },
     // Internal method to create a model's ties to a collection.
     _addReference: function (model, options) {
       this._byId[model.cid] = model;
-      if (model.id != null)
-        this._byId[model.id] = model;
-      if (!model.collection)
-        model.collection = this;
+      var id = this.modelId(model.attributes);
+      if (id != null)
+        this._byId[id] = model;
       model.on('all', this._onModelEvent, this);
     },
     // Internal method to sever a model's ties to a collection.
     _removeReference: function (model, options) {
+      delete this._byId[model.cid];
+      var id = this.modelId(model.attributes);
+      if (id != null)
+        delete this._byId[id];
       if (this === model.collection)
         delete model.collection;
       model.off('all', this._onModelEvent, this);
@@ -9537,10 +9721,15 @@ widgetFactory = function (_, utils, constants, $Nurego) {
         return;
       if (event === 'destroy')
         this.remove(model, options);
-      if (model && event === 'change:' + model.idAttribute) {
-        delete this._byId[model.previous(model.idAttribute)];
-        if (model.id != null)
-          this._byId[model.id] = model;
+      if (event === 'change') {
+        var prevId = this.modelId(model.previousAttributes());
+        var id = this.modelId(model.attributes);
+        if (prevId !== id) {
+          if (prevId != null)
+            delete this._byId[prevId];
+          if (id != null)
+            this._byId[id] = model;
+        }
       }
       this.trigger.apply(this, arguments);
     }
@@ -9548,73 +9737,57 @@ widgetFactory = function (_, utils, constants, $Nurego) {
   // Underscore methods that we want to implement on the Collection.
   // 90% of the core usefulness of Backbone Collections is actually implemented
   // right here:
-  var methods = [
-    'forEach',
-    'each',
-    'map',
-    'collect',
-    'reduce',
-    'foldl',
-    'inject',
-    'reduceRight',
-    'foldr',
-    'find',
-    'detect',
-    'filter',
-    'select',
-    'reject',
-    'every',
-    'all',
-    'some',
-    'any',
-    'include',
-    'contains',
-    'invoke',
-    'max',
-    'min',
-    'toArray',
-    'size',
-    'first',
-    'head',
-    'take',
-    'initial',
-    'rest',
-    'tail',
-    'drop',
-    'last',
-    'without',
-    'difference',
-    'indexOf',
-    'shuffle',
-    'lastIndexOf',
-    'isEmpty',
-    'chain',
-    'sample'
-  ];
+  var collectionMethods = {
+    forEach: 3,
+    each: 3,
+    map: 3,
+    collect: 3,
+    reduce: 4,
+    foldl: 4,
+    inject: 4,
+    reduceRight: 4,
+    foldr: 4,
+    find: 3,
+    detect: 3,
+    filter: 3,
+    select: 3,
+    reject: 3,
+    every: 3,
+    all: 3,
+    some: 3,
+    any: 3,
+    include: 3,
+    includes: 3,
+    contains: 3,
+    invoke: 0,
+    max: 3,
+    min: 3,
+    toArray: 1,
+    size: 1,
+    first: 3,
+    head: 3,
+    take: 3,
+    initial: 3,
+    rest: 3,
+    tail: 3,
+    drop: 3,
+    last: 3,
+    without: 0,
+    difference: 0,
+    indexOf: 3,
+    shuffle: 1,
+    lastIndexOf: 3,
+    isEmpty: 1,
+    chain: 1,
+    sample: 3,
+    partition: 3,
+    groupBy: 3,
+    countBy: 3,
+    sortBy: 3,
+    indexBy: 3
+  };
   // Mix in each Underscore method as a proxy to `Collection#models`.
-  _.each(methods, function (method) {
-    Collection.prototype[method] = function () {
-      var args = slice.call(arguments);
-      args.unshift(this.models);
-      return _[method].apply(_, args);
-    };
-  });
-  // Underscore methods that take a property name as an argument.
-  var attributeMethods = [
-    'groupBy',
-    'countBy',
-    'sortBy',
-    'indexBy'
-  ];
-  // Use attributes instead of properties.
-  _.each(attributeMethods, function (method) {
-    Collection.prototype[method] = function (value, context) {
-      var iterator = _.isFunction(value) ? value : function (model) {
-        return model.get(value);
-      };
-      return _[method](this.models, iterator, context);
-    };
-  });
+  addUnderscoreMethods(Collection, collectionMethods, 'models');
   // Backbone.View
   // -------------
   // Backbone Views are almost more convention than they are actual code. A View
@@ -9628,15 +9801,13 @@ widgetFactory = function (_, utils, constants, $Nurego) {
   // if an existing element is not provided...
   var View = Backbone.View = function (options) {
     this.cid = _.uniqueId('view');
-    options || (options = {});
     _.extend(this, _.pick(options, viewOptions));
     this._ensureElement();
     this.initialize.apply(this, arguments);
-    this.delegateEvents();
   };
   // Cached regex to split keys for `delegate`.
   var delegateEventSplitter = /^(\S+)\s*(.*)$/;
-  // List of view options to be merged as properties.
+  // List of view options to be set as properties.
   var viewOptions = [
     'model',
     'collection',
@@ -9669,20 +9840,32 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // Remove this view by taking the element out of the DOM, and removing any
     // applicable Backbone.Events listeners.
     remove: function () {
-      this.$el.remove();
+      this._removeElement();
       this.stopListening();
       return this;
     },
-    // Change the view's element (`this.el` property), including event
-    // re-delegation.
-    setElement: function (element, delegate) {
-      if (this.$el)
-        this.undelegateEvents();
-      this.$el = element instanceof Backbone.$ ? element : Backbone.$(element);
-      this.el = this.$el[0];
-      if (delegate !== false)
-        this.delegateEvents();
+    // Remove this view's element from the document and all event listeners
+    // attached to it. Exposed for subclasses using an alternative DOM
+    // manipulation API.
+    _removeElement: function () {
+      this.$el.remove();
+    },
+    // Change the view's element (`this.el` property) and re-delegate the
+    // view's events on the new element.
+    setElement: function (element) {
+      this.undelegateEvents();
+      this._setElement(element);
+      this.delegateEvents();
       return this;
+    },
+    // Creates the `this.el` and `this.$el` references for this view using the
+    // given `el`. `el` can be a CSS selector or an HTML string, a jQuery
+    // context or an element. Subclasses can override this to utilize an
+    // alternative DOM manipulation API and are only required to set the
+    // `this.el` property.
+    _setElement: function (el) {
+      this.$el = el instanceof Backbone.$ ? el : Backbone.$(el);
+      this.el = this.$el[0];
     },
     // Set callbacks, where `this.events` is a hash of
     //
@@ -9697,36 +9880,47 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // pairs. Callbacks will be bound to the view, with `this` set properly.
     // Uses event delegation for efficiency.
     // Omitting the selector binds the event to `this.el`.
-    // This only works for delegate-able events: not `focus`, `blur`, and
-    // not `change`, `submit`, and `reset` in Internet Explorer.
     delegateEvents: function (events) {
-      if (!(events || (events = _.result(this, 'events'))))
+      events || (events = _.result(this, 'events'));
+      if (!events)
         return this;
       this.undelegateEvents();
       for (var key in events) {
         var method = events[key];
         if (!_.isFunction(method))
-          method = this[events[key]];
+          method = this[method];
         if (!method)
           continue;
         var match = key.match(delegateEventSplitter);
-        var eventName = match[1], selector = match[2];
-        method = _.bind(method, this);
-        eventName += '.delegateEvents' + this.cid;
-        if (selector === '') {
-          this.$el.on(eventName, method);
-        } else {
-          this.$el.on(eventName, selector, method);
-        }
+        this.delegate(match[1], match[2], _.bind(method, this));
       }
       return this;
     },
-    // Clears all callbacks previously bound to the view with `delegateEvents`.
+    // Add a single event listener to the view's element (or a child element
+    // using `selector`). This only works for delegate-able events: not `focus`,
+    // `blur`, and not `change`, `submit`, and `reset` in Internet Explorer.
+    delegate: function (eventName, selector, listener) {
+      this.$el.on(eventName + '.delegateEvents' + this.cid, selector, listener);
+      return this;
+    },
+    // Clears all callbacks previously bound to the view by `delegateEvents`.
     // You usually don't need to use this, but may wish to if you have multiple
     // Backbone views attached to the same DOM element.
     undelegateEvents: function () {
-      this.$el.off('.delegateEvents' + this.cid);
+      if (this.$el)
+        this.$el.off('.delegateEvents' + this.cid);
       return this;
+    },
+    // A finer-grained `undelegateEvents` for removing a single delegated event.
+    // `selector` and `listener` are both optional.
+    undelegate: function (eventName, selector, listener) {
+      this.$el.off(eventName + '.delegateEvents' + this.cid, selector, listener);
+      return this;
+    },
+    // Produces a DOM element to be assigned to your view. Exposed for
+    // subclasses using an alternative DOM manipulation API.
+    _createElement: function (tagName) {
+      return document.createElement(tagName);
     },
     // Ensure that the View has a DOM element to render into.
     // If `this.el` is a string, pass it through `$()`, take the first
@@ -9739,11 +9933,16 @@ widgetFactory = function (_, utils, constants, $Nurego) {
           attrs.id = _.result(this, 'id');
         if (this.className)
           attrs['class'] = _.result(this, 'className');
-        var $el = Backbone.$('<' + _.result(this, 'tagName') + '>').attr(attrs);
-        this.setElement($el, false);
+        this.setElement(this._createElement(_.result(this, 'tagName')));
+        this._setAttributes(attrs);
       } else {
-        this.setElement(_.result(this, 'el'), false);
+        this.setElement(_.result(this, 'el'));
       }
+    },
+    // Set attributes from a hash on this view's element.  Exposed for
+    // subclasses using an alternative DOM manipulation API.
+    _setAttributes: function (attributes) {
+      this.$el.attr(attributes);
     }
   });
   // Backbone.sync
@@ -9806,20 +10005,19 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     if (params.type !== 'GET' && !options.emulateJSON) {
       params.processData = false;
     }
-    // If we're sending a `PATCH` request, and we're in an old Internet Explorer
-    // that still has ActiveX enabled by default, override jQuery to use that
-    // for XHR instead. Remove this line when jQuery supports `PATCH` on IE8.
-    if (params.type === 'PATCH' && noXhrPatch) {
-      params.xhr = function () {
-        return new ActiveXObject('Microsoft.XMLHTTP');
-      };
-    }
+    // Pass along `textStatus` and `errorThrown` from jQuery.
+    var error = options.error;
+    options.error = function (xhr, textStatus, errorThrown) {
+      options.textStatus = textStatus;
+      options.errorThrown = errorThrown;
+      if (error)
+        error.call(options.context, xhr, textStatus, errorThrown);
+    };
     // Make the request, allowing the user to override any Ajax options.
     var xhr = options.xhr = Backbone.ajax(_.extend(params, options));
     model.trigger('request', model, xhr, options);
     return xhr;
   };
-  var noXhrPatch = typeof window !== 'undefined' && !!window.ActiveXObject && !(window.XMLHttpRequest && new XMLHttpRequest().dispatchEvent);
   // Map from CRUD to HTTP for our default `Backbone.sync` implementation.
   var methodMap = {
     'create': 'POST',
@@ -9874,16 +10072,17 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       var router = this;
       Backbone.history.route(route, function (fragment) {
         var args = router._extractParameters(route, fragment);
-        router.execute(callback, args);
-        router.trigger.apply(router, ['route:' + name].concat(args));
-        router.trigger('route', name, args);
-        Backbone.history.trigger('route', router, name, args);
+        if (router.execute(callback, args, name) !== false) {
+          router.trigger.apply(router, ['route:' + name].concat(args));
+          router.trigger('route', name, args);
+          Backbone.history.trigger('route', router, name, args);
+        }
       });
       return this;
     },
     // Execute a route handler with the provided parameters.  This is an
     // excellent place to do pre-route setup or post-route cleanup.
-    execute: function (callback, args) {
+    execute: function (callback, args, name) {
       if (callback)
         callback.apply(this, args);
     },
@@ -9934,7 +10133,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
   // falls back to polling.
   var History = Backbone.History = function () {
     this.handlers = [];
-    _.bindAll(this, 'checkUrl');
+    this.checkUrl = _.bind(this.checkUrl, this);
     // Ensure that `History` can be used outside of the browser.
     if (typeof window !== 'undefined') {
       this.location = window.location;
@@ -9945,10 +10144,6 @@ widgetFactory = function (_, utils, constants, $Nurego) {
   var routeStripper = /^[#\/]|\s+$/g;
   // Cached regex for stripping leading and trailing slashes.
   var rootStripper = /^\/+|\/+$/g;
-  // Cached regex for detecting MSIE.
-  var isExplorer = /msie [\w.]+/;
-  // Cached regex for removing a trailing slash.
-  var trailingSlash = /\/$/;
   // Cached regex for stripping urls of hash.
   var pathStripper = /#.*$/;
   // Has the history handling already been started?
@@ -9960,7 +10155,26 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     interval: 50,
     // Are we at the app root?
     atRoot: function () {
-      return this.location.pathname.replace(/[^\/]$/, '$&/') === this.root;
+      var path = this.location.pathname.replace(/[^\/]$/, '$&/');
+      return path === this.root && !this.getSearch();
+    },
+    // Does the pathname match the root?
+    matchRoot: function () {
+      var path = this.decodeFragment(this.location.pathname);
+      var root = path.slice(0, this.root.length - 1) + '/';
+      return root === this.root;
+    },
+    // Unicode characters in `location.pathname` are percent encoded so they're
+    // decoded for comparison. `%25` should not be decoded since it may be part
+    // of an encoded parameter.
+    decodeFragment: function (fragment) {
+      return decodeURI(fragment.replace(/%25/g, '%2525'));
+    },
+    // In IE6, the hash fragment and search params are incorrect if the
+    // fragment contains `?`.
+    getSearch: function () {
+      var match = this.location.href.replace(/#.*/, '').match(/\?.+/);
+      return match ? match[0] : '';
     },
     // Gets the true hash value. Cannot use location.hash directly due to bug
     // in Firefox where location.hash will always be decoded.
@@ -9968,15 +10182,16 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       var match = (window || this).location.href.match(/#(.*)$/);
       return match ? match[1] : '';
     },
-    // Get the cross-browser normalized URL fragment, either from the URL,
-    // the hash, or the override.
-    getFragment: function (fragment, forcePushState) {
+    // Get the pathname and search params, without the root.
+    getPath: function () {
+      var path = this.decodeFragment(this.location.pathname + this.getSearch()).slice(this.root.length - 1);
+      return path.charAt(0) === '/' ? path.slice(1) : path;
+    },
+    // Get the cross-browser normalized URL fragment from the path or hash.
+    getFragment: function (fragment) {
       if (fragment == null) {
-        if (this._hasPushState || !this._wantsHashChange || forcePushState) {
-          fragment = decodeURI(this.location.pathname + this.location.search);
-          var root = this.root.replace(trailingSlash, '');
-          if (!fragment.indexOf(root))
-            fragment = fragment.slice(root.length);
+        if (this._usePushState || !this._wantsHashChange) {
+          fragment = this.getPath();
         } else {
           fragment = this.getHash();
         }
@@ -9994,46 +10209,56 @@ widgetFactory = function (_, utils, constants, $Nurego) {
       this.options = _.extend({ root: '/' }, this.options, options);
       this.root = this.options.root;
       this._wantsHashChange = this.options.hashChange !== false;
+      this._hasHashChange = 'onhashchange' in window && (document.documentMode === void 0 || document.documentMode > 7);
+      this._useHashChange = this._wantsHashChange && this._hasHashChange;
       this._wantsPushState = !!this.options.pushState;
-      this._hasPushState = !!(this.options.pushState && this.history && this.history.pushState);
-      var fragment = this.getFragment();
-      var docMode = document.documentMode;
-      var oldIE = isExplorer.exec(navigator.userAgent.toLowerCase()) && (!docMode || docMode <= 7);
+      this._hasPushState = !!(this.history && this.history.pushState);
+      this._usePushState = this._wantsPushState && this._hasPushState;
+      this.fragment = this.getFragment();
       // Normalize root to always include a leading and trailing slash.
       this.root = ('/' + this.root + '/').replace(rootStripper, '/');
-      if (oldIE && this._wantsHashChange) {
-        var frame = Backbone.$('<iframe src="javascript:0" tabindex="-1">');
-        this.iframe = frame.hide().appendTo('body')[0].contentWindow;
-        this.navigate(fragment);
-      }
-      // Depending on whether we're using pushState or hashes, and whether
-      // 'onhashchange' is supported, determine how we check the URL state.
-      if (this._hasPushState) {
-        Backbone.$(window).on('popstate', this.checkUrl);
-      } else if (this._wantsHashChange && 'onhashchange' in window && !oldIE) {
-        Backbone.$(window).on('hashchange', this.checkUrl);
-      } else if (this._wantsHashChange) {
-        this._checkUrlInterval = setInterval(this.checkUrl, this.interval);
-      }
-      // Determine if we need to change the base url, for a pushState link
-      // opened by a non-pushState browser.
-      this.fragment = fragment;
-      var loc = this.location;
       // Transition from hashChange to pushState or vice versa if both are
       // requested.
       if (this._wantsHashChange && this._wantsPushState) {
         // If we've started off with a route from a `pushState`-enabled
         // browser, but we're currently in a browser that doesn't support it...
         if (!this._hasPushState && !this.atRoot()) {
-          this.fragment = this.getFragment(null, true);
-          this.location.replace(this.root + '#' + this.fragment);
+          var root = this.root.slice(0, -1) || '/';
+          this.location.replace(root + '#' + this.getPath());
           // Return immediately as browser will do redirect to new url
           return true;  // Or if we've started out with a hash-based route, but we're currently
                         // in a browser where it could be `pushState`-based instead...
-        } else if (this._hasPushState && this.atRoot() && loc.hash) {
-          this.fragment = this.getHash().replace(routeStripper, '');
-          this.history.replaceState({}, document.title, this.root + this.fragment);
+        } else if (this._hasPushState && this.atRoot()) {
+          this.navigate(this.getHash(), { replace: true });
         }
+      }
+      // Proxy an iframe to handle location events if the browser doesn't
+      // support the `hashchange` event, HTML5 history, or the user wants
+      // `hashChange` but not `pushState`.
+      if (!this._hasHashChange && this._wantsHashChange && !this._usePushState) {
+        this.iframe = document.createElement('iframe');
+        this.iframe.src = 'javascript:0';
+        this.iframe.style.display = 'none';
+        this.iframe.tabIndex = -1;
+        var body = document.body;
+        // Using `appendChild` will throw on IE < 9 if the document is not ready.
+        var iWindow = body.insertBefore(this.iframe, body.firstChild).contentWindow;
+        iWindow.document.open();
+        iWindow.document.close();
+        iWindow.location.hash = '#' + this.fragment;
+      }
+      // Add a cross-platform `addEventListener` shim for older browsers.
+      var addEventListener = window.addEventListener || function (eventName, listener) {
+        return attachEvent('on' + eventName, listener);
+      };
+      // Depending on whether we're using pushState or hashes, and whether
+      // 'onhashchange' is supported, determine how we check the URL state.
+      if (this._usePushState) {
+        addEventListener('popstate', this.checkUrl, false);
+      } else if (this._useHashChange && !this.iframe) {
+        addEventListener('hashchange', this.checkUrl, false);
+      } else if (this._wantsHashChange) {
+        this._checkUrlInterval = setInterval(this.checkUrl, this.interval);
       }
       if (!this.options.silent)
         return this.loadUrl();
@@ -10041,7 +10266,22 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // Disable Backbone.history, perhaps temporarily. Not useful in a real app,
     // but possibly useful for unit testing Routers.
     stop: function () {
-      Backbone.$(window).off('popstate', this.checkUrl).off('hashchange', this.checkUrl);
+      // Add a cross-platform `removeEventListener` shim for older browsers.
+      var removeEventListener = window.removeEventListener || function (eventName, listener) {
+        return detachEvent('on' + eventName, listener);
+      };
+      // Remove window listeners.
+      if (this._usePushState) {
+        removeEventListener('popstate', this.checkUrl, false);
+      } else if (this._useHashChange && !this.iframe) {
+        removeEventListener('hashchange', this.checkUrl, false);
+      }
+      // Clean up the iframe if necessary.
+      if (this.iframe) {
+        document.body.removeChild(this.iframe);
+        this.iframe = null;
+      }
+      // Some environments will throw when clearing an undefined interval.
       if (this._checkUrlInterval)
         clearInterval(this._checkUrlInterval);
       History.started = false;
@@ -10058,8 +10298,10 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // calls `loadUrl`, normalizing across the hidden iframe.
     checkUrl: function (e) {
       var current = this.getFragment();
+      // If the user pressed the back button, the iframe's hash will have
+      // changed and we should use that for comparison.
       if (current === this.fragment && this.iframe) {
-        current = this.getFragment(this.getHash(this.iframe));
+        current = this.getHash(this.iframe.contentWindow);
       }
       if (current === this.fragment)
         return false;
@@ -10071,8 +10313,11 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // match, returns `true`. If no defined routes matches the fragment,
     // returns `false`.
     loadUrl: function (fragment) {
+      // If the root doesn't match, no routes can match either.
+      if (!this.matchRoot())
+        return false;
       fragment = this.fragment = this.getFragment(fragment);
-      return _.any(this.handlers, function (handler) {
+      return _.some(this.handlers, function (handler) {
         if (handler.route.test(fragment)) {
           handler.callback(fragment);
           return true;
@@ -10091,28 +10336,35 @@ widgetFactory = function (_, utils, constants, $Nurego) {
         return false;
       if (!options || options === true)
         options = { trigger: !!options };
-      var url = this.root + (fragment = this.getFragment(fragment || ''));
-      // Strip the hash for matching.
-      fragment = fragment.replace(pathStripper, '');
+      // Normalize the fragment.
+      fragment = this.getFragment(fragment || '');
+      // Don't include a trailing slash on the root.
+      var root = this.root;
+      if (fragment === '' || fragment.charAt(0) === '?') {
+        root = root.slice(0, -1) || '/';
+      }
+      var url = root + fragment;
+      // Strip the hash and decode for matching.
+      fragment = this.decodeFragment(fragment.replace(pathStripper, ''));
       if (this.fragment === fragment)
         return;
       this.fragment = fragment;
-      // Don't include a trailing slash on the root.
-      if (fragment === '' && url !== '/')
-        url = url.slice(0, -1);
       // If pushState is available, we use it to set the fragment as a real URL.
-      if (this._hasPushState) {
+      if (this._usePushState) {
         this.history[options.replace ? 'replaceState' : 'pushState']({}, document.title, url);  // If hash changes haven't been explicitly disabled, update the hash
                                                                                                 // fragment to store history.
       } else if (this._wantsHashChange) {
         this._updateHash(this.location, fragment, options.replace);
-        if (this.iframe && fragment !== this.getFragment(this.getHash(this.iframe))) {
+        if (this.iframe && fragment !== this.getHash(this.iframe.contentWindow)) {
+          var iWindow = this.iframe.contentWindow;
           // Opening and closing the iframe tricks IE7 and earlier to push a
           // history entry on hash-tag change.  When replace is true, we don't
           // want this.
-          if (!options.replace)
-            this.iframe.document.open().close();
-          this._updateHash(this.iframe.location, fragment, options.replace);
+          if (!options.replace) {
+            iWindow.document.open();
+            iWindow.document.close();
+          }
+          this._updateHash(iWindow.location, fragment, options.replace);
         }  // If you've told us that you explicitly don't want fallback hashchange-
            // based history, then `navigate` becomes a page refresh.
       } else {
@@ -10137,7 +10389,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
   Backbone.history = new History();
   // Helpers
   // -------
-  // Helper function to correctly set up the prototype chain, for subclasses.
+  // Helper function to correctly set up the prototype chain for subclasses.
   // Similar to `goog.inherits`, but uses a hash of prototype properties and
   // class properties to be extended.
   var extend = function (protoProps, staticProps) {
@@ -10145,7 +10397,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     var child;
     // The constructor function for the new subclass is either defined by you
     // (the "constructor" property in your `extend` definition), or defaulted
-    // by us to simply call the parent's constructor.
+    // by us to simply call the parent constructor.
     if (protoProps && _.has(protoProps, 'constructor')) {
       child = protoProps.constructor;
     } else {
@@ -10156,7 +10408,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     // Add static properties to the constructor function, if supplied.
     _.extend(child, parent, staticProps);
     // Set the prototype chain to inherit from `parent`, without calling
-    // `parent`'s constructor function.
+    // `parent` constructor function.
     var Surrogate = function () {
       this.constructor = child;
     };
@@ -10182,7 +10434,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     var error = options.error;
     options.error = function (resp) {
       if (error)
-        error(model, resp, options);
+        error.call(options.context, model, resp, options);
       model.trigger('error', model, resp, options);
     };
   };
@@ -10300,8 +10552,8 @@ text = {
     throw new Error('Dynamic load not allowed: ' + id);
   }
 };
-text_loginHTML = '<div>\r\n\twelcome {{=user.name}} - {{=user.last}}\r\n\t<input class="form-control" type="text" placeholder="username" autofocus/>\r\n\t<input class="form-control" type="text" placeholder="password"/>\r\n\r\n\t<br/>\r\n\t<div>\r\n\t\t<button class="button btn btn-primary">Login</button>\r\n\t</div>\r\n</div>\r\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t  <span class="sr-only">Error:</span>\r\n\t  <span class="txt"></span>\r\n</div>';
-text_absHTML = '<div>\r\n\r\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t\t  <span class="sr-only">Error:</span>\r\n\t\t  <span class="txt"></span>\r\n\t</div>\r\n\r\n\r\n</div>';
+text_loginHTML = '<div>\n\twelcome {{=user.name}} - {{=user.last}}\n\t<input class="form-control" type="text" placeholder="username" autofocus/>\n\t<input class="form-control" type="text" placeholder="password"/>\n\n\t<br/>\n\t<div>\n\t\t<button class="button btn btn-primary">Login</button>\n\t</div>\n</div>\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t  <span class="sr-only">Error:</span>\n\t  <span class="txt"></span>\n</div>';
+text_absHTML = '<div>\n\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t\t  <span class="sr-only">Error:</span>\n\t\t  <span class="txt"></span>\n\t</div>\n\n\n</div>';
 absNuregoView = function (bb, utils, absErrorTmpl) {
   var absNuregoView = Backbone.View.extend({
     initialize: function (model, customTmpl) {
@@ -10393,8 +10645,8 @@ loginViewCtrl = function (bb, loginTmpl, absNuregoView, $Nurego) {
   });
   return loginViewCtrl;
 }(backbone, text_loginHTML, absNuregoView, jquery);
-text_priceListHTML = '<style>\r\n\t.headers,\r\n\t.tableWrapper{\r\n\t\tdisplay:flex;\r\n\t\tdisplay:-webkit-flex;\r\n\t}\r\n \r\n\t.cell {\r\n\t\t  padding: 8px;\r\n\t\t  border: 1px solid #E8E8E8;\r\n\t\t  min-height: 50px;\r\n\t\t  max-height: 50px;\r\n\t\t  overflow: hidden;\r\n\t\t  white-space: nowrap;\r\n\t\t  overflow: hidden;\r\n\t\t  text-overflow: ellipsis;\r\n\t}\r\n\r\n\t.nr-nurego-tag-line {\r\n  \t\ttext-align: right;\r\n\t}\r\n\r\n\t.headers div,\r\n\t.tableWrapper div{\r\n\t\tflex:1;\r\n\t  \t-webkit-flex: 1;\r\n\t\ttext-align:center;\r\n\t\tcolor:#9799A2;\r\n\t}\r\n\r\n\t.plansHeader .header{\r\n\t\ttext-transform:uppercase;\r\n\t\tcolor:#9799A2;\r\n\t\tfont-weight:bold;\r\n\t\tfont-size:14px;\r\n\t}\r\n\r\n\t.priceRecurrence{\r\n\t\tcolor:#8EBE2E;\r\n\t\tfont-size:14px;\r\n\t}\r\n\r\n\t.planPrice{\r\n\t\tcolor:#F26522;\r\n\t\tfont-size:16px;\r\n\t\tfont-weight:bold;\r\n\t}\r\n\r\n\t.planDiscount{\r\n\t\tbackground: #F26522;\r\n\t\tfont-weight: bold;\r\n\t}\r\n\r\n\t.planDiscount span{\r\n\t\tcolor: #fff !important;\r\n\t\tborder:0px;\r\n\t\tdisplay:block;\r\n\t}\r\n\r\n\t.nr-check.nr-no {\r\n\t\tcolor:#FB6B5B;\r\n\t\tfont-size:16px;\r\n\t}\r\n\r\n\t.nr-check.nr-yes {\r\n\t\tcolor:#92CF5C;\r\n\t\tfont-size:16px;\r\n\t}\r\n\r\n\t.planCol .features div:nth-of-type(odd),\r\n\t.featuresCol .featureName:nth-of-type(odd){\r\n\t\tbackground: #F9F9F9;\r\n\t}\r\n\r\n\t.subscribeToPlan {\r\n\t\tbackground: gray;\r\n\t\tcolor: #fff;\r\n\t\tborder: 0px;\r\n\t\tpadding: 6px;\r\n\t\tfont-size: 16px;\r\n\t\t/*margin: 8px 1px 0px 1px;*/\r\n\t}\r\n\r\n\t.subscribeToPlan span {\r\n\t    color: white;\r\n\t    font-weight: bold;\r\n\t}\r\n\r\n\t.subscribeToPlan span:hover {\r\n\t    text-decoration: underline;\r\n\t    cursor: pointer;\r\n\t}\r\n\t\t\r\n\t.emailWrapper .invalidEmail{\r\n\t\tdisplay: none;\r\n\t}\r\n\r\n\t.emailWrapper.has-error .invalidEmail{\r\n\t\tdisplay: block;\r\n\t}\r\n\r\n\t.noSSO.fillEmail .emailWrapper{\r\n\t  display: block;\r\n\t  position: absolute;\r\n\t  width: 100%;\r\n\t  top: 0px;\r\n\t  background: white;\r\n\t  height: 100%;\r\n\t  padding: 20px;\r\n\t}\r\n\r\n\t.noSSO.fillEmail.done .emailWrapper, .emailWrapper,\r\n\t.noSSO.fillEmail .nr-nurego-tag-line{\r\n\t\tdisplay:none;\r\n\t}\r\n\r\n\t.btn.btn-primary.postNoSSo {\r\n    \tmargin-top: 10px;\r\n\t}\r\n\r\n\t.thankYou{\r\n\t\tdisplay: none;\r\n\t}\r\n\r\n\t.done .p1 {\r\n    \tfont-size: 28px;\r\n\t}\r\n\t.done .thankYou{\r\n\t  display: block;\r\n\t  position: absolute;\r\n\t  top: 0px;\r\n\t  width: 100%;\r\n\t  text-align: center;\r\n\t  background: rgba(255,255,255,1);\r\n\t  height: 100%;\r\n\t  padding: 10%;\r\n\t}\r\n\r\n\t.unchecked .subscribeToPlan{\r\n\t\topacity:0.35;\r\n\t}\r\n\r\n\t.checked .subscribeToPlan{\r\n\t\topacity:1;\r\n\t}\r\n\r\n\t.noSSO.fillEmail .tableWrapper{\r\n\t\tdisplay:none;\r\n\t}\r\n\r\n\r\n</style>\r\n\r\n<div class="plansHeader headers">\r\n\t\t\t<div class="featuresHeader header cell">\r\n\t\t\t\t\r\n\t\t\t</div>\r\n\t{{  for(var plan in plans) { }}\t\t        \t\t\r\n    \t\t<div class="header cell" title="{{=plans[plan].name}}">\r\n\t\t\t\t{{=plans[plan].name}}\r\n    \t\t</div>\r\n\r\n\t{{ \t}\t}}\r\n</div>\r\n\r\n<div class="priceHeaders headers">\r\n\t\t\t<div class="price header cell">\r\n\t\t\t\tPrice\r\n\t\t\t</div>\r\n\t{{  for(var plan in plans) { }}\t\t        \t\t\r\n    \t\t<div class="header cell">\r\n    \t\t{{\tif(plans[plan].features.map["recurring"])\t{\t}}\r\n\t\t\t\t\r\n\t\t\t\t<span class="planPrice">${{=plans[plan].features.map["recurring"].price}}</span>\r\n\t\t\t\t<span class="priceRecurrence">/Month</span>\r\n\r\n\t\t\t{{\t}else if(plans[plan].price){ }}\r\n\t\t\t\t\r\n\t\t\t\t<span class="planPrice">${{=plans[plan].price}}</span>\r\n\r\n\t\t\t{{\t}else{\t}}\r\n\r\n\t\t\t\t{{  for(var item in plans[plan].features.data) { }}\t\t        \t\t\r\n\r\n\t\t\t\t\t{{\tif(plans[plan].features.data[item].element_type === "recurring"){\t}}\r\n\t\t\t\t\t\t\t<span class="planPrice">${{=plans[plan].features.data[item].price}}</span>\r\n\t\t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t{{\t}\t}}\r\n    \t\t</div>\r\n    \t\t\r\n\t{{ \t}\t}}\r\n</div>\r\n\r\n<!--div class="ccHeaders headers">\r\n\t\t\t<div class="price header cell" title="Credit Cards">\r\n\t\t\t\tCredit Card\r\n\t\t\t</div>\r\n\t{{  for(var plan in plans) { }}\t\t        \t\t\r\n    \t\t\r\n    \t\t<div class="header cell">\r\n\t\t\t\t{{if (plans[plan].credit_card) { }} \r\n\t\t\t\t\r\n\t\t\t\t\t<span class="nr-check nr-yes ion-checkmark"></span>\r\n\r\n    \t\t\t{{\t}else{\t}}\r\n\r\n    \t\t\t\t<span class="nr-check nr-no ion-close "></span>\r\n\r\n    \t\t\t{{\t}\t}}\r\n\r\n    \t\t</div>\r\n\r\n\t{{ \t}\t}}\r\n</div-->\r\n\r\n\r\n<div class="tableWrapper">\r\n\t\t\t\r\n\t\t\t<div class="featuresCol">\r\n\t\t\t\t{{  for(var item in features) { }}\r\n\t\t        \t\r\n\t\t        \t{{\tif([features[item]] != \'recurring\') {\t }}\r\n\t\t        \t\t<div class="featureName cell" title="{{=features[item]}}">\r\n\t\t\t\t\t\t\t{{=features[item]}}\r\n\t\t        \t\t</div>\r\n\t\t        \t{{\t}\t}}\r\n\r\n\t\t        {{  } }}\r\n\t\r\n\t\t\t</div>\r\n\r\n\r\n\r\n\t\t\t\r\n\t{{  for(var plan in plans) { }}\r\n\t\t\t<div class="planCol">\r\n\t\t        \t\t\t        \t\t\r\n\r\n\t\t        \t\t<div class="features">\r\n\t\t        \t\t\t{{  for(var item in features) { }}\r\n\r\n\r\n\r\n\t\t\t        \t\t\t{{\tif([features[item]] != \'recurring\') {\t }}\t\t        \t\t\t\t\r\n\r\n\r\n\t\t\t        \t\t\t\t\t{{\tif(plans[plan].features.map[features[item]].name) {\t }}\r\n\r\n\t\t\t        \t\t\t\t\t\t{{\tif(plans[plan].features.map[features[item]].max_unit) {\t }}\r\n\t\t\t\t        \t\t\t\t\t\t<div class="featureItem cell">\r\n\t\t\t\t\t        \t\t\t\t\t\t<span>\r\n\t\t\t\t\t        \t\t\t\t\t\t\t{{=plans[plan].features.map[features[item]].max_unit}}\r\n\t\t\t\t\t        \t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t        \t\t\t\t</div>\r\n\t\t\t        \t\t\t\t\t\t{{\t}else{ \t}}\r\n\r\n\t\t\t\t\t        \t\t\t\t\t<div class="featureItem cell">\r\n\t\t\t\t\t        \t\t\t\t\t\t<span class="nr-check nr-yes ion-checkmark"></span>\r\n\t\t\t\t\t\t        \t\t\t\t</div>\r\n\r\n\t\t\t\t\t        \t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t\t        \t\t\t\t{{\t}\t}}\r\n\r\n\t\t\t\t        \t\t\t\t{{\tif(plans[plan].features.map[features[item]].missingFeature){\t}}\r\n\t\t\t\t\t\t\t\t\t\t\t<div class="featureItemMissing cell">\r\n\t\t\t\t\t\t\t\t\t\t\t\t<span class="nr-check nr-no ion-close "></span>\r\n\t\t\t\t        \t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t\t{{\t}\t}}\t\t\t        \t\t\t\t\t\t        \t\t\t\r\n\r\n\t\t\t\t\t\t\t\t{{\t}\t}}\r\n\r\n\r\n\r\n\t\t        \t\t\t{{\t}\t}}\r\n\t\t        \t\t</div>\r\n\r\n\t\t        \t\t<div class="discount">\r\n\t\t        \t\t\t\r\n\t\t        \t\t\t{{for (item in plans[plan].discounts.data) { }}\r\n\t\t\t\t\t\t\t\t<div class="header planDiscount cell">\r\n\t\t\t\t\t\t\t\t\t<span>{{=plans[plan].discounts.data[item].days_to_apply}} days</span>\r\n\t\t\t\t\t\t\t\t\t<span>FREE TRIAL</span>\r\n\t\t\t\t\t    \t\t</div>\r\n\t\t\t\t\t\t\t{{\t}\t}}\r\n\t\t        \t\t</div>\r\n\r\n\t\t        \t\t{{\tif(!obj.urlParams["preview"]) {\t}}\r\n\t\t        \t\t<div class="subscribeToPlan">\r\n\t\t\t\t\t\t\t<span class="plan-select" data-id="{{=plans[plan].id}}">subscribe</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t{{\t}\t}}\r\n\t\t\t</div>\r\n\t{{  } }}\r\n\r\n\t\r\n</div>\r\n\r\n\r\n<div class="emailWrapper">\r\n\t<h4 class="">Please enter your Email:</h4>\r\n\t<input class="form-control email" type="text" placeholder="example@email.com"/>\r\n\r\n\t<div class="alert alert-danger invalidEmail" role="alert" style="margin-top:12px;">\r\n\t\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t\t  <span class="sr-only"></span>\r\n\t\t  <span class="txt">Error:Invalid Email address, please try again.</span>\r\n\t</div>\r\n\r\n\t<div class="btn btn-primary postNoSSo">Subscribe</div>\r\n\r\n</div>\r\n\r\n{{ if(obj.urlParams["terms-of-service-url"]) {\t}}\r\n\t<div class="nr-nurego-tag-line">\r\n\t\t\t <div class="checkbox" id="checkbox">\r\n\t\t\t    <label>\r\n\t\t\t      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox"> \r\n\t\t\t      By clicking subscribe you agree to the \r\n                  <a href="javascript:void(0)" class="terms">Terms of Service</a>\r\n\t\t\t    </label>\r\n\t\t\t  </div>\r\n\t</div>\r\n{{\t}\t}}\r\n\r\n<div class="thankYou">\r\n\t<div class="p1">Your registration invite has been sent.</div>\r\n\t<div class="p2">Please check your inbox and use the link inside to sign up</div>\r\n</div>\r\n\r\n<div class="nr-nurego-tag-line">\r\n\tPricing Table Crafted by <a href="http://www.nurego.com">Nurego</a>\r\n</div>\r\n\r\n\r\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t  <span class="sr-only">Error:</span>\r\n\t  <span class="txt"></span>\r\n</div>';
-text_priceListCSS = '/*.simple_3_tier {\r\n    font-family:"Lato",Helvetica,Arial,sans-serif;\r\n    float: left;\r\n    margin: 0 auto;\r\n}\r\n.simple_3_tier table {\r\n    width: auto;\r\n    border-collapse: collapse;\r\n    background: #fff;\r\n}\r\n.simple_3_tier td,\r\n.simple_3_tier th {\r\n    border: 1px solid #e8e8e8;\r\n    vertical-align: middle;\r\n}\r\n.simple_3_tier td {\r\n    color: #707383;\r\n    font-size: 14px;\r\n    line-height: 18px;\r\n}\r\n.simple_3_tier thead th,\r\n.simple_3_tier tfoot th {\r\n    border: none;\r\n}\r\n.simple_3_tier thead td {\r\n    height: 30px;\r\n    background: #fff;\r\n    font-size: 11px;\r\n    color: #9799a2;\r\n    text-transform: uppercase;\r\n    text-align: center;\r\n    font-weight: bold;\r\n    padding: 0 10px;\r\n}\r\n.simple_3_tier tbody th {\r\n    text-align: left;\r\n    font-size: 12px;\r\n    padding: 10px 20px;\r\n    font-weight: normal;\r\n}\r\n.simple_3_tier tbody td {\r\n    text-align: center;\r\n    padding: 0 10px;\r\n}\r\n.simple_3_tier tfoot td {\r\n    text-align: center;\r\n    padding: 12px 0;\r\n}\r\n.simple_3_tier th.nr-price {\r\n    color: #666;\r\n    height: 32px;\r\n    background-color: #fff;\r\n    text-align: left;\r\n    font-weight: normal;\r\n}\r\n.simple_3_tier td.nr-price {\r\n    color: #f26522;\r\n    font-size: 20px;\r\n    font-weight: bold;\r\n    background-color: #fff;\r\n}\r\n.simple_3_tier tfoot a {\r\n    display: inline-block;\r\n    color: #fff;\r\n    background: #9799A2;\r\n    height: 32px;\r\n    line-height: 32px;\r\n    text-align: center;\r\n    padding: 0 15px;\r\n    margin-left: 5px;\r\n    margin-right: 5px;\r\n    font-size: 10px;\r\n    text-transform: uppercase;\r\n    font-weight: bold;\r\n    text-decoration: none;\r\n    -webkit-border-radius: 4px;\r\n    -moz-border-radius: 4px;\r\n    border-radius: 4px;\r\n}\r\n\r\n.simple_3_tier tfoot a:hover {\r\n    background: #959595;\r\n    text-decoration:underline;\r\n}\r\n\r\n.simple_3_tier .nr-check {\r\n    width: 16px;\r\n    height: 16px;\r\n    display: block;\r\n    margin: 0 auto;\r\n}\r\n\r\n.simple_3_tier .nr-check.nr-yes {font-size:16px; color:#69be28; }\r\n.simple_3_tier .nr-check.nr-no { font-size:16px; color:#f26522;  }\r\n.simple_3_tier .nr-notify {\r\n    font-size: 14px;\r\n    font-weight: bold;\r\n    text-align: center;\r\n    line-height: 18px;\r\n    padding: 20px;\r\n    margin: 0 0 15px;\r\n    font-family: Tahoma, Verdana, Segoe, sans-serif;\r\n    letter-spacing: 1px;\r\n}\r\n.simple_3_tier .nr-notify.nr-red {\r\n    background: #f2dede;\r\n    color: #a94442;\r\n}\r\n.simple_3_tier .nr-notify.nr-yellow {\r\n    background: #fcf8e3;\r\n    color: #986d3b;\r\n}\r\n.simple_3_tier .nr-container {\r\n    height: 304px;\r\n    margin: 0 auto 10px;\r\n}\r\n.simple_3_tier .nr-container.nr-loading {\r\n    background: url("../images/loader.gif") 50% 50% no-repeat;\r\n}\r\n.simple_3_tier .nr-container.nr-empty {\r\n    background: url("../images/empty.gif") 50% 50% no-repeat;\r\n}\r\n\r\n.nr-signup-div {\r\n    margin: 40px auto;\r\n    width: 100%;\r\n    text-align: center;\r\n}\r\n.nr-signup, .nr-go-signup, .nr-go-update {\r\n    text-decoration: none;\r\n    background: transparent;\r\n    border: 2px solid #dfe1e6;\r\n    min-width: 120px;\r\n    font-weight: 400;\r\n    margin-top: 0.5em;\r\n    color: #565a6b;\r\n    text-transform: uppercase;\r\n    padding: 0.625em 1.125em;\r\n    font-size: 0.857em;\r\n    margin-left: 5px;\r\n}\r\n\r\n.nr-signup:hover, .nr-go-signup:hover {\r\n    color: white;\r\n    background: #565a6b;\r\n    border: 2px solid white;\r\n}\r\n\r\n.simple_3_tier .nr-plan-selected {\r\n    background: #f26522; \r\n}\r\n\r\n.simple_3_tier .nr-plan-selected:hover {\r\n    background: #f26522; \r\n}\r\n\r\n.nr-discount {\r\n  text-transform:uppercase;\r\n  padding: 10px 10px 10px 10px !important;\r\n  background-color: #f26522;\r\n  color: wheat !important;\r\n}\r\n.nr-trial-days {\r\n  font-size: 10px;\r\n}\r\n\r\n.nr-price-period {\r\n  font-size: 14px;\r\n  font-weight: normal;\r\n  color: #69be28;\r\n}\r\n\r\n.nr-nurego-tag-line{\r\n  margin-top: 10px;\r\n    text-align: right;\r\n  font-size: 12px;\r\n}\r\n\r\n.nr-nurego-cc-require{\r\n  margin-top: 10px;\r\n    text-align: right;\r\n  font-size: 14px;\r\n}\r\n\r\n.nr-nurego-tag-line a{\r\n  color: #69be28;\r\n}\r\n\r\n.nr-cc td {\r\n  font-size: 12px;  \r\n}\r\n\r\n\r\n.on-offswitch {\r\n    display: inline-block;\r\n    margin-bottom: 15px;\r\n    position: relative; width: 74px;\r\n    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;\r\n}\r\n\r\n.on-offswitch-checkbox {\r\n    display: none;\r\n}\r\n.on-offswitch-label {\r\n    display: block; overflow: hidden; cursor: pointer;\r\n    border: 1px solid #DFE1E6; border-radius: 0px;\r\n}\r\n.on-offswitch-inner {\r\n    display: block; width: 200%; margin-left: -100%;\r\n    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;\r\n    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;\r\n}\r\n.on-offswitch-inner:before, .on-offswitch-inner:after {\r\n    display: block; float: left; width: 50%; height: 7px; padding: 0; line-height: 7px;\r\n    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;\r\n    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;\r\n}\r\n.on-offswitch-inner:before {\r\n    content: "";\r\n    padding-left: 10px;\r\n    background-color: #FFFFFF; color: #FFFFFF;\r\n}\r\n.on-offswitch-inner:after {\r\n    content: "";\r\n    padding-right: 10px;\r\n    background-color: #FFFFFF;\r\n    text-align: right;\r\n}\r\n.on-offswitch-switch {\r\n    display: block; width: 37px; margin: 1px;\r\n    background: #C59DD7;\r\n    border: 1px solid #DFE1E6; border-radius: 0px;\r\n    position: absolute; top: 0; bottom: 0; left: 35px;\r\n    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;\r\n    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; \r\n}\r\n\r\n.monthly-checked .on-offswitch-inner {\r\n    margin-left: 0;\r\n}\r\n\r\n.monthly-checked .on-offswitch-switch {\r\n    left: 0px; \r\n}\r\n\r\n.switch-monthly {\r\n    padding-right: 13px;\r\n    text-align: -webkit-right;   \r\n    color: #C59DD7;\r\n    font-size: 11px;\r\n    cursor: pointer;\r\n}\r\n\r\n.switch-yearly {\r\n    padding-left: 11px;\r\n    color: #6D6D6E;\r\n    font-size: 11px;\r\n    cursor: pointer;\r\n}\r\n\r\n.switcher-full {\r\n    display: none;\r\n    margin-left: 620px;\r\n    margin-bottom: 10px;\r\n}\r\n\r\n@media only screen and (max-width: 1260px) {\r\n  .switcher-full {\r\n    margin-left: 542px;\r\n  }\r\n}\r\n@media only screen and (max-width: 1150px) {\r\n  .switcher-full {\r\n    margin-left: 475px;\r\n  }\r\n}\r\n@media only screen and (max-width: 1050px) {\r\n  .switcher-full {\r\n    margin-left: 455px;\r\n  }\r\n}\r\n@media only screen and (max-width: 1020px) {\r\n  .switcher-full {\r\n    margin-left: 426px;\r\n  }\r\n}\r\n@media only screen and (max-width: 980px) {\r\n  .switcher-full {\r\n    margin-left: 400px;\r\n  }\r\n}\r\n@media only screen and (max-width: 913px) {\r\n  .switcher-full {\r\n    margin-left: 340px;\r\n  }\r\n}\r\n@media only screen and (max-width: 825px) {\r\n  .switcher-full {\r\n    margin-left: 200px;\r\n  }\r\n}\r\n\r\n*/';
+text_priceListHTML = '<style>\n\t.headers,\n\t.tableWrapper{\n\t\tdisplay:flex;\n\t\tdisplay:-webkit-flex;\n\t}\n \n\t.cell {\n\t\t  padding: 8px;\n\t\t  border: 1px solid #E8E8E8;\n\t\t  min-height: 50px;\n\t\t  max-height: 50px;\n\t\t  overflow: hidden;\n\t\t  white-space: nowrap;\n\t\t  overflow: hidden;\n\t\t  text-overflow: ellipsis;\n\t}\n\n\t.nr-nurego-tag-line {\n  \t\ttext-align: right;\n\t}\n\n\t.headers div,\n\t.tableWrapper div{\n\t\tflex:1;\n\t  \t-webkit-flex: 1;\n\t\ttext-align:center;\n\t\tcolor:#9799A2;\n\t}\n\n\t.plansHeader .header{\n\t\ttext-transform:uppercase;\n\t\tcolor:#9799A2;\n\t\tfont-weight:bold;\n\t\tfont-size:14px;\n\t}\n\n\t.priceRecurrence{\n\t\tcolor:#8EBE2E;\n\t\tfont-size:14px;\n\t}\n\n\t.planPrice{\n\t\tcolor:#F26522;\n\t\tfont-size:16px;\n\t\tfont-weight:bold;\n\t}\n\n\t.planDiscount{\n\t\tbackground: #F26522;\n\t\tfont-weight: bold;\n\t}\n\n\t.planDiscount span{\n\t\tcolor: #fff !important;\n\t\tborder:0px;\n\t\tdisplay:block;\n\t}\n\n\t.nr-check.nr-no {\n\t\tcolor:#FB6B5B;\n\t\tfont-size:16px;\n\t}\n\n\t.nr-check.nr-yes {\n\t\tcolor:#92CF5C;\n\t\tfont-size:16px;\n\t}\n\n\t.planCol .features div:nth-of-type(odd),\n\t.featuresCol .featureName:nth-of-type(odd){\n\t\tbackground: #F9F9F9;\n\t}\n\n\t.subscribeToPlan {\n\t\tbackground: gray;\n\t\tcolor: #fff;\n\t\tborder: 0px;\n\t\tpadding: 6px;\n\t\tfont-size: 16px;\n\t\t/*margin: 8px 1px 0px 1px;*/\n\t}\n\n\t.subscribeToPlan span {\n\t    color: white;\n\t    font-weight: bold;\n\t}\n\n\t.subscribeToPlan span:hover {\n\t    text-decoration: underline;\n\t    cursor: pointer;\n\t}\n\t\t\n\t.emailWrapper .invalidEmail{\n\t\tdisplay: none;\n\t}\n\n\t.emailWrapper.has-error .invalidEmail{\n\t\tdisplay: block;\n\t}\n\n\t.noSSO.fillEmail .emailWrapper{\n\t  display: block;\n\t  position: absolute;\n\t  width: 100%;\n\t  top: 0px;\n\t  background: white;\n\t  height: 100%;\n\t  padding: 20px;\n\t}\n\n\t.noSSO.fillEmail.done .emailWrapper, .emailWrapper,\n\t.noSSO.fillEmail .nr-nurego-tag-line{\n\t\tdisplay:none;\n\t}\n\n\t.btn.btn-primary.postNoSSo {\n    \tmargin-top: 10px;\n\t}\n\n\t.thankYou{\n\t\tdisplay: none;\n\t}\n\n\t.done .p1 {\n    \tfont-size: 28px;\n\t}\n\t.done .thankYou{\n\t  display: block;\n\t  position: absolute;\n\t  top: 0px;\n\t  width: 100%;\n\t  text-align: center;\n\t  background: rgba(255,255,255,1);\n\t  height: 100%;\n\t  padding: 10%;\n\t}\n\n\t.unchecked .subscribeToPlan{\n\t\topacity:0.35;\n\t}\n\n\t.checked .subscribeToPlan{\n\t\topacity:1;\n\t}\n\n\t.noSSO.fillEmail .tableWrapper{\n\t\tdisplay:none;\n\t}\n\n\n</style>\n\n<div class="plansHeader headers">\n\t\t\t<div class="featuresHeader header cell">\n\t\t\t\t\n\t\t\t</div>\n\t{{  for(var plan in plans) { }}\t\t        \t\t\n    \t\t<div class="header cell" title="{{=plans[plan].name}}">\n\t\t\t\t{{=plans[plan].name}}\n    \t\t</div>\n\n\t{{ \t}\t}}\n</div>\n\n<div class="priceHeaders headers">\n\t\t\t<div class="price header cell">\n\t\t\t\tPrice\n\t\t\t</div>\n\t{{  for(var plan in plans) { }}\t\t        \t\t\n    \t\t<div class="header cell">\n    \t\t{{\tif(plans[plan].features.map["recurring"])\t{\t}}\n\t\t\t\t\n\t\t\t\t<span class="planPrice">${{=plans[plan].features.map["recurring"].price}}</span>\n\t\t\t\t<span class="priceRecurrence">/Month</span>\n\n\t\t\t{{\t}else if(plans[plan].price){ }}\n\t\t\t\t\n\t\t\t\t<span class="planPrice">${{=plans[plan].price}}</span>\n\n\t\t\t{{\t}else{\t}}\n\n\t\t\t\t{{  for(var item in plans[plan].features.data) { }}\t\t        \t\t\n\n\t\t\t\t\t{{\tif(plans[plan].features.data[item].element_type === "recurring"){\t}}\n\t\t\t\t\t\t\t<span class="planPrice">${{=plans[plan].features.data[item].price}}</span>\n\t\t\t\t\t{{\t}\t}}\n\n\t\t\t\t{{\t}\t}}\n\n\t\t\t{{\t}\t}}\n    \t\t</div>\n    \t\t\n\t{{ \t}\t}}\n</div>\n\n<!--div class="ccHeaders headers">\n\t\t\t<div class="price header cell" title="Credit Cards">\n\t\t\t\tCredit Card\n\t\t\t</div>\n\t{{  for(var plan in plans) { }}\t\t        \t\t\n    \t\t\n    \t\t<div class="header cell">\n\t\t\t\t{{if (plans[plan].credit_card) { }} \n\t\t\t\t\n\t\t\t\t\t<span class="nr-check nr-yes ion-checkmark"></span>\n\n    \t\t\t{{\t}else{\t}}\n\n    \t\t\t\t<span class="nr-check nr-no ion-close "></span>\n\n    \t\t\t{{\t}\t}}\n\n    \t\t</div>\n\n\t{{ \t}\t}}\n</div-->\n\n\n<div class="tableWrapper">\n\t\t\t\n\t\t\t<div class="featuresCol">\n\t\t\t\t{{  for(var item in features) { }}\n\t\t        \t\n\t\t        \t{{\tif([features[item]] != \'recurring\') {\t }}\n\t\t        \t\t<div class="featureName cell" title="{{=features[item]}}">\n\t\t\t\t\t\t\t{{=features[item]}}\n\t\t        \t\t</div>\n\t\t        \t{{\t}\t}}\n\n\t\t        {{  } }}\n\t\n\t\t\t</div>\n\n\n\n\t\t\t\n\t{{  for(var plan in plans) { }}\n\t\t\t<div class="planCol">\n\t\t        \t\t\t        \t\t\n\n\t\t        \t\t<div class="features">\n\t\t        \t\t\t{{  for(var item in features) { }}\n\n\n\n\t\t\t        \t\t\t{{\tif([features[item]] != \'recurring\') {\t }}\t\t        \t\t\t\t\n\n\n\t\t\t        \t\t\t\t\t{{\tif(plans[plan].features.map[features[item]].name) {\t }}\n\n\t\t\t        \t\t\t\t\t\t{{\tif(plans[plan].features.map[features[item]].max_unit) {\t }}\n\t\t\t\t        \t\t\t\t\t\t<div class="featureItem cell">\n\t\t\t\t\t        \t\t\t\t\t\t<span>\n\t\t\t\t\t        \t\t\t\t\t\t\t{{=plans[plan].features.map[features[item]].max_unit}}\n\t\t\t\t\t        \t\t\t\t\t\t</span>\n\t\t\t\t\t\t        \t\t\t\t</div>\n\t\t\t        \t\t\t\t\t\t{{\t}else{ \t}}\n\n\t\t\t\t\t        \t\t\t\t\t<div class="featureItem cell">\n\t\t\t\t\t        \t\t\t\t\t\t<span class="nr-check nr-yes ion-checkmark"></span>\n\t\t\t\t\t\t        \t\t\t\t</div>\n\n\t\t\t\t\t        \t\t\t\t{{\t}\t}}\n\n\t\t\t\t        \t\t\t\t{{\t}\t}}\n\n\t\t\t\t        \t\t\t\t{{\tif(plans[plan].features.map[features[item]].missingFeature){\t}}\n\t\t\t\t\t\t\t\t\t\t\t<div class="featureItemMissing cell">\n\t\t\t\t\t\t\t\t\t\t\t\t<span class="nr-check nr-no ion-close "></span>\n\t\t\t\t        \t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t{{\t}\t}}\t\t\t        \t\t\t\t\t\t        \t\t\t\n\n\t\t\t\t\t\t\t\t{{\t}\t}}\n\n\n\n\t\t        \t\t\t{{\t}\t}}\n\t\t        \t\t</div>\n\n\t\t        \t\t<div class="discount">\n\t\t        \t\t\t\n\t\t        \t\t\t{{for (item in plans[plan].discounts.data) { }}\n\t\t\t\t\t\t\t\t<div class="header planDiscount cell">\n\t\t\t\t\t\t\t\t\t<span>{{=plans[plan].discounts.data[item].days_to_apply}} days</span>\n\t\t\t\t\t\t\t\t\t<span>FREE TRIAL</span>\n\t\t\t\t\t    \t\t</div>\n\t\t\t\t\t\t\t{{\t}\t}}\n\t\t        \t\t</div>\n\n\t\t        \t\t{{\tif(!obj.urlParams["preview"]) {\t}}\n\t\t        \t\t<div class="subscribeToPlan">\n\t\t\t\t\t\t\t<span class="plan-select" data-id="{{=plans[plan].id}}">subscribe</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t{{\t}\t}}\n\t\t\t</div>\n\t{{  } }}\n\n\t\n</div>\n\n\n<div class="emailWrapper">\n\t<h4 class="">Please enter your Email:</h4>\n\t<input class="form-control email" type="text" placeholder="example@email.com"/>\n\n\t<div class="alert alert-danger invalidEmail" role="alert" style="margin-top:12px;">\n\t\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t\t  <span class="sr-only"></span>\n\t\t  <span class="txt">Error:Invalid Email address, please try again.</span>\n\t</div>\n\n\t<div class="btn btn-primary postNoSSo">Subscribe</div>\n\n</div>\n\n{{ if(obj.urlParams["terms-of-service-url"]) {\t}}\n\t<div class="nr-nurego-tag-line">\n\t\t\t <div class="checkbox" id="checkbox">\n\t\t\t    <label>\n\t\t\t      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox"> \n\t\t\t      By clicking subscribe you agree to the \n                  <a href="javascript:void(0)" class="terms">Terms of Service</a>\n\t\t\t    </label>\n\t\t\t  </div>\n\t</div>\n{{\t}\t}}\n\n<div class="thankYou">\n\t<div class="p1">Your registration invite has been sent.</div>\n\t<div class="p2">Please check your inbox and use the link inside to sign up</div>\n</div>\n\n<div class="nr-nurego-tag-line">\n\tPricing Table Crafted by <a href="http://www.nurego.com">Nurego</a>\n</div>\n\n\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t  <span class="sr-only">Error:</span>\n\t  <span class="txt"></span>\n</div>';
+text_priceListCSS = '/*.simple_3_tier {\n    font-family:"Lato",Helvetica,Arial,sans-serif;\n    float: left;\n    margin: 0 auto;\n}\n.simple_3_tier table {\n    width: auto;\n    border-collapse: collapse;\n    background: #fff;\n}\n.simple_3_tier td,\n.simple_3_tier th {\n    border: 1px solid #e8e8e8;\n    vertical-align: middle;\n}\n.simple_3_tier td {\n    color: #707383;\n    font-size: 14px;\n    line-height: 18px;\n}\n.simple_3_tier thead th,\n.simple_3_tier tfoot th {\n    border: none;\n}\n.simple_3_tier thead td {\n    height: 30px;\n    background: #fff;\n    font-size: 11px;\n    color: #9799a2;\n    text-transform: uppercase;\n    text-align: center;\n    font-weight: bold;\n    padding: 0 10px;\n}\n.simple_3_tier tbody th {\n    text-align: left;\n    font-size: 12px;\n    padding: 10px 20px;\n    font-weight: normal;\n}\n.simple_3_tier tbody td {\n    text-align: center;\n    padding: 0 10px;\n}\n.simple_3_tier tfoot td {\n    text-align: center;\n    padding: 12px 0;\n}\n.simple_3_tier th.nr-price {\n    color: #666;\n    height: 32px;\n    background-color: #fff;\n    text-align: left;\n    font-weight: normal;\n}\n.simple_3_tier td.nr-price {\n    color: #f26522;\n    font-size: 20px;\n    font-weight: bold;\n    background-color: #fff;\n}\n.simple_3_tier tfoot a {\n    display: inline-block;\n    color: #fff;\n    background: #9799A2;\n    height: 32px;\n    line-height: 32px;\n    text-align: center;\n    padding: 0 15px;\n    margin-left: 5px;\n    margin-right: 5px;\n    font-size: 10px;\n    text-transform: uppercase;\n    font-weight: bold;\n    text-decoration: none;\n    -webkit-border-radius: 4px;\n    -moz-border-radius: 4px;\n    border-radius: 4px;\n}\n\n.simple_3_tier tfoot a:hover {\n    background: #959595;\n    text-decoration:underline;\n}\n\n.simple_3_tier .nr-check {\n    width: 16px;\n    height: 16px;\n    display: block;\n    margin: 0 auto;\n}\n\n.simple_3_tier .nr-check.nr-yes {font-size:16px; color:#69be28; }\n.simple_3_tier .nr-check.nr-no { font-size:16px; color:#f26522;  }\n.simple_3_tier .nr-notify {\n    font-size: 14px;\n    font-weight: bold;\n    text-align: center;\n    line-height: 18px;\n    padding: 20px;\n    margin: 0 0 15px;\n    font-family: Tahoma, Verdana, Segoe, sans-serif;\n    letter-spacing: 1px;\n}\n.simple_3_tier .nr-notify.nr-red {\n    background: #f2dede;\n    color: #a94442;\n}\n.simple_3_tier .nr-notify.nr-yellow {\n    background: #fcf8e3;\n    color: #986d3b;\n}\n.simple_3_tier .nr-container {\n    height: 304px;\n    margin: 0 auto 10px;\n}\n.simple_3_tier .nr-container.nr-loading {\n    background: url("../images/loader.gif") 50% 50% no-repeat;\n}\n.simple_3_tier .nr-container.nr-empty {\n    background: url("../images/empty.gif") 50% 50% no-repeat;\n}\n\n.nr-signup-div {\n    margin: 40px auto;\n    width: 100%;\n    text-align: center;\n}\n.nr-signup, .nr-go-signup, .nr-go-update {\n    text-decoration: none;\n    background: transparent;\n    border: 2px solid #dfe1e6;\n    min-width: 120px;\n    font-weight: 400;\n    margin-top: 0.5em;\n    color: #565a6b;\n    text-transform: uppercase;\n    padding: 0.625em 1.125em;\n    font-size: 0.857em;\n    margin-left: 5px;\n}\n\n.nr-signup:hover, .nr-go-signup:hover {\n    color: white;\n    background: #565a6b;\n    border: 2px solid white;\n}\n\n.simple_3_tier .nr-plan-selected {\n    background: #f26522; \n}\n\n.simple_3_tier .nr-plan-selected:hover {\n    background: #f26522; \n}\n\n.nr-discount {\n  text-transform:uppercase;\n  padding: 10px 10px 10px 10px !important;\n  background-color: #f26522;\n  color: wheat !important;\n}\n.nr-trial-days {\n  font-size: 10px;\n}\n\n.nr-price-period {\n  font-size: 14px;\n  font-weight: normal;\n  color: #69be28;\n}\n\n.nr-nurego-tag-line{\n  margin-top: 10px;\n    text-align: right;\n  font-size: 12px;\n}\n\n.nr-nurego-cc-require{\n  margin-top: 10px;\n    text-align: right;\n  font-size: 14px;\n}\n\n.nr-nurego-tag-line a{\n  color: #69be28;\n}\n\n.nr-cc td {\n  font-size: 12px;  \n}\n\n\n.on-offswitch {\n    display: inline-block;\n    margin-bottom: 15px;\n    position: relative; width: 74px;\n    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;\n}\n\n.on-offswitch-checkbox {\n    display: none;\n}\n.on-offswitch-label {\n    display: block; overflow: hidden; cursor: pointer;\n    border: 1px solid #DFE1E6; border-radius: 0px;\n}\n.on-offswitch-inner {\n    display: block; width: 200%; margin-left: -100%;\n    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;\n    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;\n}\n.on-offswitch-inner:before, .on-offswitch-inner:after {\n    display: block; float: left; width: 50%; height: 7px; padding: 0; line-height: 7px;\n    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;\n    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;\n}\n.on-offswitch-inner:before {\n    content: "";\n    padding-left: 10px;\n    background-color: #FFFFFF; color: #FFFFFF;\n}\n.on-offswitch-inner:after {\n    content: "";\n    padding-right: 10px;\n    background-color: #FFFFFF;\n    text-align: right;\n}\n.on-offswitch-switch {\n    display: block; width: 37px; margin: 1px;\n    background: #C59DD7;\n    border: 1px solid #DFE1E6; border-radius: 0px;\n    position: absolute; top: 0; bottom: 0; left: 35px;\n    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;\n    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; \n}\n\n.monthly-checked .on-offswitch-inner {\n    margin-left: 0;\n}\n\n.monthly-checked .on-offswitch-switch {\n    left: 0px; \n}\n\n.switch-monthly {\n    padding-right: 13px;\n    text-align: -webkit-right;   \n    color: #C59DD7;\n    font-size: 11px;\n    cursor: pointer;\n}\n\n.switch-yearly {\n    padding-left: 11px;\n    color: #6D6D6E;\n    font-size: 11px;\n    cursor: pointer;\n}\n\n.switcher-full {\n    display: none;\n    margin-left: 620px;\n    margin-bottom: 10px;\n}\n\n@media only screen and (max-width: 1260px) {\n  .switcher-full {\n    margin-left: 542px;\n  }\n}\n@media only screen and (max-width: 1150px) {\n  .switcher-full {\n    margin-left: 475px;\n  }\n}\n@media only screen and (max-width: 1050px) {\n  .switcher-full {\n    margin-left: 455px;\n  }\n}\n@media only screen and (max-width: 1020px) {\n  .switcher-full {\n    margin-left: 426px;\n  }\n}\n@media only screen and (max-width: 980px) {\n  .switcher-full {\n    margin-left: 400px;\n  }\n}\n@media only screen and (max-width: 913px) {\n  .switcher-full {\n    margin-left: 340px;\n  }\n}\n@media only screen and (max-width: 825px) {\n  .switcher-full {\n    margin-left: 200px;\n  }\n}\n\n*/';
 tosModel = function (Backbone, constants) {
   var tos = Backbone.Model.extend({
     initialize: function () {
@@ -10410,7 +10662,7 @@ tosModel = function (Backbone, constants) {
   });
   return tos;
 }(backbone, constants);
-text_priceListSingleTierHTML = '<style>\r\n\r\n*,*:before,*:after {\r\n    -moz-box-sizing: border-box;\r\n    -webkit-box-sizing: border-box;\r\n    box-sizing: border-box\r\n}\r\n\r\nhtml,html a {\r\n    -webkit-font-smoothing: antialiased;\r\n    text-shadow: 1px 1px 1px rgba(0,0,0,0.004)\r\n}\r\n\r\nhtml {\r\n    font-size: 14px\r\n}\r\n\r\nbody,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td,html,body {\r\n    margin: 0;\r\n    padding: 0\r\n} \r\n\r\nbody {\r\n    -webkit-font-smoothing: antialiased;\r\n    background: #fff;\r\n    font-family: "Lato",Helvetica,Arial,sans-serif;\r\n    height: 100%;\r\n    position: relative\r\n}\r\n\r\n@media only screen and (min-width: 768px) {\r\n    .nr-large-16 {\r\n        position:relative;\r\n        width: 100%\r\n    }\r\n\r\n    .nr-large-8 {\r\n        position: relative;\r\n        width: 50%\r\n    }\r\n}\r\n\r\n.nr-column {\r\n    position: relative;\r\n    padding-left: .9375em;\r\n    padding-right: .9375em;\r\n    float: left;\r\n    margin: 0;\r\n    padding-top: 0;\r\n    padding-bottom: 0\r\n}\r\n\r\n.nr-price {\r\n    text-align: center\r\n}\r\n\r\n.nr-price-plans {\r\n    background: #565a6b;\r\n    max-width: 1007px\r\n}\r\n\r\n.nr-price-plans-left {\r\n    margin-top: 40px;\r\n    margin-bottom: 40px\r\n}\r\n\r\n.nr-price-plans-right {\r\n    margin-top: 40px;\r\n    margin-bottom: 40px\r\n}\r\n\r\n.nr-price-plans-right .nr-title {\r\n    color: #bdffbd;\r\n    margin-top: 10px;\r\n    margin-bottom: 20px;\r\n    margin-left: 20px;\r\n    font-weight: lighter;\r\n    font-size: 2.571em\r\n}\r\n\r\n.nr-price-plans-right .nr-description {\r\n    margin-left: 20px;\r\n    color: white;\r\n    font-size: 1.125em;\r\n    line-height: 23px;\r\n    font-weight: normal;\r\n    margin-bottom: 40px\r\n}\r\n\r\n.nr-bg-white {\r\n    background: white\r\n}\r\n\r\n.nr-price-value {\r\n    color: #00be18;\r\n    margin-top: 30px;\r\n    font-size: 3.125em;\r\n    margin-bottom: 10px;\r\n    font-weight: lighter\r\n}\r\n\r\n.nr-price-info {\r\n    color: #565a6b;\r\n    font-weight: bold;\r\n    font-size: 1.286em\r\n}\r\n\r\n.nr-features {\r\n    position: relative;\r\n    margin-bottom: 30px;\r\n    margin-top: 40px;\r\n    margin-left: 20px;\r\n    margin-right: 20px\r\n}\r\n\r\n.nr-ul li {\r\n    line-height: 20px;\r\n    margin-bottom: 10px;\r\n    list-style-type: none\r\n}\r\n\r\n.nr-ul li .nr-feature-info {\r\n    margin-left: 100px;\r\n    margin-bottom: 50px\r\n}\r\n\r\n.nr-ul li .nr-feature-check {\r\n    color: #00be18;\r\n    font-size: 15px\r\n}\r\n\r\n.nr-feature-price {\r\n    margin-left: -120px;\r\n    float: left;\r\n    font-size: 40px;\r\n    line-height: 40px;\r\n    color: #00be18\r\n}\r\n\r\n.nr-name-per {\r\n    font-weight: normal\r\n}\r\n\r\n.nr-ul li .nr-feature-info .nr-title {\r\n    color: black;\r\n    font-size: 1.8em;\r\n    line-height: 1.2em;\r\n    float: left;\r\n    width: 100%\r\n}\r\n\r\n.nr-price-and-title {\r\n    margin-left: 40px\r\n}\r\n\r\n.nr-ul li .nr-feature-info .nr-description {\r\n    color: #565a6b;\r\n    font-weight: normal;\r\n    font-size: 1em\r\n}\r\n\r\n.nr-bottom {\r\n    position: absolute;\r\n    bottom: 40px;\r\n    text-align: center;\r\n}\r\n\r\n.nr-nurego-cc-require {\r\n    display: none;\r\n    position: absolute;\r\n    bottom: -10px;\r\n    text-align: right;\r\n    font-size: 14px;\r\n    color: white\r\n}\r\n\r\n.nr-nurego-tag-line {\r\n    position: absolute;\r\n    bottom: -30px;\r\n    text-align: right;\r\n    font-size: 12px;\r\n    color: white\r\n}\r\n\r\n.nr-nurego-tag-line a {\r\n    color: #bdffbd\r\n}\r\n\r\n.termsWrapper {\r\n  color:white;\r\n  font-size: 12px;\r\n  margin:35px 0px 0px 0px;\r\n}\r\n\r\n.termsWrapper a {\r\n  color:#bdffbd;\r\n  border: 0px !important;\r\n  padding: 0px !important;\r\n}\r\n\r\n.nr-bottom a {\r\n    border: 1px solid #bdffbd;\r\n    color: #bdffbd;\r\n    text-transform: uppercase;\r\n    padding: 10px 43px;\r\n    text-decoration: none\r\n}\r\n\r\n.nr-bottom a:hover {\r\n    background-color: #bdffbd;\r\n    color: #565a6b\r\n}\r\n\r\n#trial-ribbon {\r\n    /*display: none*/\r\n}\r\n\r\n/*!\r\n * "Fork me on GitHub" CSS ribbon v0.1.1 | MIT License\r\n * https://github.com/simonwhitaker/github-fork-ribbon-css\r\n*/\r\n.github-fork-ribbon {\r\n    position: absolute;\r\n    padding: 2px 0;\r\n    background-color: #a00;\r\n    background-image: -webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,0)),to(rgba(0,0,0,0.15)));\r\n    background-image: -webkit-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.15));\r\n    background-image: -moz-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.15));\r\n    background-image: -ms-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.15));\r\n    background-image: -o-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.15));\r\n    background-image: linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,0.15));\r\n    -webkit-box-shadow: 0 2px 3px 0 rgba(0,0,0,0.5);\r\n    -moz-box-shadow: 0 2px 3px 0 rgba(0,0,0,0.5);\r\n    box-shadow: 0 2px 3px 0 rgba(0,0,0,0.5);\r\n    font: 700 13px "Helvetica Neue",Helvetica,Arial,sans-serif;\r\n    z-index: 9999;\r\n    pointer-events: auto\r\n}\r\n\r\n.github-fork-ribbon span,.github-fork-ribbon span:hover {\r\n    color: #fff;\r\n    text-decoration: none;\r\n    text-shadow: 0 -1px rgba(0,0,0,0.5);\r\n    text-align: center;\r\n    width: 250px;\r\n    line-height: 30px;\r\n    display: inline-block;\r\n    padding: 2px 0;\r\n    border-width: 1px 0;\r\n    border-style: dotted;\r\n    border-color: #fff;\r\n    border-color: rgba(255,255,255,0.7)\r\n}\r\n\r\n.github-fork-ribbon-wrapper {\r\n    width: 200px;\r\n    height: 200px;\r\n    position: absolute;\r\n    overflow: hidden;\r\n    top: 0px;\r\n    z-index: 9999;\r\n    pointer-events: none\r\n}\r\n\r\n.github-fork-ribbon-wrapper.fixed {\r\n    position: fixed\r\n}\r\n\r\n.github-fork-ribbon-wrapper.left {\r\n    left: 0px;\r\n}\r\n\r\n.github-fork-ribbon-wrapper.right {\r\n    right: 0\r\n}\r\n\r\n.github-fork-ribbon-wrapper.left-bottom {\r\n    position: fixed;\r\n    top: inherit;\r\n    bottom: 0;\r\n    left: 0\r\n}\r\n\r\n.github-fork-ribbon-wrapper.right-bottom {\r\n    position: fixed;\r\n    top: inherit;\r\n    bottom: 0;\r\n    right: 0\r\n}\r\n\r\n.github-fork-ribbon-wrapper.right .github-fork-ribbon {\r\n    top: 42px;\r\n    right: -43px;\r\n    -webkit-transform: rotate(45deg);\r\n    -moz-transform: rotate(45deg);\r\n    -ms-transform: rotate(45deg);\r\n    -o-transform: rotate(45deg);\r\n    transform: rotate(45deg)\r\n}\r\n\r\n.github-fork-ribbon-wrapper.left .github-fork-ribbon {\r\n    top: 52px;\r\n    left: -53px;\r\n    -webkit-transform: rotate(-45deg);\r\n    -moz-transform: rotate(-45deg);\r\n    -ms-transform: rotate(-45deg);\r\n    -o-transform: rotate(-45deg);\r\n    transform: rotate(-45deg)\r\n}\r\n\r\n.github-fork-ribbon-wrapper.left-bottom .github-fork-ribbon {\r\n    top: 80px;\r\n    left: -43px;\r\n    -webkit-transform: rotate(45deg);\r\n    -moz-transform: rotate(45deg);\r\n    -ms-transform: rotate(45deg);\r\n    -o-transform: rotate(45deg);\r\n    transform: rotate(45deg)\r\n}\r\n\r\n.github-fork-ribbon-wrapper.right-bottom .github-fork-ribbon {\r\n    top: 80px;\r\n    right: -43px;\r\n    -webkit-transform: rotate(-45deg);\r\n    -moz-transform: rotate(-45deg);\r\n    -ms-transform: rotate(-45deg);\r\n    -o-transform: rotate(-45deg);\r\n    transform: rotate(-45deg)\r\n}\r\n\r\n.nurego-ribbon {\r\n    background-color: #69be28;\r\n    font-size: 18px\r\n}\r\n\r\n.nr-description a {\r\n    color: #bdffbd\r\n}\r\n\r\n.nr-description p {\r\n    margin-bottom: 20px\r\n}\r\n\r\n.section-header {\r\n    font-size: 20px;\r\n    font-weight: bold;\r\n    display: block;\r\n    width: 100%;\r\n    float: left;\r\n    padding-top: 10px;\r\n    padding-bottom: 10px\r\n}\r\n\r\n.cent-symbol {\r\n    font-size: 26px;\r\n    margin-top: -5px\r\n}\r\n \r\n.unchecked .plan-select{\r\n  opacity: 0.3;\r\n}\r\n\r\n</style>\r\n<div id="pricing-page" class="vc_col-sm-12" style="margin:0 auto;">\r\n<div class="nr-large-16 nr-column nr-price-plans" data-external-id="7f10c490-cdb5-420b-ad7f-5b31a95144ca"> \r\n  <div class="nr-large-8 nr-column nr-price-plans-left" id="nr_pp_left"> \r\n    <div class="nr-large-16 nr-column nr-bg-white"> \r\n      <div class="nr-large-16 nr-column nr-price"> \r\n        <div class="nr-price-value" style="font-size: 20px; font-weight: bold;">Pay per Subscriber</div> \r\n        <div class="nr-price-info"></div> \r\n      </div> \r\n      <div class="nr-large-16 nr-column"> \r\n        <div class="nr-features"> \r\n          <ul class="nr-ul"> \r\n            <li style="display:none" class="nr-feature-item"> \r\n              <div class="nr-feature-info">\r\n                <div class="nr-price-and-title"> \r\n                  <span class="nr-feature-price">\r\n                  </span>\r\n                  <div class="nr-title">Pay only for what you use</div>\r\n                  <span class="nr-description"><p>No  monthly or hidden fees. You only pay for the number of subscribers you have.</p><p>More than 200 subscribers?   Send us an email for volume discounts - <a href="mailto:hello@nurego.com">hello@nurego.com</a>.</p></span>\r\n                </div>  \r\n              </div> \r\n            </li> \r\n          <li style="display: list-item;" class="nr-feature-item"> \r\n              <div class="nr-feature-info">\r\n                <div class="nr-price-and-title"> \r\n                  <span class="nr-feature-price">&nbsp;&nbsp;5<span class="cent-symbol">\xA2</span></span>\r\n                  <div class="nr-title">per </div>\r\n                  <span class="nr-description">Number of Free Subscribers</span>\r\n                </div>  \r\n              </div> \r\n            </li><li style="display: list-item;" class="nr-feature-item"> \r\n              <div class="nr-feature-info">\r\n                <div class="nr-price-and-title"> \r\n                  <span class="nr-feature-price">&nbsp;&nbsp;50<span class="cent-symbol">\xA2</span></span>\r\n                  <div class="nr-title">per </div>\r\n                  <span class="nr-description">Number of Paid Subscribers</span>\r\n                </div>  \r\n              </div> \r\n            </li></ul> \r\n        </div> \r\n      </div> \r\n    </div> \r\n  </div> \r\n  <div class="nr-large-8 nr-column nr-price-plans-right" id="nr_pp_right" style="height: 383px;"> \r\n    <div class="nr-large-16 nr-column"> \r\n      <div class="nr-title">Pay only for what you use</div> \r\n      <div class="nr-description"><p>No  monthly or hidden fees. You only pay for the number of subscribers you have.</p><p>More than 200 subscribers?   Send us an email for volume discounts - <a href="mailto:hello@nurego.com">hello@nurego.com</a>.</p></div> \r\n    </div> \r\n    <div class="nr-large-16 nr-column nr-bottom"> \r\n      <div id="sign-up-button-div" style=""> \r\n        <a id="sign-up-button" href="javascript:void(0)" class="nr-plan-select plan-select" data-id="{{=obj.plans[0].id}}">Get Started</a>\r\n      </div> \r\n\r\n      {{ if(obj.urlParams["terms-of-service-url"]) {  }}\r\n           <div class="checkbox termsWrapper" id="checkbox">\r\n              <label>\r\n                <input name="terms" checked="checked" class="termsCheckbox" type="checkbox"> \r\n                By clicking subscribe you agree to the \r\n                <a href="javascript:void(0)" class="terms">Terms of Service</a>\r\n              </label>\r\n            </div>\r\n      {{  } }}\r\n    \r\n    </div>\r\n    <div class="nr-large-16 nr-column nr-nurego-cc-require" style="display: block;"> \r\n      No credit card required\r\n    </div>\r\n    <div class="nr-large-16 nr-column nr-nurego-tag-line"> \r\n      Pricing Table Crafted by <a href="http://www.nurego.com" target="_parent" >Nurego</a>\r\n    </div>\r\n\r\n\r\n  </div>\r\n  \r\n  <!-- TOP LEFT RIBBON -->\r\n  <div class="github-fork-ribbon-wrapper left" id="trial-ribbon">\r\n      <div class="github-fork-ribbon nurego-ribbon">\r\n          <span href="#" id="trial-ribbon-text">45-day Free Trial</span>\r\n      </div>\r\n  </div>\r\n<div class="nr-container nr-loading" style="display: none;"></div><div class="nr-notify nr-yellow" style="display: none;"></div><div class="nr-notify nr-red" style="display: none;"></div><div class="nr-container nr-empty" style="display: none;"></div></div></div>';
+text_priceListSingleTierHTML = '<style>\n\n*,*:before,*:after {\n    -moz-box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    box-sizing: border-box\n}\n\nhtml,html a {\n    -webkit-font-smoothing: antialiased;\n    text-shadow: 1px 1px 1px rgba(0,0,0,0.004)\n}\n\nhtml {\n    font-size: 14px\n}\n\nbody,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td,html,body {\n    margin: 0;\n    padding: 0\n} \n\nbody {\n    -webkit-font-smoothing: antialiased;\n    background: #fff;\n    font-family: "Lato",Helvetica,Arial,sans-serif;\n    height: 100%;\n    position: relative\n}\n\n@media only screen and (min-width: 768px) {\n    .nr-large-16 {\n        position:relative;\n        width: 100%\n    }\n\n    .nr-large-8 {\n        position: relative;\n        width: 50%\n    }\n}\n\n.nr-column {\n    position: relative;\n    padding-left: .9375em;\n    padding-right: .9375em;\n    float: left;\n    margin: 0;\n    padding-top: 0;\n    padding-bottom: 0\n}\n\n.nr-price {\n    text-align: center\n}\n\n.nr-price-plans {\n    background: #565a6b;\n    max-width: 1007px\n}\n\n.nr-price-plans-left {\n    margin-top: 40px;\n    margin-bottom: 40px\n}\n\n.nr-price-plans-right {\n    margin-top: 40px;\n    margin-bottom: 40px\n}\n\n.nr-price-plans-right .nr-title {\n    color: #bdffbd;\n    margin-top: 10px;\n    margin-bottom: 20px;\n    margin-left: 20px;\n    font-weight: lighter;\n    font-size: 2.571em\n}\n\n.nr-price-plans-right .nr-description {\n    margin-left: 20px;\n    color: white;\n    font-size: 1.125em;\n    line-height: 23px;\n    font-weight: normal;\n    margin-bottom: 40px\n}\n\n.nr-bg-white {\n    background: white\n}\n\n.nr-price-value {\n    color: #00be18;\n    margin-top: 30px;\n    font-size: 3.125em;\n    margin-bottom: 10px;\n    font-weight: lighter\n}\n\n.nr-price-info {\n    color: #565a6b;\n    font-weight: bold;\n    font-size: 1.286em\n}\n\n.nr-features {\n    position: relative;\n    margin-bottom: 30px;\n    margin-top: 40px;\n    margin-left: 20px;\n    margin-right: 20px\n}\n\n.nr-ul li {\n    line-height: 20px;\n    margin-bottom: 10px;\n    list-style-type: none\n}\n\n.nr-ul li .nr-feature-info {\n    margin-left: 100px;\n    margin-bottom: 50px\n}\n\n.nr-ul li .nr-feature-check {\n    color: #00be18;\n    font-size: 15px\n}\n\n.nr-feature-price {\n    margin-left: -120px;\n    float: left;\n    font-size: 40px;\n    line-height: 40px;\n    color: #00be18\n}\n\n.nr-name-per {\n    font-weight: normal\n}\n\n.nr-ul li .nr-feature-info .nr-title {\n    color: black;\n    font-size: 1.8em;\n    line-height: 1.2em;\n    float: left;\n    width: 100%\n}\n\n.nr-price-and-title {\n    margin-left: 40px\n}\n\n.nr-ul li .nr-feature-info .nr-description {\n    color: #565a6b;\n    font-weight: normal;\n    font-size: 1em\n}\n\n.nr-bottom {\n    position: absolute;\n    bottom: 40px;\n    text-align: center;\n}\n\n.nr-nurego-cc-require {\n    display: none;\n    position: absolute;\n    bottom: -10px;\n    text-align: right;\n    font-size: 14px;\n    color: white\n}\n\n.nr-nurego-tag-line {\n    position: absolute;\n    bottom: -30px;\n    text-align: right;\n    font-size: 12px;\n    color: white\n}\n\n.nr-nurego-tag-line a {\n    color: #bdffbd\n}\n\n.termsWrapper {\n  color:white;\n  font-size: 12px;\n  margin:35px 0px 0px 0px;\n}\n\n.termsWrapper a {\n  color:#bdffbd;\n  border: 0px !important;\n  padding: 0px !important;\n}\n\n.nr-bottom a {\n    border: 1px solid #bdffbd;\n    color: #bdffbd;\n    text-transform: uppercase;\n    padding: 10px 43px;\n    text-decoration: none\n}\n\n.nr-bottom a:hover {\n    background-color: #bdffbd;\n    color: #565a6b\n}\n\n#trial-ribbon {\n    /*display: none*/\n}\n\n/*!\n * "Fork me on GitHub" CSS ribbon v0.1.1 | MIT License\n * https://github.com/simonwhitaker/github-fork-ribbon-css\n*/\n.github-fork-ribbon {\n    position: absolute;\n    padding: 2px 0;\n    background-color: #a00;\n    background-image: -webkit-gradient(linear,left top,left bottom,from(rgba(0,0,0,0)),to(rgba(0,0,0,0.15)));\n    background-image: -webkit-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.15));\n    background-image: -moz-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.15));\n    background-image: -ms-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.15));\n    background-image: -o-linear-gradient(top,rgba(0,0,0,0),rgba(0,0,0,0.15));\n    background-image: linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,0.15));\n    -webkit-box-shadow: 0 2px 3px 0 rgba(0,0,0,0.5);\n    -moz-box-shadow: 0 2px 3px 0 rgba(0,0,0,0.5);\n    box-shadow: 0 2px 3px 0 rgba(0,0,0,0.5);\n    font: 700 13px "Helvetica Neue",Helvetica,Arial,sans-serif;\n    z-index: 9999;\n    pointer-events: auto\n}\n\n.github-fork-ribbon span,.github-fork-ribbon span:hover {\n    color: #fff;\n    text-decoration: none;\n    text-shadow: 0 -1px rgba(0,0,0,0.5);\n    text-align: center;\n    width: 250px;\n    line-height: 30px;\n    display: inline-block;\n    padding: 2px 0;\n    border-width: 1px 0;\n    border-style: dotted;\n    border-color: #fff;\n    border-color: rgba(255,255,255,0.7)\n}\n\n.github-fork-ribbon-wrapper {\n    width: 200px;\n    height: 200px;\n    position: absolute;\n    overflow: hidden;\n    top: 0px;\n    z-index: 9999;\n    pointer-events: none\n}\n\n.github-fork-ribbon-wrapper.fixed {\n    position: fixed\n}\n\n.github-fork-ribbon-wrapper.left {\n    left: 0px;\n}\n\n.github-fork-ribbon-wrapper.right {\n    right: 0\n}\n\n.github-fork-ribbon-wrapper.left-bottom {\n    position: fixed;\n    top: inherit;\n    bottom: 0;\n    left: 0\n}\n\n.github-fork-ribbon-wrapper.right-bottom {\n    position: fixed;\n    top: inherit;\n    bottom: 0;\n    right: 0\n}\n\n.github-fork-ribbon-wrapper.right .github-fork-ribbon {\n    top: 42px;\n    right: -43px;\n    -webkit-transform: rotate(45deg);\n    -moz-transform: rotate(45deg);\n    -ms-transform: rotate(45deg);\n    -o-transform: rotate(45deg);\n    transform: rotate(45deg)\n}\n\n.github-fork-ribbon-wrapper.left .github-fork-ribbon {\n    top: 52px;\n    left: -53px;\n    -webkit-transform: rotate(-45deg);\n    -moz-transform: rotate(-45deg);\n    -ms-transform: rotate(-45deg);\n    -o-transform: rotate(-45deg);\n    transform: rotate(-45deg)\n}\n\n.github-fork-ribbon-wrapper.left-bottom .github-fork-ribbon {\n    top: 80px;\n    left: -43px;\n    -webkit-transform: rotate(45deg);\n    -moz-transform: rotate(45deg);\n    -ms-transform: rotate(45deg);\n    -o-transform: rotate(45deg);\n    transform: rotate(45deg)\n}\n\n.github-fork-ribbon-wrapper.right-bottom .github-fork-ribbon {\n    top: 80px;\n    right: -43px;\n    -webkit-transform: rotate(-45deg);\n    -moz-transform: rotate(-45deg);\n    -ms-transform: rotate(-45deg);\n    -o-transform: rotate(-45deg);\n    transform: rotate(-45deg)\n}\n\n.nurego-ribbon {\n    background-color: #69be28;\n    font-size: 18px\n}\n\n.nr-description a {\n    color: #bdffbd\n}\n\n.nr-description p {\n    margin-bottom: 20px\n}\n\n.section-header {\n    font-size: 20px;\n    font-weight: bold;\n    display: block;\n    width: 100%;\n    float: left;\n    padding-top: 10px;\n    padding-bottom: 10px\n}\n\n.cent-symbol {\n    font-size: 26px;\n    margin-top: -5px\n}\n \n.unchecked .plan-select{\n  opacity: 0.3;\n}\n\n</style>\n<div id="pricing-page" class="vc_col-sm-12" style="margin:0 auto;">\n<div class="nr-large-16 nr-column nr-price-plans" data-external-id="7f10c490-cdb5-420b-ad7f-5b31a95144ca"> \n  <div class="nr-large-8 nr-column nr-price-plans-left" id="nr_pp_left"> \n    <div class="nr-large-16 nr-column nr-bg-white"> \n      <div class="nr-large-16 nr-column nr-price"> \n        <div class="nr-price-value" style="font-size: 20px; font-weight: bold;">Pay per Subscriber</div> \n        <div class="nr-price-info"></div> \n      </div> \n      <div class="nr-large-16 nr-column"> \n        <div class="nr-features"> \n          <ul class="nr-ul"> \n            <li style="display:none" class="nr-feature-item"> \n              <div class="nr-feature-info">\n                <div class="nr-price-and-title"> \n                  <span class="nr-feature-price">\n                  </span>\n                  <div class="nr-title">Pay only for what you use</div>\n                  <span class="nr-description"><p>No  monthly or hidden fees. You only pay for the number of subscribers you have.</p><p>More than 200 subscribers?   Send us an email for volume discounts - <a href="mailto:hello@nurego.com">hello@nurego.com</a>.</p></span>\n                </div>  \n              </div> \n            </li> \n          <li style="display: list-item;" class="nr-feature-item"> \n              <div class="nr-feature-info">\n                <div class="nr-price-and-title"> \n                  <span class="nr-feature-price">&nbsp;&nbsp;5<span class="cent-symbol">\xA2</span></span>\n                  <div class="nr-title">per </div>\n                  <span class="nr-description">Number of Free Subscribers</span>\n                </div>  \n              </div> \n            </li><li style="display: list-item;" class="nr-feature-item"> \n              <div class="nr-feature-info">\n                <div class="nr-price-and-title"> \n                  <span class="nr-feature-price">&nbsp;&nbsp;50<span class="cent-symbol">\xA2</span></span>\n                  <div class="nr-title">per </div>\n                  <span class="nr-description">Number of Paid Subscribers</span>\n                </div>  \n              </div> \n            </li></ul> \n        </div> \n      </div> \n    </div> \n  </div> \n  <div class="nr-large-8 nr-column nr-price-plans-right" id="nr_pp_right" style="height: 383px;"> \n    <div class="nr-large-16 nr-column"> \n      <div class="nr-title">Pay only for what you use</div> \n      <div class="nr-description"><p>No  monthly or hidden fees. You only pay for the number of subscribers you have.</p><p>More than 200 subscribers?   Send us an email for volume discounts - <a href="mailto:hello@nurego.com">hello@nurego.com</a>.</p></div> \n    </div> \n    <div class="nr-large-16 nr-column nr-bottom"> \n      <div id="sign-up-button-div" style=""> \n        <a id="sign-up-button" href="javascript:void(0)" class="nr-plan-select plan-select" data-id="{{=obj.plans[0].id}}">Get Started</a>\n      </div> \n\n      {{ if(obj.urlParams["terms-of-service-url"]) {  }}\n           <div class="checkbox termsWrapper" id="checkbox">\n              <label>\n                <input name="terms" checked="checked" class="termsCheckbox" type="checkbox"> \n                By clicking subscribe you agree to the \n                <a href="javascript:void(0)" class="terms">Terms of Service</a>\n              </label>\n            </div>\n      {{  } }}\n    \n    </div>\n    <div class="nr-large-16 nr-column nr-nurego-cc-require" style="display: block;"> \n      No credit card required\n    </div>\n    <div class="nr-large-16 nr-column nr-nurego-tag-line"> \n      Pricing Table Crafted by <a href="http://www.nurego.com" target="_parent" >Nurego</a>\n    </div>\n\n\n  </div>\n  \n  <!-- TOP LEFT RIBBON -->\n  <div class="github-fork-ribbon-wrapper left" id="trial-ribbon">\n      <div class="github-fork-ribbon nurego-ribbon">\n          <span href="#" id="trial-ribbon-text">45-day Free Trial</span>\n      </div>\n  </div>\n<div class="nr-container nr-loading" style="display: none;"></div><div class="nr-notify nr-yellow" style="display: none;"></div><div class="nr-notify nr-red" style="display: none;"></div><div class="nr-container nr-empty" style="display: none;"></div></div></div>';
 priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, priceListSingleTierHTML, $Nurego) {
   var priceList = absNuregoView.extend({
     tagName: 'div',
@@ -10593,8 +10845,8 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
   });
   return priceList;
 }(backbone, text_priceListHTML, utils, text_priceListCSS, tosModel, absNuregoView, text_priceListSingleTierHTML, jquery);
-text_registrationHTML = '<style>\r\n\t\r\n\tbutton.button.btn.btn-primary.activate {\r\n  \t\tmargin-top: 8px;\r\n\t}\r\n\r\n\t.passError{\r\n\t\tdisplay:none;\r\n\t\tmargin-top:8px;\r\n\t}\r\n\r\n\t.passError.show{\r\n\t\tdisplay:none;\r\n\t}\r\n\r\n\t.passConfirm{\r\n\t\tmargin-top:6px;\r\n\t}\r\n\r\n</style>\r\n\r\n<div>\r\n\tComplete Registration\r\n\t{{\tif(obj[\'request-email\'] === \'true\'){\t}}\r\n\t\t<input class="form-control email" type="text" placeholder="email"/>\r\n\t{{\t}\t}}\r\n\t<input class="form-control pass" type="password" placeholder="Password" autofocus/>\r\n\r\n\t<input class="form-control passConfirm" type="password" placeholder="Confirm Password"/>\r\n\r\n\t<div class="alert alert-danger passError" role="alert">\r\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t  <span class="sr-only">Error:</span>\r\n\t  Passwords do not match, please re-enter your password.\r\n\t</div>\r\n\t\r\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t  <span class="sr-only">Error:</span>\r\n\t  <span class="txt"></span>\r\n\t</div>\r\n\t\r\n\r\n\t<div> \r\n\t\t<button class="button btn btn-primary activate">Complete</button>\r\n\t</div>\r\n</div>\r\n';
-text_registrationCSS = 'div {\r\n    /*my div*/\r\n}';
+text_registrationHTML = '<style>\n\t\n\tbutton.button.btn.btn-primary.activate {\n  \t\tmargin-top: 8px;\n\t}\n\n\t.passError{\n\t\tdisplay:none;\n\t\tmargin-top:8px;\n\t}\n\n\t.passError.show{\n\t\tdisplay:none;\n\t}\n\n\t.passConfirm{\n\t\tmargin-top:6px;\n\t}\n\n</style>\n\n<div>\n\tComplete Registration\n\t{{\tif(obj[\'request-email\'] === \'true\'){\t}}\n\t\t<input class="form-control email" type="text" placeholder="email"/>\n\t{{\t}\t}}\n\t<input class="form-control pass" type="password" placeholder="Password" autofocus/>\n\n\t<input class="form-control passConfirm" type="password" placeholder="Confirm Password"/>\n\n\t<div class="alert alert-danger passError" role="alert">\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t  <span class="sr-only">Error:</span>\n\t  Passwords do not match, please re-enter your password.\n\t</div>\n\t\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t  <span class="sr-only">Error:</span>\n\t  <span class="txt"></span>\n\t</div>\n\t\n\n\t<div> \n\t\t<button class="button btn btn-primary activate">Complete</button>\n\t</div>\n</div>\n';
+text_registrationCSS = 'div {\n    /*my div*/\n}';
 registrationViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) {
   var activation = absNuregoView.extend({
     tagName: 'div',
@@ -10659,8 +10911,8 @@ registrationViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) {
   });
   return activation;
 }(backbone, text_registrationHTML, utils, text_registrationCSS, absNuregoView, jquery);
-text_tosHTML = '<style type="text/css">\r\n\tbody{\r\n\t\tpadding-bottom: 75px;\r\n\t}\r\n\t.termsWrapper{\r\n\t\tposition: fixed;\r\n\t\t  bottom: 14px;\r\n\t\t  width: 100%;\r\n\t\t  background: #fff;\r\n\t\t  height: auto;\r\n\t\t  padding: 14px;\r\n\t}\r\n\r\n\t.acceptTerms{\r\n\t\tpadding:6px;\r\n\t}\r\n\r\n\t.pageHeader{\r\n\t\theight: 250px;\r\n\t \twidth: 100%;\r\n\t\tposition: relative;\r\n\t\tbackground: rgb(216, 216, 216);\r\n\t\tcolor: gray;\r\n\t}\r\n\r\n\t.pageHeader h2{\r\n\t\tposition:absolute;\r\n\t\ttop:100px;\r\n\t\twidth: 100%;\r\n\t\ttext-align: center;\r\n\t}\r\n</style>\r\n\r\n<div class="well container">\r\n\t<div class="pageHeader">\r\n\t\t<h2>Terms of Service</h2>\r\n\t</div>\r\n\t\r\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t  <span class="sr-only">Error:</span>\r\n\t  <span class="txt"></span>\r\n\t</div>\r\n\t\r\n\r\n\t{{\tif(obj[\'doc_html\']){\t}}\r\n\t\t\r\n\t\t<h3>{{=obj.name}}</h3>\r\n\t\t<div>{{=\tobj[\'doc_html\']\t}}</div>\r\n\r\n\t{{\t}else if(obj[\'legal_docs\'])\t{\t}}\r\n\r\n\t\t{{ for(doc in obj.legal_docs.data){\t}}\r\n\t\t\t\t<h3>{{=obj.legal_docs.data[doc].name}}</h3>\r\n\t\t\t\t<div>{{=obj.legal_docs.data[doc].doc_html}}</div>\r\n\t\t\t\t<br/>\r\n\t\t\t\t<br/>\r\n\r\n\t\t{{\t}\t}}\r\n\r\n\t<nav class="navbar navbar-default navbar-fixed-bottom">\r\n\t  <div class="container">\r\n\r\n\r\n\t  \t<ul class="nav navbar-nav">\r\n\t        <li class="acceptTerms">\r\n\t        \t<span class="btn btn-primary" href="#">Accept</span>\r\n\t        </li>\r\n\t        <!-- <li>\r\n\t        \t<span class="btn-xs btn btn-default" style="margin-top: 12px;">Decline</span>\r\n\t        </li>\r\n\t          <li>\r\n\t        \t<span class="btn-xs btn btn-default" style="margin-top: 12px;">Remind me later</span>\r\n\t        </li> -->\r\n\t    </ul>\r\n\r\n\t  </div>\r\n\t</nav>\r\n\r\n\r\n\t{{\t}\t}}\r\n\t\r\n</div>\r\n\r\n';
-text_termsOfServiceCSS = 'div{\r\n    \r\n}';
+text_tosHTML = '<style type="text/css">\n\tbody{\n\t\tpadding-bottom: 75px;\n\t}\n\t.termsWrapper{\n\t\tposition: fixed;\n\t\t  bottom: 14px;\n\t\t  width: 100%;\n\t\t  background: #fff;\n\t\t  height: auto;\n\t\t  padding: 14px;\n\t}\n\n\t.acceptTerms{\n\t\tpadding:6px;\n\t}\n\n\t.pageHeader{\n\t\theight: 250px;\n\t \twidth: 100%;\n\t\tposition: relative;\n\t\tbackground: rgb(216, 216, 216);\n\t\tcolor: gray;\n\t}\n\n\t.pageHeader h2{\n\t\tposition:absolute;\n\t\ttop:100px;\n\t\twidth: 100%;\n\t\ttext-align: center;\n\t}\n</style>\n\n<div class="well container">\n\t<div class="pageHeader">\n\t\t<h2>Terms of Service</h2>\n\t</div>\n\t\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t  <span class="sr-only">Error:</span>\n\t  <span class="txt"></span>\n\t</div>\n\t\n\n\t{{\tif(obj[\'doc_html\']){\t}}\n\t\t\n\t\t<h3>{{=obj.name}}</h3>\n\t\t<div>{{=\tobj[\'doc_html\']\t}}</div>\n\n\t{{\t}else if(obj[\'legal_docs\'])\t{\t}}\n\n\t\t{{ for(doc in obj.legal_docs.data){\t}}\n\t\t\t\t<h3>{{=obj.legal_docs.data[doc].name}}</h3>\n\t\t\t\t<div>{{=obj.legal_docs.data[doc].doc_html}}</div>\n\t\t\t\t<br/>\n\t\t\t\t<br/>\n\n\t\t{{\t}\t}}\n\n\t<nav class="navbar navbar-default navbar-fixed-bottom">\n\t  <div class="container">\n\n\n\t  \t<ul class="nav navbar-nav">\n\t        <li class="acceptTerms">\n\t        \t<span class="btn btn-primary" href="#">Accept</span>\n\t        </li>\n\t        <!-- <li>\n\t        \t<span class="btn-xs btn btn-default" style="margin-top: 12px;">Decline</span>\n\t        </li>\n\t          <li>\n\t        \t<span class="btn-xs btn btn-default" style="margin-top: 12px;">Remind me later</span>\n\t        </li> -->\n\t    </ul>\n\n\t  </div>\n\t</nav>\n\n\n\t{{\t}\t}}\n\t\n</div>\n\n';
+text_termsOfServiceCSS = 'div{\n    \n}';
 tosStatusModel = function (Backbone, constants) {
   var tosStatus = Backbone.Model.extend({
     initialize: function () {
@@ -10764,8 +11016,8 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
   });
   return activation;
 }(backbone, text_tosHTML, utils, text_termsOfServiceCSS, tosStatusModel, tosModel, absNuregoView, jquery);
-text_categoryHTML = '<style>\r\n\t.headerWrapper{\r\n\t\tpadding: 5px;\r\n  \t\ttext-align: center\r\n\t}\r\n\t\r\n\t.itemsWrapper{\r\n\t  display: flex;\r\n\t  display: -webkit-flex;\r\n\t  width: 100%;\r\n\t  text-align: left;\r\n\t  min-height: 185px;\r\n\t}\r\n\r\n\t.singleItem{\r\n\t  flex: 1;\r\n\t  -webkit-flex: 1;\r\n\t  max-width: 225px;\r\n\t  position:relative;\r\n\t  background: #e0e1e4;\r\n\t  border: 0px;\r\n\t  padding: 20px;\r\n\t  font-size: 16px;\r\n\t  margin: 20px;\r\n\t  border-radius: 20px;\r\n\t}\r\n\r\n\t.singleItem img {\r\n\t  position: absolute;\r\n\t  right: 8px;\r\n\t  width: 25px;\r\n\t  height: 25px;\r\n\t  top: 8px;\r\n\t}\r\n\r\n\t.name {\r\n\t    font-size: 18px;\r\n\t    font-weight: bold;\r\n\t    margin-top: 30px;\r\n\t    margin-bottom: 10px;\r\n\t}\r\n\r\n\t.publisher {\r\n\t    font-size: 11px;\r\n\t    font-weight: bold;\r\n\t    margin-bottom: 20px;\r\n\t}\r\n\r\n\t.section {\r\n\t    border-bottom: 2px solid #e0e1e4;\r\n\t    padding-bottom: 35px;\r\n\t    padding: 0px;\r\n\t}\r\n\r\n\t.widget_wrapper {\r\n\t\tdisplay: none;\r\n\t\tposition:absolute;\r\n\t\ttop:0px;\r\n\t\tleft:0px;\r\n\t\twidth: 100%;\r\n\t\theight: 100%;\r\n\t\tbackground:white;\r\n\t}\r\n\r\n\t.close_widget{\r\n\t\tposition: absolute;\r\n\t\ttop:15px;\r\n\t\tleft:15px;\r\n\t\tfont-weight: bold;\r\n\t\tfont-size:18px;\r\n\t}\r\n\r\n\t.show_item .widget_wrapper {\r\n\t\tdisplay: block;\r\n\t}\r\n\r\n\t.widget_holder{\r\n\t\tmargin-top:0px !important;\r\n\t}\r\n\r\n\t.widget_holder {\r\n\t    position: fixed;\r\n\t    height: 100%;\r\n\t    width: 100%;\r\n\t    z-index: 99999;\r\n\t    background-color: white;\r\n\t}\r\n\r\n\t.close_widget {\r\n\t    position: absolute;   \r\n\t    top: 15px;   \r\n\t    left: 15px;   \r\n\t    font-weight: bold;   \r\n\t    font-size: 18px;   \r\n\t    z-index: 9999999;\r\n\t    background-color: white;\r\n\t    padding: 0px 10px;\r\n\t}\r\n\r\n</style>\r\n\r\n\r\n\r\n\r\n{{ for (category in obj.data ) { }}\r\n\t<div class="section">\r\n\t\t<div class="headerWrapper">\r\n\t\t\t<h1>\r\n\t\t\t\t\t{{=obj.data[category].name}}\r\n\t\t\t</h1>\r\n\t\t\t<h5>\r\n\t\t\t\tDescription text for {{=obj.data[category].name}} goes here\r\n\t\t\t</h5>\r\n\t\t</div>\r\n\t\t\r\n\t\t<div class="itemsWrapper">\r\n\t\t{{ for(item in obj.data[category].services.data) {  }}\r\n\r\n\t\t\t<div class="singleItem" data-id="{{=obj.data[category].services.data[item].id}}">\r\n\t\t\t\t<img src="https://cdn1.iconfinder.com/data/icons/logotypes/32/github-128.png" height="45px" width="45px" />\r\n\t\t\t\t<div class="name">\r\n\t\t\t\t\t{{=obj.data[category].services.data[item].name}}\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div class="publisher">\r\n\t\t\t\t\tGE Software\r\n\t\t\t\t</div>\r\n\t\t\t\t\r\n\t\t\t\t<div class="desc">\r\n\t\t\t\t\t{{=obj.data[category].services.data[item].description}}\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t{{\t}\t}}\r\n\t\t</div>\r\n\r\n\t</div>\r\n{{ } }}\r\n\r\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n\t  <span class="sr-only">Error:</span>\r\n\t  <span class="txt"></span>\r\n</div>\r\n\r\n<div class="widget_wrapper">\r\n\t<div class="close_widget">[Back]</div>\r\n\t<div class="widget_holder"></div>\r\n</div>\r\n';
-text_categoryCSS = 'div.myCategoryDiv {\r\n\r\n}';
+text_categoryHTML = '<style>\n\t.headerWrapper{\n\t\tpadding: 5px;\n  \t\ttext-align: center\n\t}\n\t\n\t.itemsWrapper{\n\t  display: flex;\n\t  display: -webkit-flex;\n\t  width: 100%;\n\t  text-align: left;\n\t  min-height: 185px;\n\t}\n\n\t.singleItem{\n\t  flex: 1;\n\t  -webkit-flex: 1;\n\t  max-width: 225px;\n\t  position:relative;\n\t  background: #e0e1e4;\n\t  border: 0px;\n\t  padding: 20px;\n\t  font-size: 16px;\n\t  margin: 20px;\n\t  border-radius: 20px;\n\t}\n\n\t.singleItem img {\n\t  position: absolute;\n\t  right: 8px;\n\t  width: 25px;\n\t  height: 25px;\n\t  top: 8px;\n\t}\n\n\t.name {\n\t    font-size: 18px;\n\t    font-weight: bold;\n\t    margin-top: 30px;\n\t    margin-bottom: 10px;\n\t}\n\n\t.publisher {\n\t    font-size: 11px;\n\t    font-weight: bold;\n\t    margin-bottom: 20px;\n\t}\n\n\t.section {\n\t    border-bottom: 2px solid #e0e1e4;\n\t    padding-bottom: 35px;\n\t    padding: 0px;\n\t}\n\n\t.widget_wrapper {\n\t\tdisplay: none;\n\t\tposition:absolute;\n\t\ttop:0px;\n\t\tleft:0px;\n\t\twidth: 100%;\n\t\theight: 100%;\n\t\tbackground:white;\n\t}\n\n\t.close_widget{\n\t\tposition: absolute;\n\t\ttop:15px;\n\t\tleft:15px;\n\t\tfont-weight: bold;\n\t\tfont-size:18px;\n\t}\n\n\t.show_item .widget_wrapper {\n\t\tdisplay: block;\n\t}\n\n\t.widget_holder{\n\t\tmargin-top:0px !important;\n\t}\n\n\t.widget_holder {\n\t    position: fixed;\n\t    height: 100%;\n\t    width: 100%;\n\t    z-index: 99999;\n\t    background-color: white;\n\t}\n\n\t.close_widget {\n\t    position: absolute;   \n\t    top: 15px;   \n\t    left: 15px;   \n\t    font-weight: bold;   \n\t    font-size: 18px;   \n\t    z-index: 9999999;\n\t    background-color: white;\n\t    padding: 0px 10px;\n\t}\n\n</style>\n\n\n\n\n{{ for (category in obj.data ) { }}\n\t<div class="section">\n\t\t<div class="headerWrapper">\n\t\t\t<h1>\n\t\t\t\t\t{{=obj.data[category].name}}\n\t\t\t</h1>\n\t\t\t<h5>\n\t\t\t\tDescription text for {{=obj.data[category].name}} goes here\n\t\t\t</h5>\n\t\t</div>\n\t\t\n\t\t<div class="itemsWrapper">\n\t\t{{ for(item in obj.data[category].services.data) {  }}\n\n\t\t\t<div class="singleItem" data-id="{{=obj.data[category].services.data[item].id}}">\n\t\t\t\t<img src="https://cdn1.iconfinder.com/data/icons/logotypes/32/github-128.png" height="45px" width="45px" />\n\t\t\t\t<div class="name">\n\t\t\t\t\t{{=obj.data[category].services.data[item].name}}\n\t\t\t\t</div>\n\n\t\t\t\t<div class="publisher">\n\t\t\t\t\tGE Software\n\t\t\t\t</div>\n\t\t\t\t\n\t\t\t\t<div class="desc">\n\t\t\t\t\t{{=obj.data[category].services.data[item].description}}\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t{{\t}\t}}\n\t\t</div>\n\n\t</div>\n{{ } }}\n\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t  <span class="sr-only">Error:</span>\n\t  <span class="txt"></span>\n</div>\n\n<div class="widget_wrapper">\n\t<div class="close_widget">[Back]</div>\n\t<div class="widget_holder"></div>\n</div>\n';
+text_categoryCSS = 'div.myCategoryDiv {\n\n}';
 categoryModel = function (Backbone, constants) {
   var categoryMod = Backbone.Model.extend({
     initialize: function (opt) {
@@ -10853,7 +11105,7 @@ categoryViewCtrl = function (bb, tmpl, utils, css, categoryModel, absNuregoView,
   });
   return categoryView;
 }(backbone, text_categoryHTML, utils, text_categoryCSS, categoryModel, absNuregoView, jquery);
-text_singleItemHTML = '<!-- <div>\r\n\t<h2>{{=obj.name}}</h2>\r\n\t<h5>{{=obj.description}}</h5> \r\n\thello world\r\n</div> -->\r\n\r\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\r\n      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\r\n      <span class="sr-only">Error:</span>\r\n      <span class="txt"></span>\r\n</div>\r\n\r\n<main id="MAIN_34">\r\n\t<section id="SECTION_35">\r\n\t\t<div id="DIV_38">\r\n\t\t\t<h1 id="H1_39">\r\n\t\t\t\t{{=obj.name}}\r\n\t\t\t</h1>\r\n\t\t\t<h2 id="H2_40">\r\n\t\t\t\tBy {{=obj.author}}\r\n\t\t\t</h2>\r\n\t\t\t<h3 id="H3_41">\r\n\t\t\t\tPublished April 28, 2015\r\n\t\t\t</h3>\r\n\t\t</div>\r\n\t</section>\r\n\t<section id="SECTION_42">\r\n\t\t<div id="DIV_43">\r\n\t\t\t<div id="DIV_44">\r\n\t\t\t\t<div id="DIV_45">\r\n\t\t\t\t\t<p id="P_46">\r\n\t\t\t\t\t\t<!-- <img src="http://www.alberttoledo.com/img/icons/social/github.png" id="IMG_47" alt=\'\' />  -->\r\n\t\t\t\t\t\t<img src="{{=obj.icon}}" id="IMG_47" alt=\'\' /> \r\n\t\t\t\t\t\t<a href="https://livesample.grc-apps.svc.ice.ge.com/" id="A_48">View Live Sample</a>\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div id="DIV_49">\r\n\t\t\t\t\t<div id="DIV_50">\r\n\t\t\t\t\t\t<p id="P_51">\r\n\t\t\t\t\t\t\t{{=obj.description}}\r\n\t\t\t\t\t\t\t<!-- The Predix Asset Service provides asset modeling and data management with real time intelligence, and provides insight into the relationships and connections between independently managed assets. Industrial Internet applications are generally machine-focused. The Asset service enables application developers to import, create, and store asset models that describe machine types, as well as create instance representations for those machines. -->\r\n\t\t\t\t\t\t</p>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t</section>\r\n\t<section id="SECTION_52">\r\n\t\t<div id="DIV_53">\r\n\t\t</div>\r\n\t</section>\r\n</main>\r\n\r\n\r\n\r\n<style>\r\n\r\nbody , html {\r\n\toverflow:hidden;\r\n}\r\n\r\n#HTML_1 {\r\n    box-sizing: border-box;\r\n    height: 939.171875px;\r\n    min-height: 100%;\r\n    width: 1326px;\r\n    z-index: 0;\r\n    perspective-origin: 663px 469.578125px;\r\n    transform-origin: 663px 469.578125px;\r\n    background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    overflow: auto;\r\n}/*#HTML_1*/\r\n\r\n#HEAD_2, #META_3, #TITLE_5, #LINK_7, #NUREGO-PUBLIC-CUSTOMER-ID_10, #SCRIPT_54, #SCRIPT_56, #SCRIPT_58, #SCRIPT_60, #SCRIPT_62, #SCRIPT_64, #SCRIPT_96, #SCRIPT_98 {\r\n    box-sizing: border-box;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n}/*#HEAD_2, #META_3, #TITLE_5, #LINK_7, #NUREGO-PUBLIC-CUSTOMER-ID_10, #SCRIPT_54, #SCRIPT_56, #SCRIPT_58, #SCRIPT_60, #SCRIPT_62, #SCRIPT_64, #SCRIPT_96, #SCRIPT_98*/\r\n\r\n#META_4, #META_6, #NUREGO-API-BASEURL_11, #SCRIPT_55, #SCRIPT_59, #SCRIPT_63, #SCRIPT_97 {\r\n    box-sizing: border-box;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n}/*#META_4, #META_6, #NUREGO-API-BASEURL_11, #SCRIPT_55, #SCRIPT_59, #SCRIPT_63, #SCRIPT_97*/\r\n\r\n#LINK_8, #SCRIPT_57, #SCRIPT_65 {\r\n    box-sizing: border-box;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n}/*#LINK_8, #SCRIPT_57, #SCRIPT_65*/\r\n\r\n#BODY_9 {\r\n    box-sizing: border-box;\r\n    height: 939.171875px;\r\n    width: 1326px;\r\n    perspective-origin: 663px 469.578125px;\r\n    transform-origin: 663px 469.578125px;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px;\r\n}/*#BODY_9*/\r\n\r\n#ASIDE_12 {\r\n    box-sizing: border-box;\r\n    height: 39px;\r\n    position: fixed;\r\n    right: -100px;\r\n    top: 80px;\r\n    width: 400px;\r\n    z-index: 2;\r\n    perspective-origin: 200px 19.5px;\r\n    transform: matrix(0.707106781186548, 0.707106781186548, -0.707106781186548, 0.707106781186548, 0, 0);\r\n    transform-origin: 200px 19.5px;\r\n    background: rgb(196, 41, 53) none repeat scroll 0% 0% / auto padding-box border-box;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n}/*#ASIDE_12*/\r\n\r\n#H2_13 {\r\n    box-sizing: border-box;\r\n    color: rgb(255, 255, 255);\r\n    height: 39px;\r\n    text-align: center;\r\n    width: 400px;\r\n    perspective-origin: 200px 19.5px;\r\n    transform-origin: 200px 19.5px;\r\n    border: 0px none rgb(255, 255, 255);\r\n    font: normal normal bold normal 30px/39.9999961853027px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px;\r\n    outline: rgb(255, 255, 255) none 0px;\r\n}/*#H2_13*/\r\n\r\n#HEADER_14 {\r\n    box-sizing: border-box;\r\n    height: 60px;\r\n    width: 1326px;\r\n    perspective-origin: 663px 30px;\r\n    transform-origin: 663px 30px;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    padding: 60px 0px 0px;\r\n}/*#HEADER_14*/\r\n\r\n#NAV_15 {\r\n    box-sizing: border-box;\r\n    height: 81px;\r\n    left: 0px;\r\n    position: fixed;\r\n    right: 0px;\r\n    top: 0px;\r\n    width: 1326px;\r\n    z-index: 1;\r\n    perspective-origin: 663px 40.5px;\r\n    transform-origin: 663px 40.5px;\r\n    background: rgb(49, 159, 29) none repeat scroll 0% 0% / auto padding-box border-box;\r\n    border-bottom: 1px solid rgb(24, 133, 4);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    transition: all 0.25s ease-in-out 0s;\r\n}/*#NAV_15*/\r\n\r\n#DIV_16 {\r\n    box-sizing: border-box;\r\n    height: 80px;\r\n    max-width: 1280px;\r\n    width: 1280px;\r\n    perspective-origin: 640px 40px;\r\n    transform-origin: 640px 40px;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px 23px;\r\n}/*#DIV_16*/\r\n\r\n#DIV_17 {\r\n    box-sizing: border-box;\r\n    display: flex;\r\n    height: 80px;\r\n    width: 1295px;\r\n    align-content: stretch;\r\n    align-items: center;\r\n    justify-content: flex-start;\r\n    perspective-origin: 647.5px 40px;\r\n    transform-origin: 647.5px 40px;\r\n    flex-flow: row wrap;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px 0px 0px -15px;\r\n}/*#DIV_17*/\r\n\r\n#DIV_18 {\r\n    box-sizing: border-box;\r\n    height: 26px;\r\n    width: 259px;\r\n    align-self: center;\r\n    perspective-origin: 129.5px 13px;\r\n    transform-origin: 129.5px 13px;\r\n    flex: 0 0 auto;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    padding: 0px 0px 0px 15px;\r\n}/*#DIV_18*/\r\n\r\n#A_19 {\r\n    box-sizing: border-box;\r\n    color: rgb(255, 255, 255);\r\n    text-decoration: none;\r\n    border: 0px none rgb(255, 255, 255);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(255, 255, 255) none 0px;\r\n}/*#A_19*/\r\n\r\n#IMG_20 {\r\n    box-sizing: border-box;\r\n    color: rgb(255, 255, 255);\r\n    height: 21px;\r\n    width: 72px;\r\n    perspective-origin: 36px 10.5px;\r\n    transform-origin: 36px 10.5px;\r\n    border: 0px none rgb(255, 255, 255);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(255, 255, 255) none 0px;\r\n}/*#IMG_20*/\r\n\r\n#UL_21 {\r\n    box-sizing: border-box;\r\n    height: 80px;\r\n    text-align: center;\r\n    width: 777px;\r\n    align-self: center;\r\n    perspective-origin: 388.5px 40px;\r\n    transform-origin: 388.5px 40px;\r\n    flex: 0 0 auto;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px;\r\n    padding: 0px;\r\n}/*#UL_21*/\r\n\r\n#LI_22 {\r\n    box-sizing: border-box;\r\n    cursor: pointer;\r\n    display: inline-block;\r\n    height: 80px;\r\n    text-align: center;\r\n    width: 84.125px;\r\n    perspective-origin: 42.0625px 40px;\r\n    transform-origin: 42.0625px 40px;\r\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px 15px 0px 0px;\r\n}/*#LI_22*/\r\n\r\n#A_23 {\r\n    box-sizing: border-box;\r\n    color: rgb(255, 255, 255);\r\n    display: block;\r\n    height: 80px;\r\n    text-align: center;\r\n    text-decoration: none;\r\n    width: 84.125px;\r\n    perspective-origin: 42.0625px 40px;\r\n    transform-origin: 42.0625px 40px;\r\n    border: 0px none rgb(255, 255, 255);\r\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(255, 255, 255) none 0px;\r\n    padding: 0px 10px;\r\n}/*#A_23*/\r\n\r\n#LI_24 {\r\n    box-sizing: border-box;\r\n    cursor: pointer;\r\n    display: inline-block;\r\n    height: 80px;\r\n    text-align: center;\r\n    width: 67.5px;\r\n    perspective-origin: 33.75px 40px;\r\n    transform-origin: 33.75px 40px;\r\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px 15px 0px 0px;\r\n}/*#LI_24*/\r\n\r\n#A_25 {\r\n    box-sizing: border-box;\r\n    color: rgb(255, 255, 255);\r\n    display: block;\r\n    height: 80px;\r\n    text-align: center;\r\n    text-decoration: none;\r\n    width: 67.5px;\r\n    perspective-origin: 33.75px 40px;\r\n    transform-origin: 33.75px 40px;\r\n    border: 0px none rgb(255, 255, 255);\r\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(255, 255, 255) none 0px;\r\n    padding: 0px 10px;\r\n}/*#A_25*/\r\n\r\n#LI_26 {\r\n    box-sizing: border-box;\r\n    cursor: pointer;\r\n    display: inline-block;\r\n    height: 80px;\r\n    text-align: center;\r\n    width: 117.90625px;\r\n    perspective-origin: 58.953125px 40px;\r\n    transform-origin: 58.953125px 40px;\r\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px 15px 0px 0px;\r\n}/*#LI_26*/\r\n\r\n#A_27 {\r\n    box-sizing: border-box;\r\n    color: rgb(255, 255, 255);\r\n    display: block;\r\n    height: 80px;\r\n    text-align: center;\r\n    text-decoration: none;\r\n    width: 117.90625px;\r\n    perspective-origin: 58.953125px 40px;\r\n    transform-origin: 58.953125px 40px;\r\n    border: 0px none rgb(255, 255, 255);\r\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(255, 255, 255) none 0px;\r\n    padding: 0px 10px;\r\n}/*#A_27*/\r\n\r\n#LI_28 {\r\n    box-sizing: border-box;\r\n    cursor: pointer;\r\n    display: inline-block;\r\n    height: 80px;\r\n    text-align: center;\r\n    width: 87.25px;\r\n    perspective-origin: 43.625px 40px;\r\n    transform-origin: 43.625px 40px;\r\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n}/*#LI_28*/\r\n\r\n#A_29 {\r\n    box-sizing: border-box;\r\n    color: rgb(255, 255, 255);\r\n    display: block;\r\n    height: 80px;\r\n    text-align: center;\r\n    text-decoration: none;\r\n    width: 87.25px;\r\n    perspective-origin: 43.625px 40px;\r\n    transform-origin: 43.625px 40px;\r\n    border: 0px none rgb(255, 255, 255);\r\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(255, 255, 255) none 0px;\r\n    padding: 0px 10px;\r\n}/*#A_29*/\r\n\r\n#DIV_30 {\r\n    box-sizing: border-box;\r\n    height: 30px;\r\n    text-align: right;\r\n    width: 259px;\r\n    align-self: center;\r\n    perspective-origin: 129.5px 15px;\r\n    transform-origin: 129.5px 15px;\r\n    flex: 0 0 auto;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    padding: 0px 0px 0px 15px;\r\n}/*#DIV_30*/\r\n\r\n#DIV_31 {\r\n    box-sizing: border-box;\r\n    height: 30px;\r\n    text-align: right;\r\n    width: 244px;\r\n    perspective-origin: 122px 15px;\r\n    transform-origin: 122px 15px;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n}/*#DIV_31*/\r\n\r\n#A_32 {\r\n    box-sizing: border-box;\r\n    color: rgb(255, 255, 255);\r\n    cursor: pointer;\r\n    display: inline-block;\r\n    height: 30px;\r\n    text-align: center;\r\n    text-decoration: none;\r\n    vertical-align: middle;\r\n    width: 67.203125px;\r\n    perspective-origin: 33.59375px 15px;\r\n    transform-origin: 33.59375px 15px;\r\n    background: rgb(42, 136, 30) none repeat scroll 0% 0% / auto padding-box border-box;\r\n    border: 0px none rgb(255, 255, 255);\r\n    border-radius: 3px 3px 3px 3px;\r\n    font: normal normal normal normal 15px/28px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(255, 255, 255) none 0px;\r\n    padding: 1px 15px;\r\n}/*#A_32*/\r\n\r\n#A_33 {\r\n    box-sizing: border-box;\r\n    color: rgb(255, 255, 255);\r\n    cursor: pointer;\r\n    display: none;\r\n    text-align: center;\r\n    text-decoration: none;\r\n    vertical-align: middle;\r\n    visibility: hidden;\r\n    perspective-origin: 50% 50%;\r\n    transform-origin: 50% 50%;\r\n    background: rgb(42, 136, 30) none repeat scroll 0% 0% / auto padding-box border-box;\r\n    border: 0px none rgb(255, 255, 255);\r\n    border-radius: 3px 3px 3px 3px;\r\n    font: normal normal normal normal 15px/28px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px 0px 0px 10px;\r\n    outline: rgb(255, 255, 255) none 0px;\r\n    padding: 1px 15px;\r\n}/*#A_33*/\r\n\r\n#MAIN_34 {\r\n    box-sizing: border-box;\r\n    height: 699.171875px;\r\n    width: 1326px;\r\n    perspective-origin: 663px 349.578125px;\r\n    transform-origin: 663px 349.578125px;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n}/*#MAIN_34*/\r\n\r\n#SECTION_35 {\r\n    box-sizing: border-box;\r\n    height: 224.171875px;\r\n    width: 1326px;\r\n    perspective-origin: 663px 112.078125px;\r\n    transform-origin: 663px 112.078125px;\r\n    border-top: 1px solid rgb(186, 186, 186);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    padding: 15px 0px;\r\n}/*#SECTION_35*/\r\n\r\n#A_36 {\r\n    box-sizing: border-box;\r\n    color: rgb(49, 113, 227);\r\n    display: block;\r\n    float: left;\r\n    height: 38px;\r\n    text-decoration: none;\r\n    width: 114.015625px;\r\n    perspective-origin: 57px 19px;\r\n    transform-origin: 57px 19px;\r\n    border: 0px none rgb(49, 113, 227);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px 0px 0px 24px;\r\n    outline: rgb(49, 113, 227) none 0px;\r\n}/*#A_36*/\r\n\r\n#I_37 {\r\n    box-sizing: border-box;\r\n    color: rgb(49, 113, 227);\r\n    display: inline-block;\r\n    height: 35px;\r\n    width: 12.859375px;\r\n    z-index: 0;\r\n    perspective-origin: 6.421875px 17.5px;\r\n    transform: matrix(1, 0, 0, 1, 0, 0);\r\n    transform-origin: 6.421875px 17.5px;\r\n    border: 0px none rgb(49, 113, 227);\r\n    font: normal normal normal normal 15px/15px FontAwesome;\r\n    outline: rgb(49, 113, 227) none 0px;\r\n    padding: 20px 0px 0px;\r\n}/*#I_37*/\r\n\r\n#I_37:before {\r\n    box-sizing: border-box;\r\n    color: rgb(49, 113, 227);\r\n    content: \'\uF0A8\';\r\n    border: 0px none rgb(49, 113, 227);\r\n    font: normal normal normal normal 15px/15px FontAwesome;\r\n    outline: rgb(49, 113, 227) none 0px;\r\n}/*#I_37:before*/\r\n\r\n#DIV_38 {\r\n    box-sizing: border-box;\r\n    height: 140px;\r\n    max-width: 960px;\r\n    text-align: center;\r\n    width: 960px;\r\n    perspective-origin: 480px 70px;\r\n    transform-origin: 480px 70px;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px 183px;\r\n}/*#DIV_38*/\r\n\r\n#H1_39 {\r\n    box-sizing: border-box;\r\n    height: 60px;\r\n    text-align: center;\r\n    width: 960px;\r\n    perspective-origin: 480px 30px;\r\n    transform-origin: 480px 30px;\r\n    font: normal normal bold normal 46px/60px \'GE Inspira Sans\', sans-serif;\r\n    margin: 38.1800003051758px 0px 10px;\r\n}/*#H1_39*/\r\n\r\n#H2_40 {\r\n    box-sizing: border-box;\r\n    height: 32px;\r\n    text-align: center;\r\n    width: 960px;\r\n    perspective-origin: 480px 16px;\r\n    transform-origin: 480px 16px;\r\n    font: normal normal normal normal 24px/32px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px 0px 10px;\r\n}/*#H2_40*/\r\n\r\n#H3_41 {\r\n    box-sizing: border-box;\r\n    color: rgb(119, 119, 119);\r\n    height: 28px;\r\n    text-align: center;\r\n    width: 960px;\r\n    perspective-origin: 480px 14px;\r\n    transform-origin: 480px 14px;\r\n    border: 0px none rgb(119, 119, 119);\r\n    font: normal normal normal normal 21px/28px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px 0px 15px;\r\n    outline: rgb(119, 119, 119) none 0px;\r\n}/*#H3_41*/\r\n\r\n#SECTION_42 {\r\n    box-sizing: border-box;\r\n    height: 413px;\r\n    width: 1326px;\r\n    perspective-origin: 663px 206.5px;\r\n    transform-origin: 663px 206.5px;\r\n    border-top: 1px solid rgb(186, 186, 186);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    padding: 15px 0px 46px;\r\n}/*#SECTION_42*/\r\n\r\n#DIV_43 {\r\n    box-sizing: border-box;\r\n    height: 351px;\r\n    max-width: 960px;\r\n    width: 960px;\r\n    perspective-origin: 480px 175.5px;\r\n    transform-origin: 480px 175.5px;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px 183px;\r\n}/*#DIV_43*/\r\n\r\n#DIV_44 {\r\n    box-sizing: border-box;\r\n    display: flex;\r\n    display: -webkit-flex;\r\n    height: 351px;\r\n    text-align: left;\r\n    width: 975px;\r\n    align-content: stretch;\r\n    align-items: stretch;\r\n    justify-content: flex-start;\r\n    perspective-origin: 487.5px 175.5px;\r\n    transform-origin: 487.5px 175.5px;\r\n    flex-flow: row wrap;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px 0px 0px -15px;\r\n}/*#DIV_44*/\r\n\r\n#DIV_45 {\r\n    box-sizing: border-box;\r\n    height: 351px;\r\n    text-align: left;\r\n    width: 292.5px;\r\n    align-self: stretch;\r\n    perspective-origin: 146.25px 175.5px;\r\n    transform-origin: 146.25px 175.5px;\r\n    flex: 0 0 auto;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    padding: 0px 0px 0px 15px;\r\n}/*#DIV_45*/\r\n\r\n#P_46 {\r\n    box-sizing: border-box;\r\n    height: 314px;\r\n    text-align: center;\r\n    width: 277.5px;\r\n    perspective-origin: 138.75px 157px;\r\n    transform-origin: 138.75px 157px;\r\n    font: normal normal normal normal 22px/28px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 22px 0px 15px;\r\n}/*#P_46*/\r\n\r\n#IMG_47 {\r\n    box-sizing: border-box;\r\n    height: 278px;\r\n    max-width: 100%;\r\n    text-align: center;\r\n    width: 277.5px;\r\n    perspective-origin: 138.75px 139px;\r\n    transform-origin: 138.75px 139px;\r\n    font: normal normal normal normal 22px/28px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n}/*#IMG_47*/\r\n\r\n#A_48 {\r\n    box-sizing: border-box;\r\n    color: rgb(49, 113, 227);\r\n    text-align: center;\r\n    text-decoration: none;\r\n    border-top: 0px none rgb(49, 113, 227);\r\n    border-right: 0px none rgb(49, 113, 227);\r\n    border-bottom: 1px solid rgb(221, 221, 221);\r\n    border-left: 0px none rgb(49, 113, 227);\r\n    font: normal normal normal normal 22px/28px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(49, 113, 227) none 0px;\r\n}/*#A_48*/\r\n\r\n#DIV_49 {\r\n    box-sizing: border-box;\r\n    height: 351px;\r\n    text-align: left;\r\n    width: 682.5px;\r\n    align-self: stretch;\r\n    perspective-origin: 341.25px 175.5px;\r\n    transform-origin: 341.25px 175.5px;\r\n    flex: 0 0 auto;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    padding: 0px 0px 0px 15px;\r\n}/*#DIV_49*/\r\n\r\n#DIV_50 {\r\n    box-sizing: border-box;\r\n    height: 196px;\r\n    text-align: left;\r\n    width: 667.5px;\r\n    perspective-origin: 333.75px 98px;\r\n    transform-origin: 333.75px 98px;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    padding: 0px 0px 0px 15px;\r\n}/*#DIV_50*/\r\n\r\n#P_51 {\r\n    box-sizing: border-box;\r\n    height: 196px;\r\n    text-align: left;\r\n    width: 652.5px;\r\n    perspective-origin: 326.25px 98px;\r\n    transform-origin: 326.25px 98px;\r\n    font-size:28px;\r\n    font: normal normal normal normal 22px/28px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 22px 0px 15px;\r\n}/*#P_51*/\r\n\r\n#SECTION_52 {\r\n    box-sizing: border-box;\r\n    height: 62px;\r\n    width: 1326px;\r\n    perspective-origin: 663px 31px;\r\n    transform-origin: 663px 31px;\r\n    border-top: 1px solid rgb(186, 186, 186);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    padding: 15px 0px 46px;\r\n}/*#SECTION_52*/\r\n\r\n#DIV_53 {\r\n    box-sizing: border-box;\r\n    max-width: 960px;\r\n    width: 960px;\r\n    perspective-origin: 480px 0px;\r\n    transform-origin: 480px 0px;\r\n    font: normal normal normal normal 15px/15px \'Droid Sans\', sans-serif;\r\n    margin: 0px 183px;\r\n}/*#DIV_53*/\r\n\r\n#SCRIPT_61 {\r\n    box-sizing: border-box;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n}/*#SCRIPT_61*/\r\n\r\n#FOOTER_66 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: 180px;\r\n    width: 1326px;\r\n    perspective-origin: 663px 90px;\r\n    transform-origin: 663px 90px;\r\n    background: rgb(238, 238, 239) none repeat scroll 0% 0% / auto padding-box border-box;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n    padding: 36px 0px 56px;\r\n}/*#FOOTER_66*/\r\n\r\n#DIV_67 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: 19px;\r\n    max-width: 960px;\r\n    width: 960px;\r\n    perspective-origin: 480px 9.5px;\r\n    transform-origin: 480px 9.5px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px 183px;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#DIV_67*/\r\n\r\n#UL_68 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: 19px;\r\n    text-align: right;\r\n    width: 960px;\r\n    perspective-origin: 480px 9.5px;\r\n    transform-origin: 480px 9.5px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n    padding: 0px;\r\n}/*#UL_68*/\r\n\r\n#LI_69 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: inline-block;\r\n    height: 19px;\r\n    text-align: right;\r\n    width: 38.421875px;\r\n    perspective-origin: 19.203125px 9.5px;\r\n    transform-origin: 19.203125px 9.5px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_69*/\r\n\r\n#A_70, #A_72, #A_74, #A_76, #A_78, #A_80 {\r\n    box-sizing: border-box;\r\n    color: rgb(0, 0, 0);\r\n    text-align: right;\r\n    text-decoration: none;\r\n    border: 0px none rgb(0, 0, 0);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(0, 0, 0) none 0px;\r\n}/*#A_70, #A_72, #A_74, #A_76, #A_78, #A_80*/\r\n\r\n#LI_71 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: inline-block;\r\n    height: 19px;\r\n    text-align: right;\r\n    width: 59.15625px;\r\n    perspective-origin: 29.578125px 9.5px;\r\n    transform-origin: 29.578125px 9.5px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_71*/\r\n\r\n#LI_71:before {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: auto;\r\n    text-align: right;\r\n    width: auto;\r\n    perspective-origin: 0px 0px;\r\n    transform-origin: 0px 0px;\r\n    content: \'\xA0|\xA0\';\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_71:before*/\r\n\r\n#LI_73 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: inline-block;\r\n    height: 19px;\r\n    text-align: right;\r\n    width: 61.765625px;\r\n    perspective-origin: 30.875px 9.5px;\r\n    transform-origin: 30.875px 9.5px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_73*/\r\n\r\n#LI_73:before {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: auto;\r\n    text-align: right;\r\n    width: auto;\r\n    perspective-origin: 0px 0px;\r\n    transform-origin: 0px 0px;\r\n    content: \'\xA0|\xA0\';\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_73:before*/\r\n\r\n#LI_75 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: inline-block;\r\n    height: 19px;\r\n    text-align: right;\r\n    width: 46.6875px;\r\n    perspective-origin: 23.34375px 9.5px;\r\n    transform-origin: 23.34375px 9.5px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_75*/\r\n\r\n#LI_75:before {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: auto;\r\n    text-align: right;\r\n    width: auto;\r\n    perspective-origin: 0px 0px;\r\n    transform-origin: 0px 0px;\r\n    content: \'\xA0|\xA0\';\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_75:before*/\r\n\r\n#LI_77 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: inline-block;\r\n    height: 19px;\r\n    text-align: right;\r\n    width: 84.5px;\r\n    perspective-origin: 42.25px 9.5px;\r\n    transform-origin: 42.25px 9.5px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_77*/\r\n\r\n#LI_77:before {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: auto;\r\n    text-align: right;\r\n    width: auto;\r\n    perspective-origin: 0px 0px;\r\n    transform-origin: 0px 0px;\r\n    content: \'\xA0|\xA0\';\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_77:before*/\r\n\r\n#LI_79 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: inline-block;\r\n    height: 19px;\r\n    text-align: right;\r\n    width: 61.5px;\r\n    perspective-origin: 30.75px 9.5px;\r\n    transform-origin: 30.75px 9.5px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_79*/\r\n\r\n#LI_79:before {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: auto;\r\n    text-align: right;\r\n    width: auto;\r\n    perspective-origin: 0px 0px;\r\n    transform-origin: 0px 0px;\r\n    content: \'\xA0|\xA0\';\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_79:before*/\r\n\r\n#ASIDE_81 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: 54px;\r\n    position: relative;\r\n    width: 1326px;\r\n    perspective-origin: 663px 27px;\r\n    transform-origin: 663px 27px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    margin: 15px 0px 0px;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#ASIDE_81*/\r\n\r\n#DIV_82 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: 54px;\r\n    max-width: 960px;\r\n    width: 960px;\r\n    perspective-origin: 480px 27px;\r\n    transform-origin: 480px 27px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    margin: 0px 183px;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#DIV_82*/\r\n\r\n#DIV_83 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: flex;\r\n    height: 54px;\r\n    width: 975px;\r\n    align-content: stretch;\r\n    align-items: center;\r\n    justify-content: flex-start;\r\n    perspective-origin: 487.5px 27px;\r\n    transform-origin: 487.5px 27px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    flex-flow: row wrap;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px 0px 0px -15px;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#DIV_83*/\r\n\r\n#DIV_84 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: 45px;\r\n    width: 487.5px;\r\n    align-self: center;\r\n    perspective-origin: 243.75px 22.5px;\r\n    transform-origin: 243.75px 22.5px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    flex: 0 0 auto;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n    padding: 0px 0px 0px 15px;\r\n}/*#DIV_84*/\r\n\r\n#A_85 {\r\n    box-sizing: border-box;\r\n    color: rgb(0, 0, 0);\r\n    display: table;\r\n    height: 45px;\r\n    text-decoration: none;\r\n    width: 472px;\r\n    perspective-origin: 236px 22.5px;\r\n    transform-origin: 236px 22.5px;\r\n    border: 0px none rgb(0, 0, 0);\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(0, 0, 0) none 0px;\r\n}/*#A_85*/\r\n\r\n#IMG_86 {\r\n    box-sizing: border-box;\r\n    display: table-cell;\r\n    height: 45px;\r\n    vertical-align: middle;\r\n    width: 55px;\r\n    perspective-origin: 27.5px 22.5px;\r\n    transform-origin: 27.5px 22.5px;\r\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    padding: 0px 10px 0px 0px;\r\n}/*#IMG_86*/\r\n\r\n#H4_87 {\r\n    box-sizing: border-box;\r\n    display: table-cell;\r\n    height: 45px;\r\n    vertical-align: middle;\r\n    width: 417px;\r\n    perspective-origin: 208.5px 22.5px;\r\n    transform-origin: 208.5px 22.5px;\r\n    font: normal normal normal normal 20px/20px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 26.6000003814697px 0px 0px;\r\n}/*#H4_87*/\r\n\r\n#SMALL_88 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: block;\r\n    height: 54px;\r\n    text-align: right;\r\n    width: 487.5px;\r\n    align-self: center;\r\n    perspective-origin: 243.75px 27px;\r\n    transform-origin: 243.75px 27px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    flex: 0 0 auto;\r\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n    padding: 0px 0px 0px 15px;\r\n}/*#SMALL_88*/\r\n\r\n#UL_89 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: 18px;\r\n    text-align: right;\r\n    width: 472.5px;\r\n    perspective-origin: 236.25px 9px;\r\n    transform-origin: 236.25px 9px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n    padding: 0px;\r\n}/*#UL_89*/\r\n\r\n#LI_90 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: inline-block;\r\n    height: 18px;\r\n    text-align: right;\r\n    width: 36.0625px;\r\n    perspective-origin: 18.03125px 9px;\r\n    transform-origin: 18.03125px 9px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_90*/\r\n\r\n#A_91, #A_93 {\r\n    box-sizing: border-box;\r\n    color: rgb(0, 0, 0);\r\n    text-align: right;\r\n    text-decoration: none;\r\n    border: 0px none rgb(0, 0, 0);\r\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(0, 0, 0) none 0px;\r\n}/*#A_91, #A_93*/\r\n\r\n#LI_92 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    display: inline-block;\r\n    height: 18px;\r\n    text-align: right;\r\n    width: 40.453125px;\r\n    perspective-origin: 20.21875px 9px;\r\n    transform-origin: 20.21875px 9px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_92*/\r\n\r\n#LI_92:before {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: auto;\r\n    text-align: right;\r\n    width: auto;\r\n    perspective-origin: 0px 0px;\r\n    transform-origin: 0px 0px;\r\n    content: \'\xA0|\xA0\';\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#LI_92:before*/\r\n\r\n#P_94, #P_95 {\r\n    box-sizing: border-box;\r\n    color: rgb(148, 148, 148);\r\n    height: 18px;\r\n    text-align: right;\r\n    width: 472.5px;\r\n    perspective-origin: 236.25px 9px;\r\n    transform-origin: 236.25px 9px;\r\n    border: 0px none rgb(148, 148, 148);\r\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\r\n    list-style: none outside none;\r\n    margin: 0px;\r\n    outline: rgb(148, 148, 148) none 0px;\r\n}/*#P_94, #P_95*/\r\n\r\n\r\n#MAIN_34 {\r\n    margin:0px auto !important;\r\n}\r\n</style>';
+text_singleItemHTML = '<!-- <div>\n\t<h2>{{=obj.name}}</h2>\n\t<h5>{{=obj.description}}</h5> \n\thello world\n</div> -->\n\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n      <span class="sr-only">Error:</span>\n      <span class="txt"></span>\n</div>\n\n<main id="MAIN_34">\n\t<section id="SECTION_35">\n\t\t<div id="DIV_38">\n\t\t\t<h1 id="H1_39">\n\t\t\t\t{{=obj.name}}\n\t\t\t</h1>\n\t\t\t<h2 id="H2_40">\n\t\t\t\tBy {{=obj.author}}\n\t\t\t</h2>\n\t\t\t<h3 id="H3_41">\n\t\t\t\tPublished April 28, 2015\n\t\t\t</h3>\n\t\t</div>\n\t</section>\n\t<section id="SECTION_42">\n\t\t<div id="DIV_43">\n\t\t\t<div id="DIV_44">\n\t\t\t\t<div id="DIV_45">\n\t\t\t\t\t<p id="P_46">\n\t\t\t\t\t\t<!-- <img src="http://www.alberttoledo.com/img/icons/social/github.png" id="IMG_47" alt=\'\' />  -->\n\t\t\t\t\t\t<img src="{{=obj.icon}}" id="IMG_47" alt=\'\' /> \n\t\t\t\t\t\t<a href="https://livesample.grc-apps.svc.ice.ge.com/" id="A_48">View Live Sample</a>\n\t\t\t\t\t</p>\n\t\t\t\t</div>\n\t\t\t\t<div id="DIV_49">\n\t\t\t\t\t<div id="DIV_50">\n\t\t\t\t\t\t<p id="P_51">\n\t\t\t\t\t\t\t{{=obj.description}}\n\t\t\t\t\t\t\t<!-- The Predix Asset Service provides asset modeling and data management with real time intelligence, and provides insight into the relationships and connections between independently managed assets. Industrial Internet applications are generally machine-focused. The Asset service enables application developers to import, create, and store asset models that describe machine types, as well as create instance representations for those machines. -->\n\t\t\t\t\t\t</p>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</section>\n\t<section id="SECTION_52">\n\t\t<div id="DIV_53">\n\t\t</div>\n\t</section>\n</main>\n\n\n\n<style>\n\nbody , html {\n\toverflow:hidden;\n}\n\n#HTML_1 {\n    box-sizing: border-box;\n    height: 939.171875px;\n    min-height: 100%;\n    width: 1326px;\n    z-index: 0;\n    perspective-origin: 663px 469.578125px;\n    transform-origin: 663px 469.578125px;\n    background: rgb(255, 255, 255) none repeat scroll 0% 0% / auto padding-box border-box;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    overflow: auto;\n}/*#HTML_1*/\n\n#HEAD_2, #META_3, #TITLE_5, #LINK_7, #NUREGO-PUBLIC-CUSTOMER-ID_10, #SCRIPT_54, #SCRIPT_56, #SCRIPT_58, #SCRIPT_60, #SCRIPT_62, #SCRIPT_64, #SCRIPT_96, #SCRIPT_98 {\n    box-sizing: border-box;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n}/*#HEAD_2, #META_3, #TITLE_5, #LINK_7, #NUREGO-PUBLIC-CUSTOMER-ID_10, #SCRIPT_54, #SCRIPT_56, #SCRIPT_58, #SCRIPT_60, #SCRIPT_62, #SCRIPT_64, #SCRIPT_96, #SCRIPT_98*/\n\n#META_4, #META_6, #NUREGO-API-BASEURL_11, #SCRIPT_55, #SCRIPT_59, #SCRIPT_63, #SCRIPT_97 {\n    box-sizing: border-box;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n}/*#META_4, #META_6, #NUREGO-API-BASEURL_11, #SCRIPT_55, #SCRIPT_59, #SCRIPT_63, #SCRIPT_97*/\n\n#LINK_8, #SCRIPT_57, #SCRIPT_65 {\n    box-sizing: border-box;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n}/*#LINK_8, #SCRIPT_57, #SCRIPT_65*/\n\n#BODY_9 {\n    box-sizing: border-box;\n    height: 939.171875px;\n    width: 1326px;\n    perspective-origin: 663px 469.578125px;\n    transform-origin: 663px 469.578125px;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    margin: 0px;\n}/*#BODY_9*/\n\n#ASIDE_12 {\n    box-sizing: border-box;\n    height: 39px;\n    position: fixed;\n    right: -100px;\n    top: 80px;\n    width: 400px;\n    z-index: 2;\n    perspective-origin: 200px 19.5px;\n    transform: matrix(0.707106781186548, 0.707106781186548, -0.707106781186548, 0.707106781186548, 0, 0);\n    transform-origin: 200px 19.5px;\n    background: rgb(196, 41, 53) none repeat scroll 0% 0% / auto padding-box border-box;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n}/*#ASIDE_12*/\n\n#H2_13 {\n    box-sizing: border-box;\n    color: rgb(255, 255, 255);\n    height: 39px;\n    text-align: center;\n    width: 400px;\n    perspective-origin: 200px 19.5px;\n    transform-origin: 200px 19.5px;\n    border: 0px none rgb(255, 255, 255);\n    font: normal normal bold normal 30px/39.9999961853027px \'GE Inspira Sans\', sans-serif;\n    margin: 0px;\n    outline: rgb(255, 255, 255) none 0px;\n}/*#H2_13*/\n\n#HEADER_14 {\n    box-sizing: border-box;\n    height: 60px;\n    width: 1326px;\n    perspective-origin: 663px 30px;\n    transform-origin: 663px 30px;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    padding: 60px 0px 0px;\n}/*#HEADER_14*/\n\n#NAV_15 {\n    box-sizing: border-box;\n    height: 81px;\n    left: 0px;\n    position: fixed;\n    right: 0px;\n    top: 0px;\n    width: 1326px;\n    z-index: 1;\n    perspective-origin: 663px 40.5px;\n    transform-origin: 663px 40.5px;\n    background: rgb(49, 159, 29) none repeat scroll 0% 0% / auto padding-box border-box;\n    border-bottom: 1px solid rgb(24, 133, 4);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    transition: all 0.25s ease-in-out 0s;\n}/*#NAV_15*/\n\n#DIV_16 {\n    box-sizing: border-box;\n    height: 80px;\n    max-width: 1280px;\n    width: 1280px;\n    perspective-origin: 640px 40px;\n    transform-origin: 640px 40px;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    margin: 0px 23px;\n}/*#DIV_16*/\n\n#DIV_17 {\n    box-sizing: border-box;\n    display: flex;\n    height: 80px;\n    width: 1295px;\n    align-content: stretch;\n    align-items: center;\n    justify-content: flex-start;\n    perspective-origin: 647.5px 40px;\n    transform-origin: 647.5px 40px;\n    flex-flow: row wrap;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px 0px 0px -15px;\n}/*#DIV_17*/\n\n#DIV_18 {\n    box-sizing: border-box;\n    height: 26px;\n    width: 259px;\n    align-self: center;\n    perspective-origin: 129.5px 13px;\n    transform-origin: 129.5px 13px;\n    flex: 0 0 auto;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    padding: 0px 0px 0px 15px;\n}/*#DIV_18*/\n\n#A_19 {\n    box-sizing: border-box;\n    color: rgb(255, 255, 255);\n    text-decoration: none;\n    border: 0px none rgb(255, 255, 255);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(255, 255, 255) none 0px;\n}/*#A_19*/\n\n#IMG_20 {\n    box-sizing: border-box;\n    color: rgb(255, 255, 255);\n    height: 21px;\n    width: 72px;\n    perspective-origin: 36px 10.5px;\n    transform-origin: 36px 10.5px;\n    border: 0px none rgb(255, 255, 255);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(255, 255, 255) none 0px;\n}/*#IMG_20*/\n\n#UL_21 {\n    box-sizing: border-box;\n    height: 80px;\n    text-align: center;\n    width: 777px;\n    align-self: center;\n    perspective-origin: 388.5px 40px;\n    transform-origin: 388.5px 40px;\n    flex: 0 0 auto;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px;\n    padding: 0px;\n}/*#UL_21*/\n\n#LI_22 {\n    box-sizing: border-box;\n    cursor: pointer;\n    display: inline-block;\n    height: 80px;\n    text-align: center;\n    width: 84.125px;\n    perspective-origin: 42.0625px 40px;\n    transform-origin: 42.0625px 40px;\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px 15px 0px 0px;\n}/*#LI_22*/\n\n#A_23 {\n    box-sizing: border-box;\n    color: rgb(255, 255, 255);\n    display: block;\n    height: 80px;\n    text-align: center;\n    text-decoration: none;\n    width: 84.125px;\n    perspective-origin: 42.0625px 40px;\n    transform-origin: 42.0625px 40px;\n    border: 0px none rgb(255, 255, 255);\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(255, 255, 255) none 0px;\n    padding: 0px 10px;\n}/*#A_23*/\n\n#LI_24 {\n    box-sizing: border-box;\n    cursor: pointer;\n    display: inline-block;\n    height: 80px;\n    text-align: center;\n    width: 67.5px;\n    perspective-origin: 33.75px 40px;\n    transform-origin: 33.75px 40px;\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px 15px 0px 0px;\n}/*#LI_24*/\n\n#A_25 {\n    box-sizing: border-box;\n    color: rgb(255, 255, 255);\n    display: block;\n    height: 80px;\n    text-align: center;\n    text-decoration: none;\n    width: 67.5px;\n    perspective-origin: 33.75px 40px;\n    transform-origin: 33.75px 40px;\n    border: 0px none rgb(255, 255, 255);\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(255, 255, 255) none 0px;\n    padding: 0px 10px;\n}/*#A_25*/\n\n#LI_26 {\n    box-sizing: border-box;\n    cursor: pointer;\n    display: inline-block;\n    height: 80px;\n    text-align: center;\n    width: 117.90625px;\n    perspective-origin: 58.953125px 40px;\n    transform-origin: 58.953125px 40px;\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px 15px 0px 0px;\n}/*#LI_26*/\n\n#A_27 {\n    box-sizing: border-box;\n    color: rgb(255, 255, 255);\n    display: block;\n    height: 80px;\n    text-align: center;\n    text-decoration: none;\n    width: 117.90625px;\n    perspective-origin: 58.953125px 40px;\n    transform-origin: 58.953125px 40px;\n    border: 0px none rgb(255, 255, 255);\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(255, 255, 255) none 0px;\n    padding: 0px 10px;\n}/*#A_27*/\n\n#LI_28 {\n    box-sizing: border-box;\n    cursor: pointer;\n    display: inline-block;\n    height: 80px;\n    text-align: center;\n    width: 87.25px;\n    perspective-origin: 43.625px 40px;\n    transform-origin: 43.625px 40px;\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n}/*#LI_28*/\n\n#A_29 {\n    box-sizing: border-box;\n    color: rgb(255, 255, 255);\n    display: block;\n    height: 80px;\n    text-align: center;\n    text-decoration: none;\n    width: 87.25px;\n    perspective-origin: 43.625px 40px;\n    transform-origin: 43.625px 40px;\n    border: 0px none rgb(255, 255, 255);\n    font: normal normal normal normal 20px/80px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(255, 255, 255) none 0px;\n    padding: 0px 10px;\n}/*#A_29*/\n\n#DIV_30 {\n    box-sizing: border-box;\n    height: 30px;\n    text-align: right;\n    width: 259px;\n    align-self: center;\n    perspective-origin: 129.5px 15px;\n    transform-origin: 129.5px 15px;\n    flex: 0 0 auto;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    padding: 0px 0px 0px 15px;\n}/*#DIV_30*/\n\n#DIV_31 {\n    box-sizing: border-box;\n    height: 30px;\n    text-align: right;\n    width: 244px;\n    perspective-origin: 122px 15px;\n    transform-origin: 122px 15px;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n}/*#DIV_31*/\n\n#A_32 {\n    box-sizing: border-box;\n    color: rgb(255, 255, 255);\n    cursor: pointer;\n    display: inline-block;\n    height: 30px;\n    text-align: center;\n    text-decoration: none;\n    vertical-align: middle;\n    width: 67.203125px;\n    perspective-origin: 33.59375px 15px;\n    transform-origin: 33.59375px 15px;\n    background: rgb(42, 136, 30) none repeat scroll 0% 0% / auto padding-box border-box;\n    border: 0px none rgb(255, 255, 255);\n    border-radius: 3px 3px 3px 3px;\n    font: normal normal normal normal 15px/28px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(255, 255, 255) none 0px;\n    padding: 1px 15px;\n}/*#A_32*/\n\n#A_33 {\n    box-sizing: border-box;\n    color: rgb(255, 255, 255);\n    cursor: pointer;\n    display: none;\n    text-align: center;\n    text-decoration: none;\n    vertical-align: middle;\n    visibility: hidden;\n    perspective-origin: 50% 50%;\n    transform-origin: 50% 50%;\n    background: rgb(42, 136, 30) none repeat scroll 0% 0% / auto padding-box border-box;\n    border: 0px none rgb(255, 255, 255);\n    border-radius: 3px 3px 3px 3px;\n    font: normal normal normal normal 15px/28px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px 0px 0px 10px;\n    outline: rgb(255, 255, 255) none 0px;\n    padding: 1px 15px;\n}/*#A_33*/\n\n#MAIN_34 {\n    box-sizing: border-box;\n    height: 699.171875px;\n    width: 1326px;\n    perspective-origin: 663px 349.578125px;\n    transform-origin: 663px 349.578125px;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n}/*#MAIN_34*/\n\n#SECTION_35 {\n    box-sizing: border-box;\n    height: 224.171875px;\n    width: 1326px;\n    perspective-origin: 663px 112.078125px;\n    transform-origin: 663px 112.078125px;\n    border-top: 1px solid rgb(186, 186, 186);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    padding: 15px 0px;\n}/*#SECTION_35*/\n\n#A_36 {\n    box-sizing: border-box;\n    color: rgb(49, 113, 227);\n    display: block;\n    float: left;\n    height: 38px;\n    text-decoration: none;\n    width: 114.015625px;\n    perspective-origin: 57px 19px;\n    transform-origin: 57px 19px;\n    border: 0px none rgb(49, 113, 227);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    margin: 0px 0px 0px 24px;\n    outline: rgb(49, 113, 227) none 0px;\n}/*#A_36*/\n\n#I_37 {\n    box-sizing: border-box;\n    color: rgb(49, 113, 227);\n    display: inline-block;\n    height: 35px;\n    width: 12.859375px;\n    z-index: 0;\n    perspective-origin: 6.421875px 17.5px;\n    transform: matrix(1, 0, 0, 1, 0, 0);\n    transform-origin: 6.421875px 17.5px;\n    border: 0px none rgb(49, 113, 227);\n    font: normal normal normal normal 15px/15px FontAwesome;\n    outline: rgb(49, 113, 227) none 0px;\n    padding: 20px 0px 0px;\n}/*#I_37*/\n\n#I_37:before {\n    box-sizing: border-box;\n    color: rgb(49, 113, 227);\n    content: \'\uF0A8\';\n    border: 0px none rgb(49, 113, 227);\n    font: normal normal normal normal 15px/15px FontAwesome;\n    outline: rgb(49, 113, 227) none 0px;\n}/*#I_37:before*/\n\n#DIV_38 {\n    box-sizing: border-box;\n    height: 140px;\n    max-width: 960px;\n    text-align: center;\n    width: 960px;\n    perspective-origin: 480px 70px;\n    transform-origin: 480px 70px;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    margin: 0px 183px;\n}/*#DIV_38*/\n\n#H1_39 {\n    box-sizing: border-box;\n    height: 60px;\n    text-align: center;\n    width: 960px;\n    perspective-origin: 480px 30px;\n    transform-origin: 480px 30px;\n    font: normal normal bold normal 46px/60px \'GE Inspira Sans\', sans-serif;\n    margin: 38.1800003051758px 0px 10px;\n}/*#H1_39*/\n\n#H2_40 {\n    box-sizing: border-box;\n    height: 32px;\n    text-align: center;\n    width: 960px;\n    perspective-origin: 480px 16px;\n    transform-origin: 480px 16px;\n    font: normal normal normal normal 24px/32px \'GE Inspira Sans\', sans-serif;\n    margin: 0px 0px 10px;\n}/*#H2_40*/\n\n#H3_41 {\n    box-sizing: border-box;\n    color: rgb(119, 119, 119);\n    height: 28px;\n    text-align: center;\n    width: 960px;\n    perspective-origin: 480px 14px;\n    transform-origin: 480px 14px;\n    border: 0px none rgb(119, 119, 119);\n    font: normal normal normal normal 21px/28px \'GE Inspira Sans\', sans-serif;\n    margin: 0px 0px 15px;\n    outline: rgb(119, 119, 119) none 0px;\n}/*#H3_41*/\n\n#SECTION_42 {\n    box-sizing: border-box;\n    height: 413px;\n    width: 1326px;\n    perspective-origin: 663px 206.5px;\n    transform-origin: 663px 206.5px;\n    border-top: 1px solid rgb(186, 186, 186);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    padding: 15px 0px 46px;\n}/*#SECTION_42*/\n\n#DIV_43 {\n    box-sizing: border-box;\n    height: 351px;\n    max-width: 960px;\n    width: 960px;\n    perspective-origin: 480px 175.5px;\n    transform-origin: 480px 175.5px;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    margin: 0px 183px;\n}/*#DIV_43*/\n\n#DIV_44 {\n    box-sizing: border-box;\n    display: flex;\n    display: -webkit-flex;\n    height: 351px;\n    text-align: left;\n    width: 975px;\n    align-content: stretch;\n    align-items: stretch;\n    justify-content: flex-start;\n    perspective-origin: 487.5px 175.5px;\n    transform-origin: 487.5px 175.5px;\n    flex-flow: row wrap;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px 0px 0px -15px;\n}/*#DIV_44*/\n\n#DIV_45 {\n    box-sizing: border-box;\n    height: 351px;\n    text-align: left;\n    width: 292.5px;\n    align-self: stretch;\n    perspective-origin: 146.25px 175.5px;\n    transform-origin: 146.25px 175.5px;\n    flex: 0 0 auto;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    padding: 0px 0px 0px 15px;\n}/*#DIV_45*/\n\n#P_46 {\n    box-sizing: border-box;\n    height: 314px;\n    text-align: center;\n    width: 277.5px;\n    perspective-origin: 138.75px 157px;\n    transform-origin: 138.75px 157px;\n    font: normal normal normal normal 22px/28px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 22px 0px 15px;\n}/*#P_46*/\n\n#IMG_47 {\n    box-sizing: border-box;\n    height: 278px;\n    max-width: 100%;\n    text-align: center;\n    width: 277.5px;\n    perspective-origin: 138.75px 139px;\n    transform-origin: 138.75px 139px;\n    font: normal normal normal normal 22px/28px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n}/*#IMG_47*/\n\n#A_48 {\n    box-sizing: border-box;\n    color: rgb(49, 113, 227);\n    text-align: center;\n    text-decoration: none;\n    border-top: 0px none rgb(49, 113, 227);\n    border-right: 0px none rgb(49, 113, 227);\n    border-bottom: 1px solid rgb(221, 221, 221);\n    border-left: 0px none rgb(49, 113, 227);\n    font: normal normal normal normal 22px/28px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(49, 113, 227) none 0px;\n}/*#A_48*/\n\n#DIV_49 {\n    box-sizing: border-box;\n    height: 351px;\n    text-align: left;\n    width: 682.5px;\n    align-self: stretch;\n    perspective-origin: 341.25px 175.5px;\n    transform-origin: 341.25px 175.5px;\n    flex: 0 0 auto;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    padding: 0px 0px 0px 15px;\n}/*#DIV_49*/\n\n#DIV_50 {\n    box-sizing: border-box;\n    height: 196px;\n    text-align: left;\n    width: 667.5px;\n    perspective-origin: 333.75px 98px;\n    transform-origin: 333.75px 98px;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    padding: 0px 0px 0px 15px;\n}/*#DIV_50*/\n\n#P_51 {\n    box-sizing: border-box;\n    height: 196px;\n    text-align: left;\n    width: 652.5px;\n    perspective-origin: 326.25px 98px;\n    transform-origin: 326.25px 98px;\n    font-size:28px;\n    font: normal normal normal normal 22px/28px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 22px 0px 15px;\n}/*#P_51*/\n\n#SECTION_52 {\n    box-sizing: border-box;\n    height: 62px;\n    width: 1326px;\n    perspective-origin: 663px 31px;\n    transform-origin: 663px 31px;\n    border-top: 1px solid rgb(186, 186, 186);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    padding: 15px 0px 46px;\n}/*#SECTION_52*/\n\n#DIV_53 {\n    box-sizing: border-box;\n    max-width: 960px;\n    width: 960px;\n    perspective-origin: 480px 0px;\n    transform-origin: 480px 0px;\n    font: normal normal normal normal 15px/15px \'Droid Sans\', sans-serif;\n    margin: 0px 183px;\n}/*#DIV_53*/\n\n#SCRIPT_61 {\n    box-sizing: border-box;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n}/*#SCRIPT_61*/\n\n#FOOTER_66 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: 180px;\n    width: 1326px;\n    perspective-origin: 663px 90px;\n    transform-origin: 663px 90px;\n    background: rgb(238, 238, 239) none repeat scroll 0% 0% / auto padding-box border-box;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    outline: rgb(148, 148, 148) none 0px;\n    padding: 36px 0px 56px;\n}/*#FOOTER_66*/\n\n#DIV_67 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: 19px;\n    max-width: 960px;\n    width: 960px;\n    perspective-origin: 480px 9.5px;\n    transform-origin: 480px 9.5px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    margin: 0px 183px;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#DIV_67*/\n\n#UL_68 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: 19px;\n    text-align: right;\n    width: 960px;\n    perspective-origin: 480px 9.5px;\n    transform-origin: 480px 9.5px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px;\n    outline: rgb(148, 148, 148) none 0px;\n    padding: 0px;\n}/*#UL_68*/\n\n#LI_69 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: inline-block;\n    height: 19px;\n    text-align: right;\n    width: 38.421875px;\n    perspective-origin: 19.203125px 9.5px;\n    transform-origin: 19.203125px 9.5px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_69*/\n\n#A_70, #A_72, #A_74, #A_76, #A_78, #A_80 {\n    box-sizing: border-box;\n    color: rgb(0, 0, 0);\n    text-align: right;\n    text-decoration: none;\n    border: 0px none rgb(0, 0, 0);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(0, 0, 0) none 0px;\n}/*#A_70, #A_72, #A_74, #A_76, #A_78, #A_80*/\n\n#LI_71 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: inline-block;\n    height: 19px;\n    text-align: right;\n    width: 59.15625px;\n    perspective-origin: 29.578125px 9.5px;\n    transform-origin: 29.578125px 9.5px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_71*/\n\n#LI_71:before {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: auto;\n    text-align: right;\n    width: auto;\n    perspective-origin: 0px 0px;\n    transform-origin: 0px 0px;\n    content: \'\xA0|\xA0\';\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_71:before*/\n\n#LI_73 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: inline-block;\n    height: 19px;\n    text-align: right;\n    width: 61.765625px;\n    perspective-origin: 30.875px 9.5px;\n    transform-origin: 30.875px 9.5px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_73*/\n\n#LI_73:before {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: auto;\n    text-align: right;\n    width: auto;\n    perspective-origin: 0px 0px;\n    transform-origin: 0px 0px;\n    content: \'\xA0|\xA0\';\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_73:before*/\n\n#LI_75 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: inline-block;\n    height: 19px;\n    text-align: right;\n    width: 46.6875px;\n    perspective-origin: 23.34375px 9.5px;\n    transform-origin: 23.34375px 9.5px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_75*/\n\n#LI_75:before {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: auto;\n    text-align: right;\n    width: auto;\n    perspective-origin: 0px 0px;\n    transform-origin: 0px 0px;\n    content: \'\xA0|\xA0\';\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_75:before*/\n\n#LI_77 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: inline-block;\n    height: 19px;\n    text-align: right;\n    width: 84.5px;\n    perspective-origin: 42.25px 9.5px;\n    transform-origin: 42.25px 9.5px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_77*/\n\n#LI_77:before {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: auto;\n    text-align: right;\n    width: auto;\n    perspective-origin: 0px 0px;\n    transform-origin: 0px 0px;\n    content: \'\xA0|\xA0\';\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_77:before*/\n\n#LI_79 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: inline-block;\n    height: 19px;\n    text-align: right;\n    width: 61.5px;\n    perspective-origin: 30.75px 9.5px;\n    transform-origin: 30.75px 9.5px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_79*/\n\n#LI_79:before {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: auto;\n    text-align: right;\n    width: auto;\n    perspective-origin: 0px 0px;\n    transform-origin: 0px 0px;\n    content: \'\xA0|\xA0\';\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_79:before*/\n\n#ASIDE_81 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: 54px;\n    position: relative;\n    width: 1326px;\n    perspective-origin: 663px 27px;\n    transform-origin: 663px 27px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    margin: 15px 0px 0px;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#ASIDE_81*/\n\n#DIV_82 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: 54px;\n    max-width: 960px;\n    width: 960px;\n    perspective-origin: 480px 27px;\n    transform-origin: 480px 27px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    margin: 0px 183px;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#DIV_82*/\n\n#DIV_83 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: flex;\n    height: 54px;\n    width: 975px;\n    align-content: stretch;\n    align-items: center;\n    justify-content: flex-start;\n    perspective-origin: 487.5px 27px;\n    transform-origin: 487.5px 27px;\n    border: 0px none rgb(148, 148, 148);\n    flex-flow: row wrap;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px 0px 0px -15px;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#DIV_83*/\n\n#DIV_84 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: 45px;\n    width: 487.5px;\n    align-self: center;\n    perspective-origin: 243.75px 22.5px;\n    transform-origin: 243.75px 22.5px;\n    border: 0px none rgb(148, 148, 148);\n    flex: 0 0 auto;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n    padding: 0px 0px 0px 15px;\n}/*#DIV_84*/\n\n#A_85 {\n    box-sizing: border-box;\n    color: rgb(0, 0, 0);\n    display: table;\n    height: 45px;\n    text-decoration: none;\n    width: 472px;\n    perspective-origin: 236px 22.5px;\n    transform-origin: 236px 22.5px;\n    border: 0px none rgb(0, 0, 0);\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(0, 0, 0) none 0px;\n}/*#A_85*/\n\n#IMG_86 {\n    box-sizing: border-box;\n    display: table-cell;\n    height: 45px;\n    vertical-align: middle;\n    width: 55px;\n    perspective-origin: 27.5px 22.5px;\n    transform-origin: 27.5px 22.5px;\n    font: normal normal normal normal 15px/19.9999980926514px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    padding: 0px 10px 0px 0px;\n}/*#IMG_86*/\n\n#H4_87 {\n    box-sizing: border-box;\n    display: table-cell;\n    height: 45px;\n    vertical-align: middle;\n    width: 417px;\n    perspective-origin: 208.5px 22.5px;\n    transform-origin: 208.5px 22.5px;\n    font: normal normal normal normal 20px/20px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 26.6000003814697px 0px 0px;\n}/*#H4_87*/\n\n#SMALL_88 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: block;\n    height: 54px;\n    text-align: right;\n    width: 487.5px;\n    align-self: center;\n    perspective-origin: 243.75px 27px;\n    transform-origin: 243.75px 27px;\n    border: 0px none rgb(148, 148, 148);\n    flex: 0 0 auto;\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n    padding: 0px 0px 0px 15px;\n}/*#SMALL_88*/\n\n#UL_89 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: 18px;\n    text-align: right;\n    width: 472.5px;\n    perspective-origin: 236.25px 9px;\n    transform-origin: 236.25px 9px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px;\n    outline: rgb(148, 148, 148) none 0px;\n    padding: 0px;\n}/*#UL_89*/\n\n#LI_90 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: inline-block;\n    height: 18px;\n    text-align: right;\n    width: 36.0625px;\n    perspective-origin: 18.03125px 9px;\n    transform-origin: 18.03125px 9px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_90*/\n\n#A_91, #A_93 {\n    box-sizing: border-box;\n    color: rgb(0, 0, 0);\n    text-align: right;\n    text-decoration: none;\n    border: 0px none rgb(0, 0, 0);\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(0, 0, 0) none 0px;\n}/*#A_91, #A_93*/\n\n#LI_92 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    display: inline-block;\n    height: 18px;\n    text-align: right;\n    width: 40.453125px;\n    perspective-origin: 20.21875px 9px;\n    transform-origin: 20.21875px 9px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_92*/\n\n#LI_92:before {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: auto;\n    text-align: right;\n    width: auto;\n    perspective-origin: 0px 0px;\n    transform-origin: 0px 0px;\n    content: \'\xA0|\xA0\';\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#LI_92:before*/\n\n#P_94, #P_95 {\n    box-sizing: border-box;\n    color: rgb(148, 148, 148);\n    height: 18px;\n    text-align: right;\n    width: 472.5px;\n    perspective-origin: 236.25px 9px;\n    transform-origin: 236.25px 9px;\n    border: 0px none rgb(148, 148, 148);\n    font: normal normal normal normal 12px/18px \'GE Inspira Sans\', sans-serif;\n    list-style: none outside none;\n    margin: 0px;\n    outline: rgb(148, 148, 148) none 0px;\n}/*#P_94, #P_95*/\n\n\n#MAIN_34 {\n    margin:0px auto !important;\n}\n</style>';
 singleItemModel = function (Backbone, constants) {
   var categoryMod = Backbone.Model.extend({
     initialize: function (opt) {
@@ -10925,7 +11177,7 @@ singleItemCtrl = function (bb, tmpl, utils, css, singleItemModel, absNuregoView,
   });
   return singleItem;
 }(backbone, text_singleItemHTML, utils, text_categoryCSS, singleItemModel, absNuregoView, jquery);
-text_absNuregoCss = '/* line 1, ../../../styles/main.scss */\r\nnurego-widget {\r\n  display: block;\r\n  height: 100%;\r\n  width: 100%;\r\n  flex:1;\r\n}\r\n\r\n/* line 7, ../../../styles/main.scss */\r\n.alert.ajaxErrorMsg {\r\n  position: relative;\r\n  z-index: 99999999999; \t\r\n  width: 90%;\r\n  margin: 45px auto;\r\n}\r\n\r\n/* line 12, ../../../styles/main.scss */\r\n#checkbox label {\r\n  line-height: 175%;\r\n}\r\n\r\n/******************CHECK BOXES ******************/\r\n';
+text_absNuregoCss = '/* line 1, ../../../styles/main.scss */\nnurego-widget {\n  display: block;\n  height: 100%;\n  width: 100%;\n  flex:1;\n}\n\n/* line 7, ../../../styles/main.scss */\n.alert.ajaxErrorMsg {\n  position: relative;\n  z-index: 99999999999; \t\n  width: 90%;\n  margin: 45px auto;\n}\n\n/* line 12, ../../../styles/main.scss */\n#checkbox label {\n  line-height: 175%;\n}\n\n/******************CHECK BOXES ******************/\n';
 Nurego = function (constants, utils, widgetFactory, loginModel, registrationModel, priceListModel, loginViewCtrl, priceListViewCtrl, registrationViewCtrl, tosViewCtrl, categoryViewCtrl, categoryModel, singleItemCtrl, singleItemModel, tosModel, tosStatusModel, absNuregoCss, $Nurego) {
   var app, lib;
   app = {};
@@ -11102,5 +11354,5 @@ Nurego = function (constants, utils, widgetFactory, loginModel, registrationMode
   });
   return app;
 }(constants, utils, widgetFactory, loginModel, registrationModel, priceListModel, loginViewCtrl, priceListViewCtrl, registrationViewCtrl, tosViewCtrl, categoryViewCtrl, categoryModel, singleItemCtrl, singleItemModel, tosModel, tosStatusModel, text_absNuregoCss, jquery);
-window.Nurego = Nurego;
+window.NuregoWidgts = NuregoWidgts;
 }());
