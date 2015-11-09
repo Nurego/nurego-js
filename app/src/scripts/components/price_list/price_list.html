@@ -268,7 +268,11 @@
 			        						{{	}else{ 	}}
 
 		        							{{	if(obj.urlParams["show_feature_price"] && plans[plan].features.map[features[item]].price != 0)	{	}}
+		        							<div class="featureItem cell">
+					        						<span>
 		        								${{=plans[plan].features.map[features[item]].price}} per unit
+		        									</span>
+		        							</div>
 		    								{{	}else{	}}	
 			    								<div class="featureItem cell">
 					        						<span class="nr-check nr-yes ion-checkmark"></span>
