@@ -252,14 +252,30 @@
 			        						{{	if(plans[plan].features.map[features[item]].max_unit) {	 }}
 				        						<div class="featureItem cell">
 					        						<span>
-					        							{{=plans[plan].features.map[features[item]].max_unit}}
+	    							{{if (plans[plan].features.map[features[item]].element_type == 'overage')  { }}
+	    								{{	if(!obj.urlParams["show_feature_price"])	{	}}
+	    									${{=plans[plan].features.map[features[item]].price}} per unit 
+	    									Up to {{=plans[plan].features.map[features[item]].max_unit}} units
+	    								{{	}else{	}}
+	    									Up to {{=plans[plan].features.map[features[item]].max_unit}} units
+	    								{{	}	}}
+	    							{{	}else{	}}
+	    								{{=plans[plan].features.map[features[item]].max_unit}}
+	    							{{	}	}}
+					        							
 					        						</span>
 						        				</div>
 			        						{{	}else{ 	}}
 
-					        					<div class="featureItem cell">
+		        							{{	if(obj.urlParams["show_feature_price"] && plans[plan].features.map[features[item]].price != 0)	{	}}
+		        								${{=plans[plan].features.map[features[item]].price}} per unit
+		    								{{	}else{	}}	
+			    								<div class="featureItem cell">
 					        						<span class="nr-check nr-yes ion-checkmark"></span>
 						        				</div>
+		    								{{	}	}}
+
+				        					
 
 					        				{{	}	}}
 
