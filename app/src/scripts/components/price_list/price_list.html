@@ -242,7 +242,13 @@
 		        		<div class="features">
 	        			{{if (plan.plan_type == "tiered") { }}
 
-		        			{{	}else{	}}
+	        					{{  for(var item in features) { }}
+	        								${{=plans[plan].features.map[features[item]].price}} per unit 
+	    									Up to {{=plans[plan].features.map[features[item]].max_unit}} units
+	        					{{	}	}}
+
+	        				<span></span>
+		        		{{	}else{	}}
 
 		        			{{  for(var item in features) { }}
 
