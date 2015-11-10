@@ -240,7 +240,7 @@
 		        			        		
 
 		        		<div class="features">
-	        			{{if (plan.plan_type == "tiered") { }}
+	        			{{if (plans[plan].plan_type == "tiered") { }}
 
 	        					{{  for(var item in plans[plan].features.data) { }}
 	        								${{=plans[plan].features.map[features[item]].price}} per unit 
