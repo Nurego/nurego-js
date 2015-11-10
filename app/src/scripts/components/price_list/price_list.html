@@ -148,6 +148,9 @@
 		display:none;
 	}
 
+	.period{
+		text-transform: uppercase;
+	}
 
 </style>
 
@@ -172,7 +175,9 @@
     		{{	if(plans[plan].features.map["recurring"])	{	}}
 				
 				<span class="planPrice">${{=plans[plan].features.map["recurring"].price}}</span>
-				<span class="priceRecurrence">/Month</span>
+				<span class="priceRecurrence">/ {{=plans[plan].features.map["recurring"].billing_period_interval}} </span>
+				<span class="period">{{=plans[plan].features.map["recurring"].period}} </span>
+			</div>
 
 			{{	}else if(plans[plan].price){ }}
 				
