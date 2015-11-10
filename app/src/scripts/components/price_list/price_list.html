@@ -269,27 +269,6 @@
 
 			        			{{	if([features[item]] != 'recurring') {	 }}		        				
 
-
-			        					{{	if(plans[plan].features.map[features[item]].name) {	 }}
-
-			        					
-		    							{{	if(obj.urlParams["show-feature-price"] && plans[plan].features.map[features[item]].price != 0)	{	}}
-		        							<div class="featureItem cell">
-					        						<span>
-		        								${{=plans[plan].features.map[features[item]].price}} per unit
-		        									</span>
-		        							</div>
-		    								{{	}else{	}}	
-			    								<div class="featureItem cell">
-					        						<span class="nr-check nr-yes ion-checkmark"></span>
-						        				</div>
-		    								{{	}	}}
-
-				        					
-
-					        				{{	}	}}
-
-
 				        				{{	if(plans[plan].features.map[features[item]].missingFeature){	}}
 											<div class="featureItemMissing cell">
 												<span class="nr-check nr-no ion-close "></span>
