@@ -179,8 +179,8 @@
     		{{	if(plans[plan].features.map["recurring"])	{	}}
 				
 				<span class="planPrice">${{=plans[plan].features.map["recurring"].price}}</span>
-				<span class="priceRecurrence">/ {{=plans[plan].features.map["recurring"].billing_period_interval}} </span>
-				<!-- <span class="period">{{=plans[plan].features.map["recurring"].period}} </span> -->
+<!-- 				<span class="priceRecurrence">/ {{=plans[plan].features.map["recurring"].billing_period_interval}} </span>
+ -->				<span class="period">{{=plans[plan].features.map["recurring"].period}} </span>
 
 			{{	}else if(plans[plan].price){ }}
 				
