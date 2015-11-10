@@ -240,6 +240,10 @@
 		        			        		
 
 		        		<div class="features">
+	        			{{if (plan.plan_type == "tiered") { }}
+
+		        			{{	}else{	}}
+
 		        			{{  for(var item in features) { }}
 
 
@@ -296,6 +300,8 @@
 
 
 		        			{{	}	}}
+
+	        			{{	}	}}
 		        		</div>
 
 		        		<div class="discount">
