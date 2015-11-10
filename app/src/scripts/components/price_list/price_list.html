@@ -245,9 +245,9 @@
 
 		        		<div class="features">
 	        			{{if (plans[plan].plan_type == "tiered") { }}
+	        					<div class="tieredWrapper">
 
 	        					{{  for(var featureItem in plans[plan].features.data) { }}
-	        					<div class="tieredWrapper">
 									<div class="featureItem featureTiered cell">
 		        						<span>
 		        							${{=plans[plan].features.data[featureItem].price}} per unit 
@@ -259,11 +259,11 @@
 
 		        						</span>
 	        						</div>
-	        					</div>
 			        				
 	        							
 	        					{{	}	}}
 
+	        					</div>
 
 
 
