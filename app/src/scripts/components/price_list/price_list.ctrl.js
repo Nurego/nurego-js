@@ -196,6 +196,7 @@ define(["backbone","text!priceListHTML","utils",
 		  render: function(){
 		  	var sso = utils.URLToArray(window.location.href).sso;
 		  	this.model.set('urlParams',this.params);
+		  	console.log(this.model.attributes);
 		  	var html = this.template(this.model.attributes);
 		    this.$el.html(	html );
 		    this.bindEvents()
