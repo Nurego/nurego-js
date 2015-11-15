@@ -48,7 +48,8 @@ require.config({
         prism: '../../bower_components/prism/prism',
         'jquery-icheck': '../../bower_components/jquery-icheck/icheck.min',
         iCheck: '../../bower_components/iCheck/icheck.min',
-        'font-awesome': '../../bower_components/font-awesome/fonts/*'
+        'font-awesome': '../../bower_components/font-awesome/fonts/*',
+        unslider: '../../bower_components/unslider/src/unslider.min'
     },
     shim: {
         backbone: {
@@ -57,6 +58,12 @@ require.config({
                 'jquery'
             ],
             exports: 'Backbone'
+        },
+        unslider: {
+            exports: 'flexslider',
+            deps: [
+                'jquery'
+            ]
         },
         jquery: {
             exports: '$Nurego'

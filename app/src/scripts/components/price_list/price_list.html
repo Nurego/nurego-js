@@ -156,8 +156,11 @@
     	min-height: 50px;
 	}
 
+	.tieredWrapper ul{
+		padding:0px;
+		margin:0px;
+	}
 	.featureItem.featureTiered.cell {
-	    position: absolute;
 	    width: 100%;
 	}
 
@@ -254,10 +257,10 @@
 
 		        		<div class="features">
 	        			{{if (plans[plan].plan_type == "tiered") { }}
-	        					<div class="tieredWrapper">
-
+	        				<div class="tieredWrapper">
+	        					<ul>
 	        					{{  for(var featureItem in plans[plan].features.data) { }}
-									<div class="featureItem featureTiered cell">
+									<li class="featureItem featureTiered cell">
 		        						<span>
 		        							${{=plans[plan].features.data[featureItem].price}} per unit 
 		        							{{if (plans[plan].features.data[featureItem].max_unit != 0) { }}
@@ -267,12 +270,12 @@
 		        							{{	}	}}
 
 		        						</span>
-	        						</div>
-			        				
-	        							
+	        						</li>
 	        					{{	}	}}
+			        				
+    							</ul>
 
-	        					</div>
+	        				</div>
 
 
 

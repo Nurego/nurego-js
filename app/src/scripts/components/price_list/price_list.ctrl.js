@@ -1,7 +1,7 @@
 define(["backbone","text!priceListHTML","utils",
 		"text!priceListCSS","tosModel",
-		"absNuregoView","text!priceListSingleTierHTML","jquery"],
-		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
+		"absNuregoView","text!priceListSingleTierHTML","jquery","unslider"],
+		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego,unslider){
 		var priceList = absNuregoView.extend({
 		  tagName: "div",
 		  className: "login",
@@ -10,8 +10,8 @@ define(["backbone","text!priceListHTML","utils",
 		    "click .plan-select":   "registration",
 		    "click .terms":   "openTerms",
 		    "click .postNoSSo" : "postRegistration"
-		  },
-
+		  }, 
+ 
 		  initialize: function(model,customTmpl){
 		  	//this.__super__.initialize.apply(this);
 		  	this.params = utils.URLToArray(window.location.href);
@@ -46,6 +46,9 @@ define(["backbone","text!priceListHTML","utils",
 		    }); 
 		    this.initStyle();
 		    this.addStyle();
+		    $Nurego(document).ready(function(){
+		    	$Nurego('.tieredWrapper').unslider();
+		    })
 		  },
 		  
 		  openTerms:function(){
