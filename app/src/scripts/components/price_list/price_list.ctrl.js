@@ -47,10 +47,10 @@ define(["backbone","text!priceListHTML","utils",
 		    this.initStyle();
 		    this.addStyle();
 		    $Nurego(document).ready(function(){
-		    	$Nurego('.tieredWrapper').unslider();
+		    	$Nurego('.tieredWrapper').unslider({autoplay: true});
 		    })
 		  },
-		  
+
 		  openTerms:function(){
 		  	var url = this.params['terms-of-service-url'];
 		  	if(url.indexOf('http') == -1){//Doron: Absolute URL

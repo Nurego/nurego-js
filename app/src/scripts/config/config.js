@@ -49,7 +49,7 @@ require.config({
         'jquery-icheck': '../../bower_components/jquery-icheck/icheck.min',
         iCheck: '../../bower_components/iCheck/icheck.min',
         'font-awesome': '../../bower_components/font-awesome/fonts/*',
-        unslider: '../../bower_components/unslider/src/unslider.min'
+        unslider: '../../bower_components/unslider/src/unslider'
     },
     shim: {
         backbone: {
@@ -60,7 +60,7 @@ require.config({
             exports: 'Backbone'
         },
         unslider: {
-            exports: 'flexslider',
+            exports: 'unslider',
             deps: [
                 'jquery'
             ]
