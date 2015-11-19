@@ -1,4 +1,4 @@
-var Nurego = window.Nurego = {
+var NuregoWidgets = window.NuregoWidgets = {
 	options:{},
 	init:function(opt){
 		this.options = opt;
@@ -88,19 +88,19 @@ Nurego.init = function(config){
 		}
 	</script>
 </iframe>
- 
 
- 
+
+
 
 <iframe="http://nurego.com/widgets/pricelist#&parent=https://mydomain.com&css=css.css&html=html.css" name="priceList">
-	
+
 	<script>
 		var html = "thisHtmlTemplate";
 		var NuregoLib = window.addEventListener('message',function(e){
 			var NuregoLib = e.data;
 		})
 	</script>
-	
+
 	{
 		html : ?,
 		css: ?,

@@ -43,12 +43,13 @@ require.config({
         absHTML: '../components/abstract/abstract.html',
         absNuregoView: '../components/abstract/abstract.view',
         absNuregoCss: '../components/abstract/main.css',
-        Nurego: '../app',
+        NuregoWidgets: '../app',
         almond: '../../bower_components/almond/almond',
         prism: '../../bower_components/prism/prism',
         'jquery-icheck': '../../bower_components/jquery-icheck/icheck.min',
         iCheck: '../../bower_components/iCheck/icheck.min',
-        'font-awesome': '../../bower_components/font-awesome/fonts/*'
+        'font-awesome': '../../bower_components/font-awesome/fonts/*',
+        unslider: '../../bower_components/unslider/src/unslider'
     },
     shim: {
         backbone: {
@@ -57,6 +58,12 @@ require.config({
                 'jquery'
             ],
             exports: 'Backbone'
+        },
+        unslider: {
+            exports: 'unslider',
+            deps: [
+                'jquery'
+            ]
         },
         jquery: {
             exports: '$Nurego'

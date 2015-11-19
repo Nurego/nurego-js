@@ -148,6 +148,24 @@
 		display:none;
 	}
 
+	.period{
+		text-transform: uppercase;
+	}
+	.tieredWrapper {
+    position: relative;
+    min-height: 50px;
+    margin: 0px 0px 0px 1px;
+    border: 1px solid #E8E8E8;
+	}
+
+	.tieredWrapper ul{
+		padding:0px;
+		margin:0px;
+	}
+	.featureItem.featureTiered.cell {
+	    width: 100%;
+    	border: 0px;
+	}
 
 </style>
 
@@ -172,7 +190,8 @@
     		{{	if(plans[plan].features.map["recurring"])	{	}}
 				
 				<span class="planPrice">${{=plans[plan].features.map["recurring"].price}}</span>
-				<span class="priceRecurrence">/Month</span>
+<!-- 				<span class="priceRecurrence">/ {{=plans[plan].features.map["recurring"].billing_period_interval}} </span>
+ -->			<span class="priceRecurrence"> / {{=plans[plan].features.map["recurring"].period}} </span>
 
 			{{	}else if(plans[plan].price){ }}
 				
@@ -240,6 +259,67 @@
 		        			        		
 
 		        		<div class="features">
+	        			{{if (plans[plan].plan_type == "tiered") { }}
+	        				<div class="tieredWrapper">
+	        					<ul>
+	        					{{  for(var featureItem in plans[plan].features.data) { }}
+									<li class="featureItem featureTiered cell">
+		        						<span>
+		        							${{=plans[plan].features.data[featureItem].price}} per unit 
+		        							{{if (plans[plan].features.data[featureItem].max_unit != 0) { }}
+												Up to {{=plans[plan].features.data[featureItem].max_unit}} units
+		        							{{	}else{	}}
+	    										from {{=plans[plan].features.data[featureItem].min_unit}}
+		        							{{	}	}}
+
+		        						</span>
+	        						</li>
+	        					{{	}	}}
+			        				
+    							</ul>
+
+	        				</div>
+
+
+
+
+
+
+	        					{{  for(var item in features) { }}
+
+
+
+			        			{{	if([features[item]] != 'recurring') {	 }}		        				
+
+				        				{{	if(plans[plan].features.map[features[item]].missingFeature){	}}
+											<div class="featureItemMissing cell">
+												<span class="nr-check nr-no ion-close "></span>
+				        					</div>
+										{{	}	}}			        						        			
+
+								{{	}	}}
+
+
+
+		        			{{	}	}}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		        		{{	}else{	}}
+
 		        			{{  for(var item in features) { }}
 
 
@@ -252,14 +332,34 @@
 			        						{{	if(plans[plan].features.map[features[item]].max_unit) {	 }}
 				        						<div class="featureItem cell">
 					        						<span>
-					        							{{=plans[plan].features.map[features[item]].max_unit}}
+	    							{{if (plans[plan].features.map[features[item]].element_type == 'overage')  { }}
+	    								{{	if(!obj.urlParams["show-feature-price"])	{	}}
+	    									${{=plans[plan].features.map[features[item]].price}} per unit 
+	    									Up to {{=plans[plan].features.map[features[item]].max_unit}} units
+	    								{{	}else{	}}
+	    									Up to {{=plans[plan].features.map[features[item]].max_unit}} units
+	    								{{	}	}}
+	    							{{	}else{	}}
+	    								{{=plans[plan].features.map[features[item]].max_unit}}
+	    							{{	}	}}
+					        							
 					        						</span>
 						        				</div>
 			        						{{	}else{ 	}}
 
-					        					<div class="featureItem cell">
+		        							{{	if(obj.urlParams["show-feature-price"] && plans[plan].features.map[features[item]].price != 0)	{	}}
+		        							<div class="featureItem cell">
+					        						<span>
+		        								${{=plans[plan].features.map[features[item]].price}} per unit
+		        									</span>
+		        							</div>
+		    								{{	}else{	}}	
+			    								<div class="featureItem cell">
 					        						<span class="nr-check nr-yes ion-checkmark"></span>
 						        				</div>
+		    								{{	}	}}
+
+				        					
 
 					        				{{	}	}}
 
@@ -276,6 +376,8 @@
 
 
 		        			{{	}	}}
+
+	        			{{	}	}}
 		        		</div>
 
 		        		<div class="discount">

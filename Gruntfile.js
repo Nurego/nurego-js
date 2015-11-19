@@ -64,7 +64,7 @@ module.exports = function (grunt){
                 outputFile = data.path,
                 cleanedCode = amdclean.clean({
                   'filePath': outputFile,
-                  'globalModules':["Nurego"]
+                  'globalModules':["NuregoWidgets"]
                 });
 
               fs.writeFileSync(outputFile, cleanedCode);
@@ -76,7 +76,7 @@ module.exports = function (grunt){
               //requireLib: 'app/src/bower_components/requirejs/require'
               //requireLib: '../../bower_components/requirejs/require'
             },
-            include: ["Nurego"],
+            include: ["NuregoWidgets"],
             //include:["requireLib"],
             stubModules: ['text'],
             //findNestedDependencies: true,
@@ -418,7 +418,7 @@ module.exports = function (grunt){
       //}
     //},
 
-    
+
     // Copies remaining files to places other tasks can use
     copy: {
       dist: {

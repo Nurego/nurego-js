@@ -1,7 +1,7 @@
 define(["backbone","text!priceListHTML","utils",
 		"text!priceListCSS","tosModel",
-		"absNuregoView","text!priceListSingleTierHTML","jquery"],
-		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
+		"absNuregoView","text!priceListSingleTierHTML","jquery","unslider"],
+		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego,unslider){
 		var priceList = absNuregoView.extend({
 		  tagName: "div",
 		  className: "login",
@@ -10,8 +10,8 @@ define(["backbone","text!priceListHTML","utils",
 		    "click .plan-select":   "registration",
 		    "click .terms":   "openTerms",
 		    "click .postNoSSo" : "postRegistration"
-		  },
-
+		  }, 
+ 
 		  initialize: function(model,customTmpl){
 		  	//this.__super__.initialize.apply(this);
 		  	this.params = utils.URLToArray(window.location.href);
@@ -46,8 +46,11 @@ define(["backbone","text!priceListHTML","utils",
 		    }); 
 		    this.initStyle();
 		    this.addStyle();
+		    $Nurego(document).ready(function(){
+		    	$Nurego('.tieredWrapper').unslider({autoplay: true});
+		    })
 		  },
-		  
+
 		  openTerms:function(){
 		  	var url = this.params['terms-of-service-url'];
 		  	if(url.indexOf('http') == -1){//Doron: Absolute URL
@@ -196,6 +199,7 @@ define(["backbone","text!priceListHTML","utils",
 		  render: function(){
 		  	var sso = utils.URLToArray(window.location.href).sso;
 		  	this.model.set('urlParams',this.params);
+		  	console.log(this.model.attributes);
 		  	var html = this.template(this.model.attributes);
 		    this.$el.html(	html );
 		    this.bindEvents()
