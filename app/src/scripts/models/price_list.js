@@ -31,6 +31,36 @@ define(["backbone","constants"],function(Backbone,constants){
 
         parse:function(data,req){
 
+                function isTieredFeature(feature,tiersArr){
+                    var ans = false;
+                    for(var i = 0; i<tiersArr.length; i++){
+                        if(tiersArr[i].id == feature.id){
+                            ans = true;
+                            break;
+                        }
+                    }
+                    return ans;
+                };
+
+                function joinTieredFeatures(plans){
+                    
+                    for(var i = 0; i<plans.length;i++){
+                        var tempArr = [];
+                        for(var j = 0; j<plans[i].features.data.length; j++){
+                            var feature = plans[i].features.data[j];
+                            var featureId = feature.id;
+                            if(j == 0){
+                                tempArr.push(feature);
+                            }else if(isTieredFeature(feature,tempArr)){
+                                tempArr.push(feature);
+                            }
+                        }
+                        if(tempArr.length > 1){
+                            plans[i].features.tiered = tempArr;
+                        }
+                    }
+                    return plans;
+                }
         	   
         	   function containsFeature(featuresArr,featuresObj){
         	   		var ans = false;
@@ -78,6 +108,7 @@ define(["backbone","constants"],function(Backbone,constants){
 
 		        }
 
+                var plansParsedTieredPlans = joinTieredFeatures(raw_plans);
 
 		        return {
 		            offering_description: response.description,

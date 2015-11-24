@@ -26,6 +26,7 @@
 	  	-webkit-flex: 1;
 		text-align:center;
 		color:#9799A2;
+		min-width: 160px;
 	}
 
 	.plansHeader .header{
@@ -183,31 +184,17 @@
 
 <div class="priceHeaders headers">
 			<div class="price header cell">
-				Price
+				Base Price
 			</div>
 	{{  for(var plan in plans) { }}		        		
     		<div class="header cell">
-    		{{	if(plans[plan].features.map["recurring"])	{	}}
-				
-				<span class="planPrice">${{=plans[plan].features.map["recurring"].price}}</span>
-<!-- 				<span class="priceRecurrence">/ {{=plans[plan].features.map["recurring"].billing_period_interval}} </span>
- -->			<span class="priceRecurrence"> / {{=plans[plan].features.map["recurring"].period}} </span>
-
-			{{	}else if(plans[plan].price){ }}
+    		{{	if(plans[plan].price != "undefined")	{	}}
 				
 				<span class="planPrice">${{=plans[plan].price}}</span>
+ 				<span class="priceRecurrence"> / {{=plans[plan].billing_period}} </span>
 
-			{{	}else{	}}
-
-				{{  for(var item in plans[plan].features.data) { }}		        		
-
-					{{	if(plans[plan].features.data[item].element_type === "recurring"){	}}
-							<span class="planPrice">${{=plans[plan].features.data[item].price}}</span>
-					{{	}	}}
-
-				{{	}	}}
-
-			{{	}	}}
+			{{	} }}
+				
     		</div>
     		
 	{{ 	}	}}
@@ -259,17 +246,17 @@
 		        			        		
 
 		        		<div class="features">
-	        			{{if (plans[plan].plan_type == "tiered") { }}
+	        			{{if (plans[plan].features.tiered) { }}
 	        				<div class="tieredWrapper">
 	        					<ul>
-	        					{{  for(var featureItem in plans[plan].features.data) { }}
+	        					{{  for(var featureItem in plans[plan].features.tiered) { }}
 									<li class="featureItem featureTiered cell">
 		        						<span>
-		        							${{=plans[plan].features.data[featureItem].price}} per unit 
-		        							{{if (plans[plan].features.data[featureItem].max_unit != 0) { }}
-												Up to {{=plans[plan].features.data[featureItem].max_unit}} units
+		        							${{=plans[plan].features.tiered[featureItem].price}} per unit 
+		        							{{if (plans[plan].features.tiered[featureItem].max_unit != 0) { }}
+												Up to {{=plans[plan].features.tiered[featureItem].max_unit}} units
 		        							{{	}else{	}}
-	    										from {{=plans[plan].features.data[featureItem].min_unit}}
+	    										from {{=plans[plan].features.tiered[featureItem].min_unit}}
 		        							{{	}	}}
 
 		        						</span>
