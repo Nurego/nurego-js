@@ -10545,7 +10545,6 @@ priceListModel = function (Backbone, constants) {
         };
       }
       var parsed = customParser(data);
-      console.log(parsed);
       return parsed;
     }
   });

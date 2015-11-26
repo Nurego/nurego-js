@@ -83,9 +83,6 @@ define(["backbone","constants"],function(Backbone,constants){
 		    }
 
 		    var parsed = customParser(data);
-
-
-            console.log(parsed);
 		    return parsed;
         }
 
@@ -95,4 +92,3 @@ define(["backbone","constants"],function(Backbone,constants){
 
 });
 
-//TODO: solve when more then one tiered feature. (features.tiered can have many different tiered features)
