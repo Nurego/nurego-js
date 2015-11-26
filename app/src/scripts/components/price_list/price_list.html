@@ -170,6 +170,30 @@
 
 </style>
 
+<!--Credit cards template
+<div class="ccHeaders headers">
+			<div class="price header cell" title="Credit Cards">
+				Credit Card
+			</div>
+	{{  for(var plan in plans) { }}		        		
+    		
+    		<div class="header cell">
+				{{if (plans[plan].credit_card) { }} 
+				
+					<span class="nr-check nr-yes ion-checkmark"></span>
+
+    			{{	}else{	}}
+
+    				<span class="nr-check nr-no ion-close "></span>
+
+    			{{	}	}}
+
+    		</div>
+
+	{{ 	}	}}
+</div-->
+
+
 <div class="plansHeader headers">
 			<div class="featuresHeader header cell">
 				
@@ -200,39 +224,15 @@
 	{{ 	}	}}
 </div>
 
-<!--div class="ccHeaders headers">
-			<div class="price header cell" title="Credit Cards">
-				Credit Card
-			</div>
-	{{  for(var plan in plans) { }}		        		
-    		
-    		<div class="header cell">
-				{{if (plans[plan].credit_card) { }} 
-				
-					<span class="nr-check nr-yes ion-checkmark"></span>
-
-    			{{	}else{	}}
-
-    				<span class="nr-check nr-no ion-close "></span>
-
-    			{{	}	}}
-
-    		</div>
-
-	{{ 	}	}}
-</div-->
-
 
 <div class="tableWrapper">
 			
 			<div class="featuresCol">
 				{{  for(var item in features) { }}
 		        	
-		        	{{	if([features[item]] != 'recurring') {	 }}
 		        		<div class="featureName cell" title="{{=features[item]}}">
-							{{=features[item]}}
+							{{=features[item].name}}
 		        		</div>
-		        	{{	}	}}
 
 		        {{  } }}
 	
@@ -246,125 +246,66 @@
 		        			        		
 
 		        		<div class="features">
-	        			{{if (plans[plan].features.tiered) { }}
-	        				<div class="tieredWrapper">
-	        					<ul>
-	        					{{  for(var featureItem in plans[plan].features.tiered) { }}
-									<li class="featureItem featureTiered cell">
-		        						<span>
-		        							${{=plans[plan].features.tiered[featureItem].price}} per unit 
-		        							{{if (plans[plan].features.tiered[featureItem].max_unit != 0) { }}
-												Up to {{=plans[plan].features.tiered[featureItem].max_unit}} units
-		        							{{	}else{	}}
-	    										from {{=plans[plan].features.tiered[featureItem].min_unit}}
-		        							{{	}	}}
+	        		
+						<!-- For each featuer in this plan print the feature cell-->
 
-		        						</span>
-	        						</li>
-	        					{{	}	}}
-			        				
-    							</ul>
+		        		{{  for(var item in features) { }}
 
-	        				</div>
+		        			<!-- print missing feature if is missing -->
+
+		        			{{	if(typeof(plans[plan].features.grouped[features[item].id]) == "undefined"){	}}
+									<div class="featureItemMissing cell" title="{{=features[item].name}}">
+										<span class="nr-check nr-no ion-close "></span>
+		        					</div>
+							{{	}else{	}}
 
 
+								<!-- if not nissing and is a tiered feature - print all tiers for this feature -->
+								{{ if(plans[plan].features.grouped[features[item].id].length > 1) { }}
 
 
+									<div class="tieredWrapper">
+			        					<ul>
+			        					{{  for(var featureItem in plans[plan].features.grouped[features[item].id] ) { }}
+											<li class="featureItem featureTiered cell" title="{{=features[item].name}}">
+				        						<span>
+				        							${{=plans[plan].features.grouped[features[item].id][featureItem].price}} per unit 
+				        							{{if (plans[plan].features.grouped[features[item].id][featureItem].max_unit != 0) { }}
+														Up to {{=plans[plan].features.grouped[features[item].id][featureItem].max_unit}} units
+				        							{{	}else{	}}
+			    										from {{=plans[plan].features.grouped[features[item].id][featureItem].min_unit}}
+				        							{{	}	}}
+
+				        						</span>
+			        						</li>
+			        					{{	}	}}
+					        				
+		    							</ul>
+
+			        				</div>
 
 
-	        					{{  for(var item in features) { }}
+			        			<!-- not missing and not tiered so print what you can -->
+
+								{{	}else{	}}
 
 
+        							<div class="featureItemMissing cell" title="{{=features[item].name}}">
+										<span class="nr-check nr-yes ion-checkmark"></span>
+		        					</div>
 
-			        			{{	if([features[item]] != 'recurring') {	 }}		        				
-
-				        				{{	if(plans[plan].features.map[features[item]].missingFeature){	}}
-											<div class="featureItemMissing cell">
-												<span class="nr-check nr-no ion-close "></span>
-				        					</div>
-										{{	}	}}			        						        			
 
 								{{	}	}}
 
 
 
-		        			{{	}	}}
 
+							{{	}	}}			
 
+						
 
+		        		{{ } }}
 
-
-
-
-
-
-
-
-
-
-
-
-
-		        		{{	}else{	}}
-
-		        			{{  for(var item in features) { }}
-
-
-
-			        			{{	if([features[item]] != 'recurring') {	 }}		        				
-
-
-			        					{{	if(plans[plan].features.map[features[item]].name) {	 }}
-
-			        						{{	if(plans[plan].features.map[features[item]].max_unit) {	 }}
-				        						<div class="featureItem cell">
-					        						<span>
-	    							{{if (plans[plan].features.map[features[item]].element_type == 'overage')  { }}
-	    								{{	if(!obj.urlParams["show-feature-price"])	{	}}
-	    									${{=plans[plan].features.map[features[item]].price}} per unit 
-	    									Up to {{=plans[plan].features.map[features[item]].max_unit}} units
-	    								{{	}else{	}}
-	    									Up to {{=plans[plan].features.map[features[item]].max_unit}} units
-	    								{{	}	}}
-	    							{{	}else{	}}
-	    								{{=plans[plan].features.map[features[item]].max_unit}}
-	    							{{	}	}}
-					        							
-					        						</span>
-						        				</div>
-			        						{{	}else{ 	}}
-
-		        							{{	if(obj.urlParams["show-feature-price"] && plans[plan].features.map[features[item]].price != 0)	{	}}
-		        							<div class="featureItem cell">
-					        						<span>
-		        								${{=plans[plan].features.map[features[item]].price}} per unit
-		        									</span>
-		        							</div>
-		    								{{	}else{	}}	
-			    								<div class="featureItem cell">
-					        						<span class="nr-check nr-yes ion-checkmark"></span>
-						        				</div>
-		    								{{	}	}}
-
-				        					
-
-					        				{{	}	}}
-
-				        				{{	}	}}
-
-				        				{{	if(plans[plan].features.map[features[item]].missingFeature){	}}
-											<div class="featureItemMissing cell">
-												<span class="nr-check nr-no ion-close "></span>
-				        					</div>
-										{{	}	}}			        						        			
-
-								{{	}	}}
-
-
-
-		        			{{	}	}}
-
-	        			{{	}	}}
 		        		</div>
 
 		        		<div class="discount">
@@ -383,11 +324,9 @@
 						</div>
 						{{	}	}}
 			</div>
-	{{  } }}
+	{{ }  }}
 
-	
 </div>
-
 
 <div class="emailWrapper">
 	<h4 class="">Please enter your Email:</h4>

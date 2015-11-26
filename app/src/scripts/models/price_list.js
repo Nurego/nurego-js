@@ -31,93 +31,61 @@ define(["backbone","constants"],function(Backbone,constants){
 
         parse:function(data,req){
 
-                function isTieredFeature(feature,tiersArr){
-                    var ans = false;
-                    for(var i = 0; i<tiersArr.length; i++){
-                        if(tiersArr[i].id == feature.id){
-                            ans = true;
-                            break;
-                        }
-                    }
-                    return ans;
-                };
 
-                function joinTieredFeatures(plans){
-                    
+            function joinTieredFeatures(plans){
                     for(var i = 0; i<plans.length;i++){
-                        var tempArr = [];
-                        for(var j = 0; j<plans[i].features.data.length; j++){
-                            var feature = plans[i].features.data[j];
-                            var featureId = feature.id;
-                            if(j == 0){
-                                tempArr.push(feature);
-                            }else if(isTieredFeature(feature,tempArr)){
-                                tempArr.push(feature);
-                            }
+                        var featuresArr = plans[i].features.data;
+                        var groupedFeatures = _.groupBy(featuresArr,'id');
+                        if(groupedFeatures.id){
+                            //recurring element not needed
+                            delete groupedFeatures.id;
                         }
-                        if(tempArr.length > 1){
-                            plans[i].features.tiered = tempArr;
-                        }
+                        plans[i].features.grouped = groupedFeatures;
                     }
                     return plans;
                 }
         	   
-        	   function containsFeature(featuresArr,featuresObj){
-        	   		var ans = false;
-        	   		_.each(featuresArr,function(feature){
-        	   			if(feature === featuresObj.name){
-        	   				ans = true;
-        	   			}
-        	   		})
-        	   		return ans;
-        	   }
+              function getOfferingFeatures(plans){
+                    var allFtrsArr = [];
+                    for(var i = 0; i<plans.length;i++){
+                        var planFeaturesArr = plans[i].features.data;
+                        for(var j = 0; j<planFeaturesArr.length; j++){
+                            allFtrsArr.push({
+                                id:plans[i].features.data[j].id,
+                                name:plans[i].features.data[j].name
+                            });
+                        }
+                    }
 
-        	   function getMissingFeatures(plan_features,featuresArr){
-        	   		return _.difference(featuresArr,plan_features);
-        	   		
-        	   }
+                    var groupedFtrs = _.groupBy(allFtrsArr,"id");
+                    var uniqFtrs = [];
+                    _.each(groupedFtrs,function(ftr){
+                        var uFtr = _.uniq(ftr, function(item, key, a) {
+                             return item.a;
+                        });
+                        if(uFtr[0].name != "recurring"){
+                            uniqFtrs.push(uFtr[0])
+                        }
+                    });
+                    return uniqFtrs;
+               }
 
         	   function customParser(response) {
 		        var raw_plans = response.plans.data;
-		        var features = [];
-		        var plans = [];
-
-		        //Get all features
-		        for (var i = 0; i < raw_plans.length; i++) {
-		                var plan_features = raw_plans[i].features.data;
-		                raw_plans[i].features.map = {};
-
-		                for (j = 0; j < plan_features.length; j++) {
-		                		raw_plans[i].features.map[plan_features[j].name] = plan_features[j] ;
-		                    	if(!containsFeature(features,plan_features[j])){
-		                    		features.push(plan_features[j].name);	
-		                    	}
-		                }
-		        }
-
-		        //_.reduce(data, function (o, item) { o[item.key] = item.value; return o }, {})
-
-
-		        // add empty features to plans
-		       for (var i = 0; i < raw_plans.length; i++) {
-		                var featuresList = _.keys(raw_plans[i].features.map);
-		                var featuresArr = getMissingFeatures(featuresList,features);
-		                _.each(featuresArr,function(item){  
-		                	raw_plans[i].features.map[item] = {missingFeature:item};
-		                })
-
-		        }
-
+                var offeringFeatures = getOfferingFeatures(raw_plans);
                 var plansParsedTieredPlans = joinTieredFeatures(raw_plans);
 
 		        return {
 		            offering_description: response.description,
-		            features: features,
-		            plans: raw_plans
+		            features: offeringFeatures,
+		            plans: plansParsedTieredPlans
 		        };
 		    }
 
 		    var parsed = customParser(data);
+
+
+            console.log(parsed);
 		    return parsed;
         }
 
@@ -126,3 +94,5 @@ define(["backbone","constants"],function(Backbone,constants){
     return priceListModel;
 
 });
+
+//TODO: solve when more then one tiered feature. (features.tiered can have many different tiered features)

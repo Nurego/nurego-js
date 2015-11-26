@@ -47,7 +47,7 @@ define(["backbone","text!priceListHTML","utils",
 		    this.initStyle();
 		    this.addStyle();
 		    $Nurego(document).ready(function(){
-		    	$Nurego('.tieredWrapper').unslider({autoplay: true});
+		    	$Nurego('.tieredWrapper').unslider({autoplay: false});
 		    })
 		  },
 
