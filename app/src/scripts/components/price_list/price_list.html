@@ -168,6 +168,21 @@
     	border: 0px;
 	}
 
+	.featureItem.featureTiered {
+		visibility: hidden;
+		position:absolute;
+	    opacity: 0;
+	}
+
+	.featureItem.featureTiered.active {
+		visibility: visible;
+	   -webkit-transition: opacity 0.65s ease-in-out;
+	    -moz-transition: opacity 0.65s ease-in-out;
+	    -ms-transition: opacity 0.65s ease-in-out;
+	    -o-transition: opacity 0.65s ease-in-out;
+	     opacity: 1;
+	}
+
 </style>
 
 <!--Credit cards template
@@ -290,9 +305,53 @@
 								{{	}else{	}}
 
 
-        							<div class="featureItemMissing cell" title="{{=features[item].name}}">
-										<span class="nr-check nr-yes ion-checkmark"></span>
-		        					</div>
+	    							
+									{{ if(plans[plan].features.grouped[features[item].id][0].max_unit) { }}
+										<div class="featureItem cell">
+				        					<span>
+										{{if (plans[plan].features.grouped[features[item].id][0].element_type == 'overage')  { }}
+		    								{{	if(!obj.urlParams["show-feature-price"])	{	}}
+		    									${{=plans[plan].features.grouped[features[item].id][0].price}} per unit 
+		    									Up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
+		    								{{	}else{	}}
+		    									Up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
+		    								{{	}	}}
+		    							{{	}else{	}}
+		    								{{=plans[plan].features.grouped[features[item].id][0].max_unit}}
+		    							{{	}	}}
+		    								</span>
+		    							</div>
+									{{	}else{	}}
+
+										{{	if(obj.urlParams["show-feature-price"] && plans[plan].features.grouped[features[item].id][0].price != 0)	{	}}
+
+										<div class="featureItem cell">
+					        						<span>
+		        								${{=plans[plan].features.grouped[features[item].id][0]}} per unit
+		        									</span>
+		        							</div>
+
+		        						{{	}	}}
+
+		        						{{	if(plans[plan].features.grouped[features[item].id][0].type == "constant")	{	}}
+
+										<div class="featureItem cell">
+					        						<span>
+		        								{{=plans[plan].features.grouped[features[item].id][0].value}}
+		        									</span>
+		        							</div>
+
+
+										{{	}else{	}}
+
+		        							<div class="featureItemMissing cell" title="{{=features[item].name}}">
+												<span class="nr-check nr-yes ion-checkmark"></span>
+				        					</div>
+
+										{{	}	}}
+
+									{{  }  }}
+
 
 
 								{{	}	}}
@@ -312,7 +371,7 @@
 		        			
 		        			{{for (item in plans[plan].discounts.data) { }}
 								<div class="header planDiscount cell">
-									<span>{{=plans[plan].discounts.data[item].days_to_apply}} days</span>
+									<span>{{=plans[plan].discounts.data[item].days_to_apply}} Days</span>
 									<span>FREE TRIAL</span>
 					    		</div>
 							{{	}	}}
@@ -320,7 +379,7 @@
 
 		        		{{	if(!obj.urlParams["preview"]) {	}}
 		        		<div class="subscribeToPlan">
-							<span class="plan-select" data-id="{{=plans[plan].id}}">subscribe</span>
+							<span class="plan-select" data-id="{{=plans[plan].id}}">Subscribe</span>
 						</div>
 						{{	}	}}
 			</div>

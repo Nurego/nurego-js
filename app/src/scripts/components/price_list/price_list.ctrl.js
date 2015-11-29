@@ -1,7 +1,7 @@
 define(["backbone","text!priceListHTML","utils",
 		"text!priceListCSS","tosModel",
-		"absNuregoView","text!priceListSingleTierHTML","jquery","unslider"],
-		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego,unslider){
+		"absNuregoView","text!priceListSingleTierHTML","jquery"],
+		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
 		var priceList = absNuregoView.extend({
 		  tagName: "div",
 		  className: "login",
@@ -47,7 +47,29 @@ define(["backbone","text!priceListHTML","utils",
 		    this.initStyle();
 		    this.addStyle();
 		    $Nurego(document).ready(function(){
-		    	$Nurego('.tieredWrapper').unslider({autoplay: false});
+		    	//$Nurego('.tieredWrapper').unslider({autoplay: true});
+		    	var initCarousel = function(carWrapper){
+		    		var carWrapperEl = $Nurego(carWrapper);
+		    		//initial active slider is first one
+		    		carWrapperEl.find('li:first-child').addClass('active'); 
+		    		var callback = function(){
+		    			var activeEl = carWrapperEl.find('.active');
+		    			if(activeEl.next().length != 0){
+		    				activeEl.removeClass('active');
+		    				activeEl.next().addClass('active');
+		    			}else{
+		    				activeEl.removeClass('active');
+							carWrapperEl.find('li:first-child').addClass('active');
+		    			}
+		    		}
+		    		setInterval(callback,3500);
+		    	}
+
+		    	var tieredCells = $Nurego('.tieredWrapper');
+		    	for (var i = 0; i<tieredCells.length; i++){
+		    		initCarousel(tieredCells[i])
+		    	}
+
 		    })
 		  },
 
