@@ -305,9 +305,10 @@
 								{{	}else{	}}
 
 
-	    							
+									<!-- if feature has max_unit -->
+
 									{{ if(plans[plan].features.grouped[features[item].id][0].max_unit) { }}
-										<div class="featureItem cell">
+										<div class="featureItem cell" title="{{=features[item].name}}">
 				        					<span>
 										{{if (plans[plan].features.grouped[features[item].id][0].element_type == 'overage')  { }}
 		    								{{	if(!obj.urlParams["show-feature-price"])	{	}}
@@ -323,19 +324,23 @@
 		    							</div>
 									{{	}else{	}}
 
+
+									<!-- if feature has price per unit -->
 										{{	if(obj.urlParams["show-feature-price"] && plans[plan].features.grouped[features[item].id][0].price != 0)	{	}}
 
-										<div class="featureItem cell">
+										<div class="featureItem cell" title="{{=features[item].name}}">
 					        						<span>
-		        								${{=plans[plan].features.grouped[features[item].id][0]}} per unit
+		        								${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
 		        									</span>
 		        							</div>
 
 		        						{{	}	}}
 
+
+		        						<!-- if feature is of type "constant / multi value feature"  -->
 		        						{{	if(plans[plan].features.grouped[features[item].id][0].type == "constant")	{	}}
 
-										<div class="featureItem cell">
+										<div class="featureItem cell" title="{{=features[item].name}}">
 					        						<span>
 		        								{{=plans[plan].features.grouped[features[item].id][0].value}}
 		        									</span>
