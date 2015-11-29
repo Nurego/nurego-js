@@ -52,7 +52,7 @@ define(["backbone","text!priceListHTML","utils",
 		    		var carWrapperEl = $Nurego(carWrapper);
 		    		//initial active slider is first one
 		    		carWrapperEl.find('li:first-child').addClass('active'); 
-		    		var callback = function(){
+		    		var next = function(){
 		    			var activeEl = carWrapperEl.find('.active');
 		    			if(activeEl.next().length != 0){
 		    				activeEl.removeClass('active');
@@ -62,8 +62,23 @@ define(["backbone","text!priceListHTML","utils",
 							carWrapperEl.find('li:first-child').addClass('active');
 		    			}
 		    		}
-		    		setInterval(callback,3500);
+
+		    		var back = function(){
+			    		var activeEl = carWrapperEl.find('.active');
+			    			if(activeEl.prev().length != 0){
+			    				activeEl.removeClass('active');
+			    				activeEl.prev().addClass('active');
+			    			}else{
+			    				activeEl.removeClass('active');
+								carWrapperEl.find('li:last-child').addClass('active');
+			    			}
+			    	}
+
+			    	carWrapperEl.find(".ion-arrow-left-b").on('click',back);
+			    	carWrapperEl.find(".ion-arrow-right-b").on('click',next);
+
 		    	}
+
 
 		    	var tieredCells = $Nurego('.tieredWrapper');
 		    	for (var i = 0; i<tieredCells.length; i++){
