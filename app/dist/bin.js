@@ -10565,10 +10565,15 @@ absNuregoView = function (bb, utils, absErrorTmpl) {
     },
     initStyle: function () {
       if (this.params.css) {
+        //this.params.css
         var link = document.createElement('link');
+        cssUrl = this.params.css;
         link.setAttribute('rel', 'stylesheet');
         link.setAttribute('type', 'text/css');
-        link.setAttribute('href', this.params.css);
+        if (this.params.css.indexOf('//') == -1) {
+          cssUrl = this.params.parent + '/' + this.params.css;
+        }
+        link.setAttribute('href', cssUrl);
         document.getElementsByTagName('head')[0].appendChild(link);
       }
     },
