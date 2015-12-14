@@ -18,6 +18,8 @@ define(["backbone","text!loginHTML","absNuregoView","jquery"],function(bb,loginT
 		  	if(customTmpl){
 		  		this.template = _.template(customTmpl);
 		  	}
+				this.initStyle();
+
 				this.params = utils.URLToArray(window.location.href);
 
 		  	this.model = model;
