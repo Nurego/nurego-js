@@ -10655,8 +10655,8 @@ loginViewCtrl = function (bb, loginTmpl, absNuregoView, $Nurego) {
       if (customTmpl) {
         this.template = _.template(customTmpl);
       }
-      this.initStyle();
       this.params = utils.URLToArray(window.location.href);
+      this.initStyle();
       this.model = model;
       //this.listenToOnce(this.model, "change", this.render);
       // this.model.fetch({dataType:"jsonp",error:this.modelHttpErrorsHandler});
