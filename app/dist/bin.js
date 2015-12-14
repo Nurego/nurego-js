@@ -8522,12 +8522,12 @@ constants = function (utils, $Nurego) {
   };
 }(utils, jquery);
 widgetFactory = function (_, utils, constants, $Nurego) {
-  var iframeListener = function () {
+  var widgetIframeListener = function () {
     // Create IE + others compatible event handler
     var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent';
     var eventer = window[eventMethod];
     var messageEvent = eventMethod == 'attachEvent' ? 'onmessage' : 'message';
-    // Listen to message from child window
+    // Listen to message from child window widget
     eventer(messageEvent, function (e) {
       console.log('parent received message!:', e.data);
       var msg = JSON.parse(e.data);
@@ -8536,6 +8536,8 @@ widgetFactory = function (_, utils, constants, $Nurego) {
           if (status === 'success') {
             window.location.href = msg.redirectUrl;
           }
+        }).fail(function () {
+          window.location.reload();
         });
       }
     }, false);
