@@ -8529,7 +8529,15 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     var messageEvent = eventMethod == 'attachEvent' ? 'onmessage' : 'message';
     // Listen to message from child window
     eventer(messageEvent, function (e) {
-      console.log('parent received message!:  ', e.data);
+      console.log('parent received message!:', e.data);
+      var msg = JSON.parse(e.data);
+      if (msg.action == 'post') {
+        $.post(msg.url, msg.data, function (a, status, xhr) {
+          if (status === 'success') {
+            window.location.href = msg.redirectUrl;
+          }
+        });
+      }
     }, false);
   }();
   var widgetsFactory = {
@@ -10657,27 +10665,18 @@ loginViewCtrl = function (bb, loginTmpl, absNuregoView, $Nurego) {
       var pass = this.$el.find('input[name="password"]').val();
       var postURL = this.params.parent + this.params['login-url'];
       var redirectUrl = this.params['redirect-url'];
-      parent.postMessage('Hello', this.params.parent);
-      $Nurego.ajax({
-        url: postURL,
-        data: {
-          'email': email,
-          'password': pass
-        },
-        type: 'post',
-        crossDomain: true,
-        dataType: 'json',
-        contentType: 'application/x-www-form-urlencoded',
-        error: _.bind(this.genericHttpErrorsHandler, this)
-      }).always(function (xhr, status) {
-        if (xhr.status == 200) {
-          if (redirectUrl.indexOf('http') == -1) {
-            window.top.location.href = parent + redirectUrl;
-          } else {
-            window.top.location.href = redirectUrl;
-          }
-        }
-      });
+      var data = {
+        'email': email,
+        'password': pass
+      };
+      var obj = {
+        'action': 'post',
+        'data': data,
+        'url': postURL,
+        'redirectUrl': redirectUrl
+      };
+      var frameMsg = JSON.stringify(obj);
+      parent.postMessage(frameMsg, this.params.parent);
     },
     render: function () {
       this.model.set('urlParams', this.params);
