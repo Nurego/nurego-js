@@ -29,7 +29,7 @@ define(["backbone","text!loginHTML","absNuregoView","jquery"],function(bb,loginT
 		  login:function(e){
 				var email = this.$el.find('input[name="email"]').val();;
 				var pass = this.$el.find('input[name="password"]').val();;
-				var postURL = this.params['login-url'];
+				var postURL = this.params.parent + this.params['login-url'];
 				var redirectUrl = this.params['redirect-url'];
 		  	$Nurego.post(postURL,{"email":email,"password":pass},function(res,status,xhr){
 		  		if(xhr.status == 200){
