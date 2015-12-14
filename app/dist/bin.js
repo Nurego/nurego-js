@@ -8529,7 +8529,7 @@ widgetFactory = function (_, utils, constants, $Nurego) {
     var messageEvent = eventMethod == 'attachEvent' ? 'onmessage' : 'message';
     // Listen to message from child window widget
     eventer(messageEvent, function (e) {
-      console.log('parent received message!:', e.data);
+      // console.log('parent received message!:',e.data);
       var msg = JSON.parse(e.data);
       if (msg.action == 'post') {
         $.post(msg.url, msg.data, function (a, status, xhr) {
@@ -10575,7 +10575,7 @@ text = {
     throw new Error('Dynamic load not allowed: ' + id);
   }
 };
-text_loginHTML = '<div class="login_wrapper">\n\t<div><small><b>{{=obj.urlParams.title}}</b></small></div>\n\n\t<div class="input-group input-group-lg">\n\t\t<input class="form-control" id="user" autofocus name="email" placeholder="username" type="text">\n\t</div>\n\n\t<div class="input-group input-group-lg">\n\t\t<input class="form-control" name="password" placeholder="password" type="password">\n\t</div>\n\n\t<div>\n\t\t<button class="button btn btn-primary btn-xl page-scroll">Login</button>\n\t</div>\n</div>\n';
+text_loginHTML = '<div class="login_wrapper">\n\t<div class="inner_form">\n\t\t\t<div><small><b>{{=obj.urlParams.title}}</b></small></div>\n\n\t\t\t<div class="input-group input-group-lg">\n\t\t\t\t<input class="form-control" id="user" autofocus name="email" placeholder="username" type="text">\n\t\t\t</div>\n\n\t\t\t<div class="input-group input-group-lg">\n\t\t\t\t<input class="form-control" name="password" placeholder="password" type="password">\n\t\t\t</div>\n\n\t\t\t<div>\n\t\t\t\t<button class="button btn btn-primary btn-xl page-scroll">Login</button>\n\t\t\t</div>\n\t</div>\n</div>\n';
 text_absHTML = '<div>\n\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t\t  <span class="sr-only">Error:</span>\n\t\t  <span class="txt"></span>\n\t</div>\n\n\n</div>';
 absNuregoView = function (bb, utils, absErrorTmpl) {
   var absNuregoView = Backbone.View.extend({

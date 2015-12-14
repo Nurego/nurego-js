@@ -8,7 +8,7 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 
 		// Listen to message from child window widget
 		eventer(messageEvent,function(e) {
-			console.log('parent received message!:',e.data);
+			// console.log('parent received message!:',e.data);
 			var msg = JSON.parse(e.data);
 			if(msg.action == "post"){
 				$.post(msg.url,msg.data,function(a,status,xhr){
