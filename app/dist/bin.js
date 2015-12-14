@@ -10555,7 +10555,7 @@ text = {
     throw new Error('Dynamic load not allowed: ' + id);
   }
 };
-text_loginHTML = '<div>\n\twelcome {{=user.name}} - {{=user.last}}\n\t<input class="form-control" type="text" placeholder="username" autofocus/>\n\t<input class="form-control" type="text" placeholder="password"/>\n\n\t<br/>\n\t<div>\n\t\t<button class="button btn btn-primary">Login</button>\n\t</div>\n</div>\n<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t  <span class="sr-only">Error:</span>\n\t  <span class="txt"></span>\n</div>';
+text_loginHTML = '<div class="login_wrapper">\n\t<div><small><b>{{=obj.urlParams.title}}</b></small></div>\n\n\t<div class="input-group input-group-lg">\n\t\t<input class="form-control" id="user" autofocus name="email" placeholder="username" type="text">\n\t</div>\n\n\t<div class="input-group input-group-lg">\n\t\t<input class="form-control" name="password" placeholder="password" type="password">\n\t</div>\n\n\t<div>\n\t\t<button class="button btn btn-primary btn-xl page-scroll">Login</button>\n\t</div>\n</div>\n';
 text_absHTML = '<div>\n\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t\t  <span class="sr-only">Error:</span>\n\t\t  <span class="txt"></span>\n\t</div>\n\n\n</div>';
 absNuregoView = function (bb, utils, absErrorTmpl) {
   var absNuregoView = Backbone.View.extend({
@@ -10626,26 +10626,42 @@ loginViewCtrl = function (bb, loginTmpl, absNuregoView, $Nurego) {
     className: 'login',
     template: _.template(loginTmpl),
     events: { 'click .button': 'login' },
+    /** directive attributes params:
+    	//params['login-url'];
+      //params['redirect-url'];
+    	**/
     initialize: function (model, customTmpl) {
       //this.__super__.initialize.apply(this);
       if (customTmpl) {
         this.template = _.template(customTmpl);
       }
+      this.params = utils.URLToArray(window.location.href);
       this.model = model;
-      this.listenToOnce(this.model, 'change', this.render);
-      this.model.fetch({
-        dataType: 'jsonp',
-        error: this.modelHttpErrorsHandler
-      });
+      //this.listenToOnce(this.model, "change", this.render);
+      // this.model.fetch({dataType:"jsonp",error:this.modelHttpErrorsHandler});
+      this.render();
     },
+    //
     login: function (e) {
-      //var baseURL = this.$el.find('#baseURL').val();
-      var endPoint = constants.nuregoApiUrl();
-      $Nurego.get(endPoint + '/login', function (data) {
-        console.log(data);
+      var email = this.$el.find('input[name="email"]').val();
+      var pass = this.$el.find('input[name="password"]').val();
+      var postURL = this.params['login-url'];
+      var redirectUrl = this.params['redirect-url'];
+      $Nurego.post(postURL, {
+        'email': email,
+        'password': pass
+      }, function (res, status, xhr) {
+        if (xhr.status == 200) {
+          if (redirectUrl.indexOf('http') == -1) {
+            window.top.location.href = parent + redirectUrl;
+          } else {
+            window.top.location.href = redirectUrl;
+          }
+        }
       });
     },
     render: function () {
+      this.model.set('urlParams', this.params);
       var html = this.template(this.model.attributes);
       this.$el.html(html);
       return this;
