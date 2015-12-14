@@ -31,15 +31,26 @@ define(["backbone","text!loginHTML","absNuregoView","jquery"],function(bb,loginT
 				var pass = this.$el.find('input[name="password"]').val();;
 				var postURL = this.params.parent + this.params['login-url'];
 				var redirectUrl = this.params['redirect-url'];
-		  	$Nurego.post(postURL,{"email":email,"password":pass},function(res,status,xhr){
-		  		if(xhr.status == 200){
-				  		if(redirectUrl.indexOf('http') == -1){
-							window.top.location.href = parent + redirectUrl;
-				  		}else{
-				  			window.top.location.href = redirectUrl;
-				  		}
-					}
-		  	});
+
+				$Nurego.ajax({
+			  		url:postURL,
+						data:{"email":email,"password":pass},
+			  		type:"post",
+			  		crossDomain: true,
+				    dataType: 'json',
+				    contentType: "application/x-www-form-urlencoded",
+						error:_.bind(this.genericHttpErrorsHandler,this)
+				  	}).always(function(xhr,status){
+							function(res,status,xhr){
+					  		if(xhr.status == 200){
+							  		if(redirectUrl.indexOf('http') == -1){
+										window.top.location.href = parent + redirectUrl;
+							  		}else{
+							  			window.top.location.href = redirectUrl;
+							  		}
+								}
+					  	}
+						})
 		  },
 
 		  render: function(){
