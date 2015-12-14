@@ -8522,6 +8522,16 @@ constants = function (utils, $Nurego) {
   };
 }(utils, jquery);
 widgetFactory = function (_, utils, constants, $Nurego) {
+  var iframeListener = function () {
+    // Create IE + others compatible event handler
+    var eventMethod = window.addEventListener ? 'addEventListener' : 'attachEvent';
+    var eventer = window[eventMethod];
+    var messageEvent = eventMethod == 'attachEvent' ? 'onmessage' : 'message';
+    // Listen to message from child window
+    eventer(messageEvent, function (e) {
+      console.log('parent received message!:  ', e.data);
+    }, false);
+  }();
   var widgetsFactory = {
     options: {
       widget: '',
@@ -10647,10 +10657,19 @@ loginViewCtrl = function (bb, loginTmpl, absNuregoView, $Nurego) {
       var pass = this.$el.find('input[name="password"]').val();
       var postURL = this.params.parent + this.params['login-url'];
       var redirectUrl = this.params['redirect-url'];
-      $Nurego.post(postURL, {
-        'email': email,
-        'password': pass
-      }, function (res, status, xhr) {
+      parent.postMessage('Hello', this.params.parent);
+      $Nurego.ajax({
+        url: postURL,
+        data: {
+          'email': email,
+          'password': pass
+        },
+        type: 'post',
+        crossDomain: true,
+        dataType: 'json',
+        contentType: 'application/x-www-form-urlencoded',
+        error: _.bind(this.genericHttpErrorsHandler, this)
+      }).always(function (xhr, status) {
         if (xhr.status == 200) {
           if (redirectUrl.indexOf('http') == -1) {
             window.top.location.href = parent + redirectUrl;
