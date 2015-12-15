@@ -2,30 +2,30 @@
 <div class="plans_wrapper">
 
 	{{for(var planObj in obj.offering.plans.data) { }}
-			{{ if(obj.offering.plans[planObj].id == obj.urlParams['sub-plan-id']) { }}
+			{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
 					<div class="plan-wrapper selected">
 			{{ } else{ }}
 					<div class="plan-wrapper">
 			{{ } }}
 
 
-							<h3>{{= obj.offering.plans[planObj].name }} </h3>
-									{{ if(obj.offering.plans[planObj].discounts.count != 0) { }}
+							<h3>{{= obj.offering.plans.data[planObj].name }} </h3>
+									{{ if(obj.offering.plans.data[planObj].discounts.count != 0) { }}
 									<div class="ribbon-wrapper-green">
 											<div class="ribbon-green">
-												{{=obj.offering.plans[planObj].discounts.data[0].days_to_apply}} days Free
+												{{=obj.offering.plans.data[planObj].discounts.data[0].days_to_apply}} days Free
 											</div>
 									</div>
 									{{ } }}
 
 
-			{{ if(obj.offering.plans[planObj].id == obj.urlParams['sub-plan-id']) { }}
+			{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
 					<div class="select-btn-wrapper selected">
 
 			{{ } else{ }}
 					<div class="select-btn-wrapper">
 			{{ } }}
-							{{ _.each(obj.offering.plans[planObj].features.data, function(item) { }}
+							{{ _.each(obj.offering.plans.data[planObj].features.data, function(item) { }}
 											{{ if(item.name === "recurring"){ }}
 															<div class="row price" style="margin:auto; text-align:left;">
 																<div class="col-md-4">
@@ -43,13 +43,13 @@
 							{{ }); }}
 
 									<form>
-											<input type="hidden" class="form-control" value="{{=obj.offering.plans[planObj].id }}" name="plan_id">
-											<input class="btn btn-default btn-xl selectPlan" data-plan="{{=obj.offering.plans[planObj].id }}" value="Select"/>
+											<input type="hidden" class="form-control" value="{{=obj.offering.plans.data[planObj].id }}" name="plan_id">
+											<input class="btn btn-default btn-xl selectPlan" data-plan="{{=obj.offering.plans.data[planObj].id }}" value="Select"/>
 									</form>
 
 							</div>
 
-							{{ _.each(obj.offering.plans[planObj].features.data, function(item) { }}
+							{{ _.each(obj.offering.plans.data[planObj].features.data, function(item) { }}
 													{{ if(item.name != "recurring"){ }}
 															 <div class="row" style="margin:auto; text-align:left;">
 																		<div class="col-md-9">
