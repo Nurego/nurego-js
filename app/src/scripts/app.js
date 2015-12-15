@@ -40,7 +40,7 @@ define([
 						},
 						plans_switcher:{//empty model since data is coming from an attributes
 							view:plansSwitcherViewCtrl,
-							model:new Backbone.Model({})
+							model:Backbone.Model
 						},
 						price_list:{
 							view:priceListViewCtrl,
