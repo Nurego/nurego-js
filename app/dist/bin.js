@@ -11238,6 +11238,7 @@ plansSwitcherViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) 
           initCarousel(tieredCells[i]);
         }
       });
+      this.render();
     },
     select: function (e) {
       var plan = $(e.target).attr('data-plan');

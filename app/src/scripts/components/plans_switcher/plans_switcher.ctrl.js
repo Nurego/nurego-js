@@ -16,7 +16,7 @@ define(["backbone","text!plansSwitcherHTML","utils",
 		    this.selectedPlan = "";
 		  	this.model = model;
 		  	this.model.set('offering',JSON.parse(this.params.offering));
-		  	if(customTmpl){ 
+		  	if(customTmpl){
 		  		this.template = _.template(customTmpl);
 		  	}
 		    this.initStyle();
@@ -61,6 +61,8 @@ define(["backbone","text!plansSwitcherHTML","utils",
 		    	}
 
 		    })
+
+				this.render();
 		  },
 
 			select:function(e){
