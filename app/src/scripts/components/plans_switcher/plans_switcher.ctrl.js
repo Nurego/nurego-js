@@ -1,7 +1,6 @@
 define(["backbone","text!plansSwitcherHTML","utils",
-		"text!plansSwitcherCSS","tosModel",
-		"absNuregoView","jquery"],
-		function(bb,tmpl,utils,css,tosModel,absNuregoView,$Nurego){
+		"text!plansSwitcherCSS","absNuregoView","jquery"],
+		function(bb,tmpl,utils,css,absNuregoView,$Nurego){
 		var plansSwitcher = absNuregoView.extend({
 		  tagName: "div",
 		  className: "plansSwitcher",
@@ -12,10 +11,6 @@ define(["backbone","text!plansSwitcherHTML","utils",
 		  initialize: function(model,customTmpl){
 		  	//this.__super__.initialize.apply(this);
 		  	this.params = utils.URLToArray(window.location.href);
-		  	if(!this.params.preview){
-		  		this.tosModel = new tosModel();
-		    	this.tosModel.fetch({dataType:"jsonp"});
-		  	}
 
 		    this.selectedPlan = "";
 		  	this.model = model;
