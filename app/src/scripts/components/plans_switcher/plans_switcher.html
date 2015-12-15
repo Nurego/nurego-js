@@ -1,8 +1,8 @@
 
 <div class="plans_wrapper">
 
-	{{for(var planObj in obj.offering.plans) { }}
-			{{ if(obj.offering.plans[planObj].id == obj.offering.urlParams['sub-plan-id']) { }}
+	{{for(var planObj in obj.offering.plans.data) { }}
+			{{ if(obj.offering.plans[planObj].id == obj.urlParams['sub-plan-id']) { }}
 					<div class="plan-wrapper selected">
 			{{ } else{ }}
 					<div class="plan-wrapper">
@@ -19,7 +19,7 @@
 									{{ } }}
 
 
-			{{ if(obj.offering.plans[planObj].id == obj.offering.urlParams['sub-plan-id']) { }}
+			{{ if(obj.offering.plans[planObj].id == obj.urlParams['sub-plan-id']) { }}
 					<div class="select-btn-wrapper selected">
 
 			{{ } else{ }}
