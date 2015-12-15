@@ -1,0 +1,304 @@
+<style>
+	.headers,
+	.tableWrapper{
+		display:flex;
+		display:-webkit-flex;
+	}
+
+	.cell {
+		  padding: 8px;
+		  border: 1px solid #E8E8E8;
+		  min-height: 50px;
+		  max-height: 50px;
+		  overflow: hidden;
+		  white-space: nowrap;
+		  overflow: hidden;
+		  text-overflow: ellipsis;
+	}
+
+	.nr-nurego-tag-line {
+  		text-align: right;
+	}
+
+	.headers div,
+	.tableWrapper div{
+		flex:1;
+	  	-webkit-flex: 1;
+		text-align:center;
+		color:#9799A2;
+		min-width: 160px;
+	}
+
+	.plansHeader .header{
+		text-transform:uppercase;
+		color:#9799A2;
+		font-weight:bold;
+		font-size:14px;
+	}
+
+	.priceRecurrence{
+		color:#8EBE2E;
+		font-size:14px;
+	}
+
+	.planPrice{
+		color:#F26522;
+		font-size:16px;
+		font-weight:bold;
+	}
+
+	.planDiscount{
+		background: #F26522;
+		font-weight: bold;
+	}
+
+	.planDiscount span{
+		color: #fff !important;
+		border:0px;
+		display:block;
+	}
+
+	.nr-check.nr-no {
+		color:#FB6B5B;
+		font-size:16px;
+	}
+
+	.nr-check.nr-yes {
+		color:#92CF5C;
+		font-size:16px;
+	}
+
+	.planCol .features div:nth-of-type(odd),
+	.featuresCol .featureName:nth-of-type(odd){
+		background: #F9F9F9;
+	}
+
+	.subscribeToPlan {
+		background: gray;
+		color: #fff;
+		border: 0px;
+		padding: 6px;
+		font-size: 16px;
+		/*margin: 8px 1px 0px 1px;*/
+	}
+
+	.subscribeToPlan span {
+	    color: white;
+	    font-weight: bold;
+	}
+
+	.subscribeToPlan span:hover {
+	    text-decoration: underline;
+	    cursor: pointer;
+	}
+
+	.emailWrapper .invalidEmail{
+		display: none;
+	}
+
+	.emailWrapper.has-error .invalidEmail{
+		display: block;
+	}
+
+	.noSSO.fillEmail .emailWrapper{
+	  display: block;
+	  position: absolute;
+	  width: 100%;
+	  top: 0px;
+	  background: white;
+	  height: 100%;
+	  padding: 20px;
+	}
+
+	.noSSO.fillEmail.done .emailWrapper, .emailWrapper,
+	.noSSO.fillEmail .nr-nurego-tag-line{
+		display:none;
+	}
+
+	.btn.btn-primary.postNoSSo {
+    	margin-top: 10px;
+	}
+
+	.thankYou{
+		display: none;
+	}
+
+	.done .p1 {
+    	font-size: 28px;
+	}
+	.done .thankYou{
+	  display: block;
+	  position: absolute;
+	  top: 0px;
+	  width: 100%;
+	  text-align: center;
+	  background: rgba(255,255,255,1);
+	  height: 100%;
+	  padding: 10%;
+	}
+
+	.unchecked .subscribeToPlan{
+		opacity:0.35;
+	}
+
+	.checked .subscribeToPlan{
+		opacity:1;
+	}
+
+	.noSSO.fillEmail .tableWrapper{
+		display:none;
+	}
+
+	.period{
+		text-transform: uppercase;
+	}
+	.tieredWrapper {
+    position: relative;
+    min-height: 50px;
+    margin: 0px 0px 0px 0px;
+    border: 1px solid #E8E8E8;
+	}
+
+	.tieredWrapper ul{
+		padding:0px;
+		margin:0px;
+	}
+	.featureItem.featureTiered.cell {
+	    width: 100%;
+    	border: 0px;
+	}
+
+	.featureItem.featureTiered {
+		visibility: hidden;
+		position:absolute;
+	    opacity: 0;
+	}
+
+	.featureItem.featureTiered.active {
+		visibility: visible;
+	   -webkit-transition: opacity 0.65s ease-in-out;
+	    -moz-transition: opacity 0.65s ease-in-out;
+	    -ms-transition: opacity 0.65s ease-in-out;
+	    -o-transition: opacity 0.65s ease-in-out;
+	     opacity: 1;
+	}
+
+	.featureTiered i.ion-arrow-right-b {
+    	float: right;
+	}
+	.featureTiered i.ion-arrow-left-b {
+	    float: left;
+	}
+
+	.featureTiered i.ion-arrow-left-b,
+	.featureTiered i.ion-arrow-right-b {
+	    font-size: 20px;
+	    cursor: pointer;
+	}
+
+	.featureTiered span {
+	    position: relative;
+	    top: 4px;
+	}
+
+</style>
+
+<!--Credit cards template
+<div class="ccHeaders headers">
+			<div class="price header cell" title="Credit Cards">
+				Credit Card
+			</div>
+	{{  for(var plan in plans) { }}
+
+    		<div class="header cell">
+				{{if (plans[plan].credit_card) { }}
+
+					<span class="nr-check nr-yes ion-checkmark"></span>
+
+    			{{	}else{	}}
+
+    				<span class="nr-check nr-no ion-close "></span>
+
+    			{{	}	}}
+
+    		</div>
+
+	{{ 	}	}}
+</div-->
+
+<div class="plans_wrapper">
+
+	{{for(var planObj in obj.plans) { }}
+			{{ if(obj.plans[planObj].isSelected) { }}
+					<div class="plan-wrapper selected">
+
+			{{ } else{ }}
+					<div class="plan-wrapper">
+			{{ } }}
+
+
+							<h3>{{= obj.plans[planObj].name }} </h3>
+									{{ if(obj.plans[planObj].discounts.count != 0) { }}
+									<div class="ribbon-wrapper-green">
+											<div class="ribbon-green">
+												{{=obj.plans[planObj].discounts.data[0].days_to_apply}} days Free
+											</div>
+									</div>
+									{{ } }}
+
+
+							{{ if(obj.plans[planObj].isSelected) { }}
+					<div class="select-btn-wrapper selected">
+
+			{{ } else{ }}
+					<div class="select-btn-wrapper">
+			{{ } }}
+							{{ _.each(obj.plans[planObj].features.data, function(item) { }}
+											{{ if(item.name === "recurring"){ }}
+															<div class="row price" style="margin:auto; text-align:left;">
+																<div class="col-md-4">
+																			<b style="font-size:18px;">
+																					Price
+																			</b>
+																</div>
+																<div class="col-md-8">
+																			<b style="background:green; font-size:18px;">
+											${{	print(item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")) }}
+																			</b>
+																</div>
+													</div>
+													{{ } }}
+							{{ }); }}
+
+									<form action="/home/change_plan" method="post">
+											<input type="hidden" class="form-control" value="{{=obj.plans[planObj].id }}" name="plan_id">
+											<input class="btn btn-default btn-xl" value="Select" type="submit"/>
+									</form>
+
+							</div>
+
+							{{ _.each(obj.plans[planObj].features.data, function(item) { }}
+													{{ if(item.name != "recurring"){ }}
+															 <div class="row" style="margin:auto; text-align:left;">
+																		<div class="col-md-9">
+																					{{=item.name}}
+																		</div>
+																		<div class="col-md-3">
+																					{{ if(item.max_unit === 0 ) { }}
+																					<span class="fa-check-circle fa" style="font-size:18px;"></span>
+																					{{ }else{ }}
+																							{{=item.max_unit}}
+																				{{ } }}
+																		</div>
+															</div>
+													{{ } }}
+							{{ }); }}
+					</div>
+			{{ }; }}
+
+</div>
+<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">
+	  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+	  <span class="sr-only">Error:</span>
+	  <span class="txt"></span>
+</div>
