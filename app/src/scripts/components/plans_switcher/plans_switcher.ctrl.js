@@ -69,7 +69,7 @@ define(["backbone","text!plansSwitcherHTML","utils",
 				var plan = $Nurego(e.target).attr('data-plan');
 				var postURL = this.params.parent + this.params['post-url'];
 				var redirectUrl = this.params['redirect-url'];
-				var data = {"plan":plan};
+				var data = {"plan_id":plan};
 				var obj = {"action":"post",
 										"data":data,
 										"url":postURL,
