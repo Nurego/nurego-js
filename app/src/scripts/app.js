@@ -38,9 +38,9 @@ define([
 							view:loginViewCtrl,
 							model:loginModel
 						},
-						plans_switcher:{
+						plans_switcher:{//empty model since data is coming from an attributes
 							view:plansSwitcherViewCtrl,
-							model:priceListModel
+							model:new Backbone.Model({})
 						},
 						price_list:{
 							view:priceListViewCtrl,
@@ -175,17 +175,35 @@ define([
 
 					var onHTML = function(e){
 						var key = e.message ? "message" : "data";
-		    			var data = e[key];
+		    			var htmlData = e[key];
 		    			thisWidget = lib.components[params.widget];
 				    	widgetModel = new thisWidget.model({apiKey:params.apiKey});
-				    	widgetView = new thisWidget.view(widgetModel,data).$el;
+				    	widgetView = new thisWidget.view(widgetModel,htmlData).$el;
 				    	$Nurego('body').append(widgetView);
 				    	//callback()
 				    	//widgetModel.fetch({dataType:"jsonp",success:callback});
 					};
 
-					if(params.html && params.html != "null"){//widget with html resource to load before drawing.
-						utils.listen(onHTML)
+					var onExternalModelReady = function(e){
+							var key = e.message ? "message" : "data";
+							var data = e[key];
+							try{
+								var jsonData = JSON.parse(data);
+								thisWidget = lib.components[params.widget];
+								widgetModel = new thisWidget.model({offer:data.offer,sub:data.sub});
+								widgetView = new thisWidget.view(widgetModel).$el;
+								$Nurego('body').append(widgetView);
+							}catch(e){
+
+							}
+					}
+
+					//widget with html resource to load before drawing.
+					if(params.model && params.model != "null"){
+						utils.listen(onExternalModelReady);
+					}
+					if(params.html && params.html != "null"){
+						utils.listen(onHTML);
 					}else{//go ahead and draw the widget
 						draw();
 					}

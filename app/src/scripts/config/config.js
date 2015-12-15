@@ -19,7 +19,7 @@ require.config({
         loginModel: '../models/login',
         registrationModel: '../models/registration',
         priceListModel: '../models/price_list',
-        tosModel: '../models/terms_of_service', 
+        tosModel: '../models/terms_of_service',
         tosStatusModel: '../models/terms_of_service_status',
         loginViewCtrl: '../components/login/login.ctrl',
         priceListViewCtrl: '../components/price_list/price_list.ctrl',

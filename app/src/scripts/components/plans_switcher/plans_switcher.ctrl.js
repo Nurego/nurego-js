@@ -6,6 +6,7 @@ define(["backbone","text!plansSwitcherHTML","utils",
 		  className: "plansSwitcher",
 		  template: _.template(tmpl),
 		  events:{
+				"click .selectPlan":   "select"
 		  },
 
 		  initialize: function(model,customTmpl){
@@ -14,21 +15,10 @@ define(["backbone","text!plansSwitcherHTML","utils",
 
 		    this.selectedPlan = "";
 		  	this.model = model;
-		  	if(customTmpl){
+		  	this.model.set('offering',JSON.parse(this.params.offering));
+		  	if(customTmpl){ 
 		  		this.template = _.template(customTmpl);
 		  	}
-		    this.listenToOnce(this.model, "change", this.render);
-		    this.model.fetch({
-		    	dataType:"jsonp",
-		    	error:_.bind(this.modelHttpErrorsHandler,this)
-		    	//error:function(a,b,c){debugger;}
-		    	//complete:function(a,b,c){debugger;},
-		    	/*statusCode:{
-				    404: function() {
-				      alert( "page not found" );
-				    }
-				}*/
-		    });
 		    this.initStyle();
 		    this.addStyle();
 		    $Nurego(document).ready(function(){
@@ -73,6 +63,18 @@ define(["backbone","text!plansSwitcherHTML","utils",
 		    })
 		  },
 
+			select:function(e){
+				var plan = $(e.target).attr('data-plan');
+				var postURL = this.params.parent + this.params['post-url'];
+				var redirectUrl = this.params['redirect-url'];
+				var data = {"plan":plan};
+				var obj = {"action":"post",
+										"data":data,
+										"url":postURL,
+										"redirectUrl":redirectUrl};
+				var frameMsg = JSON.stringify(obj);
+				parent.postMessage(frameMsg,this.params.parent);
+			},
 
 		  addStyle:function(){
 		  	var styleEl = document.createElement('style');
@@ -81,15 +83,12 @@ define(["backbone","text!plansSwitcherHTML","utils",
 		  },
 
 		  render: function(){
-		  	var sso = utils.URLToArray(window.location.href).sso;
+		  	var sso = utils.URLToArray(window.location.href)
 		  	this.model.set('urlParams',this.params);
 		  	console.log(this.model.attributes);
 		  	var html = this.template(this.model.attributes);
 		    this.$el.html(	html );
 		    //this.bindEvents()
-		    if(sso && sso === "false"){
-		    	this.$el.addClass('noSSO');
-		    }
 		    return this;
 		  }
 
