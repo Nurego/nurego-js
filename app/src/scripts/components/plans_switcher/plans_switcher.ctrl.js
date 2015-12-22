@@ -21,7 +21,13 @@ define(["backbone","text!plansSwitcherHTML","utils",
 		  	}
 		    this.initStyle();
 		    this.addStyle();
-		    $Nurego(document).ready(function(){
+				this.render();
+				this.initCarousel();
+		  },
+
+			initCarousel:function(){
+
+				$Nurego(document).ready(function(){
 		    	//$Nurego('.tieredWrapper').unslider({autoplay: true});
 		    	var initCarousel = function(carWrapper){
 		    		var carWrapperEl = $Nurego(carWrapper);
@@ -60,10 +66,9 @@ define(["backbone","text!plansSwitcherHTML","utils",
 		    		initCarousel(tieredCells[i])
 		    	}
 
-		    })
+		    });
 
-				this.render();
-		  },
+			},
 
 			select:function(e){
 				var plan = $Nurego(e.target).attr('data-plan');

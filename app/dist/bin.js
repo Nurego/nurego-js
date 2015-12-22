@@ -11219,6 +11219,10 @@ plansSwitcherViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) 
       }
       this.initStyle();
       this.addStyle();
+      this.render();
+      this.initCarousel();
+    },
+    initCarousel: function () {
       $Nurego(document).ready(function () {
         //$Nurego('.tieredWrapper').unslider({autoplay: true});
         var initCarousel = function (carWrapper) {
@@ -11253,7 +11257,6 @@ plansSwitcherViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) 
           initCarousel(tieredCells[i]);
         }
       });
-      this.render();
     },
     select: function (e) {
       var plan = $Nurego(e.target).attr('data-plan');
