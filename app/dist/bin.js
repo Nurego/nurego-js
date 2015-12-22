@@ -10763,40 +10763,6 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       });
       this.initStyle();
       this.addStyle();
-      $Nurego(document).ready(function () {
-        //$Nurego('.tieredWrapper').unslider({autoplay: true});
-        var initCarousel = function (carWrapper) {
-          var carWrapperEl = $Nurego(carWrapper);
-          //initial active slider is first one
-          carWrapperEl.find('li:first-child').addClass('active');
-          var next = function () {
-            var activeEl = carWrapperEl.find('.active');
-            if (activeEl.next().length != 0) {
-              activeEl.removeClass('active');
-              activeEl.next().addClass('active');
-            } else {
-              activeEl.removeClass('active');
-              carWrapperEl.find('li:first-child').addClass('active');
-            }
-          };
-          var back = function () {
-            var activeEl = carWrapperEl.find('.active');
-            if (activeEl.prev().length != 0) {
-              activeEl.removeClass('active');
-              activeEl.prev().addClass('active');
-            } else {
-              activeEl.removeClass('active');
-              carWrapperEl.find('li:last-child').addClass('active');
-            }
-          };
-          carWrapperEl.find('.ion-arrow-left-b').on('click', back);
-          carWrapperEl.find('.ion-arrow-right-b').on('click', next);
-        };
-        var tieredCells = $Nurego('.tieredWrapper');
-        for (var i = 0; i < tieredCells.length; i++) {
-          initCarousel(tieredCells[i]);
-        }
-      });
     },
     openTerms: function () {
       var url = this.params['terms-of-service-url'];
@@ -10850,7 +10816,7 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       var url = baseURL + '/registrations?api_key=' + constants.getNuregoApiKey() + '&plan_id=' + plan;
       if (this.$el.hasClass('noSSO')) {
         if (!this.validateEmail(email)) {
-          return false;  //invalid email, stop here. 
+          return false;  //invalid email, stop here.
         }
         url += '&email=' + encodeURIComponent(email);
         params.email = encodeURIComponent(email);
@@ -10912,13 +10878,49 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       var zis = this;
       $Nurego('#checkbox .termsCheckbox').click(function () {
         var $this = $Nurego(this);
-        // $this will contain a reference to the checkbox   
+        // $this will contain a reference to the checkbox
         if ($this.is(':checked')) {
           zis.$el.addClass('checked');
-          zis.$el.removeClass('unchecked');  // the checkbox was checked 
+          zis.$el.removeClass('unchecked');  // the checkbox was checked
         } else {
           zis.$el.addClass('unchecked');
           zis.$el.removeClass('checked');
+        }
+      });
+    },
+    initTiers: function () {
+      $Nurego(document).ready(function () {
+        //$Nurego('.tieredWrapper').unslider({autoplay: true});
+        var initCarousel = function (carWrapper) {
+          var carWrapperEl = $Nurego(carWrapper);
+          //initial active slider is first one
+          carWrapperEl.find('li:first-child').addClass('active');
+          var next = function () {
+            var activeEl = carWrapperEl.find('.active');
+            if (activeEl.next().length != 0) {
+              activeEl.removeClass('active');
+              activeEl.next().addClass('active');
+            } else {
+              activeEl.removeClass('active');
+              carWrapperEl.find('li:first-child').addClass('active');
+            }
+          };
+          var back = function () {
+            var activeEl = carWrapperEl.find('.active');
+            if (activeEl.prev().length != 0) {
+              activeEl.removeClass('active');
+              activeEl.prev().addClass('active');
+            } else {
+              activeEl.removeClass('active');
+              carWrapperEl.find('li:last-child').addClass('active');
+            }
+          };
+          carWrapperEl.find('.ion-arrow-left-b').on('click', back);
+          carWrapperEl.find('.ion-arrow-right-b').on('click', next);
+        };
+        var tieredCells = $Nurego('.tieredWrapper');
+        for (var i = 0; i < tieredCells.length; i++) {
+          initCarousel(tieredCells[i]);
         }
       });
     },
@@ -10932,6 +10934,7 @@ priceListViewCtrl = function (bb, tmpl, utils, css, tosModel, absNuregoView, pri
       if (sso && sso === 'false') {
         this.$el.addClass('noSSO');
       }
+      this.initTiers();
       return this;
     }
   });
