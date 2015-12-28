@@ -177,6 +177,30 @@
 		padding-left: 1%;
 	}
 
+	.embossed-line {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid #d8d8d8;
+}
+hr {
+    height: 0;
+    border: 0;
+    border-top: 1px solid #d8d8d8;
+}
+
+.embossed-line::before {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-top: 1px solid #fff;
+    content: '';
+}
+
+
 </style>
 
 
@@ -232,6 +256,7 @@
 		</div>
 
 	</div>
+	<hr class="embossed-line"></hr>
 {{ } }}
 
 <div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">
