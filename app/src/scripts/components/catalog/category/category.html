@@ -222,11 +222,54 @@ hr {
     content: '';
 }
 
+.banner--dark {
+    background-color: #333;
+}
+.banner {
+    height: 160px;
+}
+
+.banner__image {
+    height: 100%;
+    margin: 0 auto;
+    background-repeat: no-repeat;
+}
+.vw {
+    width: 98%;
+    max-width: 73.125rem;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 1%;
+    padding-left: 1%;
+}
+.banner__labels--light {
+    padding-top: 50px;
+    color: #fff;
+}
+.banner__labels {
+    position: relative;
+    margin-top: 0;
+}
+.alpha {
+    font-size: 3.75rem;
+    line-height: 1;
+    margin-bottom: 1.25rem;
+    font-weight: 400;
+}
+.banner__image--dark {
+    background-image: url(https://www.predix.io/assets/images/catalog/banner-dark.png);
+}
 
 </style>
 
 
-
+<section class="banner banner--dark" role="region">
+	<div class="vw banner__image banner__image--dark">
+		<h1 class="alpha banner__labels banner__labels--light">
+			Catalog
+		</h1>
+	</div>
+</section>
 
 {{ for (category in obj.data ) { }}
 	<div class="section">
