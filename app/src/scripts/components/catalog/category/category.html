@@ -1,7 +1,7 @@
 <style>
 	.headerWrapper{
-		padding: 5px;
-  		text-align: center
+			padding: 5px;
+  		text-align: left;
 	}
 
 	.itemsWrapper{
@@ -167,6 +167,19 @@
     border-width: 3px;
     box-shadow: 0 3px 4px -1px rgba(209,219,208,.8);
 	}
+
+	.catalog-tile__content::after {
+    position: absolute;
+    top: -6px;
+    right: -14px;
+    width: 38px;
+    height: 23px;
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+    border-bottom: 1px solid #46ad00;
+    background-color: #eaeaea;
+    content: '';
+}
 
 	div.section{
 		width: 98%;
