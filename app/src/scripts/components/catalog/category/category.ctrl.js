@@ -22,14 +22,14 @@ define(["backbone","text!categoryHTML","utils",
 		  initialize: function(model,customTmpl){
 		  	//this.__super__.initialize.apply(this);
 		  	this.params = utils.URLToArray(window.location.href);
-		  	this.model = model; 
-		  	
+		  	this.model = model;
+
 		  	if(customTmpl){
 		  		this.template = _.template(customTmpl);
 		  	}
-		  	
+
 		  	this.listenToOnce(this.model, "change", this.render);
-		  	
+
 		  	this.model.fetch({
 		  			dataType:"jsonp",
 		  			error:_.bind(this.modelHttpErrorsHandler,this),
@@ -54,6 +54,7 @@ define(["backbone","text!categoryHTML","utils",
 		  	$Nurego(widget).attr({"name":"single_item","service_id":this.selectedService})
 		  	$Nurego('.widget_holder').append(widget);
 		  	this.$el.addClass('show_item');
+				window.document.body.scrollTop = 0
 		  },
 
 		  closeService:function(){

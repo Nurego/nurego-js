@@ -11190,6 +11190,7 @@ categoryViewCtrl = function (bb, tmpl, utils, css, categoryModel, absNuregoView,
       });
       $Nurego('.widget_holder').append(widget);
       this.$el.addClass('show_item');
+      window.document.body.scrollTop = 0;
     },
     closeService: function () {
       $Nurego('body').css({ 'overflow': 'auto' });
