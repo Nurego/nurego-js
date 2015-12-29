@@ -14,6 +14,9 @@ define(["backbone","constants"],function(Backbone,constants){
         url:function(){
             //var key = this.attr.find('apiParams') // {param1:val1,params2:val2}
             var url = constants.nuregoApiUrl() + "/offerings?api_key=" + this.opt.apiKey;
+            if(this.params['product-id']){
+              url = constants.nuregoApiUrl() + "/services/"+this.params['product-id']+"?api_key=" + this.opt.apiKey;
+            }
             /*for(val in key){
                 url += "&" + key +"=" + val;
             }*/
@@ -82,7 +85,8 @@ define(["backbone","constants"],function(Backbone,constants){
             }
 
         	  function customParser(response) {
-		            var raw_plans = response.plans.data;
+                //if we are showing a product offer or a general offer.
+		            var raw_plans = (response.plans) ? response.plans.data : response.offerings.data[0].plans.data ;
                 var offeringFeatures = getOfferingFeatures(raw_plans);
                 var plansParsedTieredPlans = joinTieredFeatures(raw_plans);
                 var gotDiscount = offeringGotDiscounts(plansParsedTieredPlans);
