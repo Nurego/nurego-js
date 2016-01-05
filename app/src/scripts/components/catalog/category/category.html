@@ -275,6 +275,18 @@ hr {
 	</div>
 </section>
 
+{{ if(obj.data.length == 0) {  }}
+
+<div class="alert alert-info ajaxErrorMsg" role="alert" style="display:none">
+		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+		<span class="txt">
+			<h1>No eligible offers found</h1>
+		</span>
+</div>
+
+{{ } }}
+
+
 {{ for (category in obj.data ) { }}
 	<div class="section">
 		<div class="headerWrapper">
