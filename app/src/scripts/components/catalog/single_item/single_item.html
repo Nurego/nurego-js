@@ -29,6 +29,24 @@
 							<!-- The Predix Asset Service provides asset modeling and data management with real time intelligence, and provides insight into the relationships and connections between independently managed assets. Industrial Internet applications are generally machine-focused. The Asset service enables application developers to import, create, and store asset models that describe machine types, as well as create instance representations for those machines. -->
 						</p>
 					</div>
+
+          {{ if( obj.service_id == "reference_app" ){ }}
+
+            <div class="text--small">
+                <p>Use the Reference App to create an app that monitors machine operations, reports irregularities, and analyzes patterns of behavior and performance over time. The app integrates major components of Predix, including Asset, Time Series, and Predix Machine services.</p>
+                <p>To gain a better understanding of the Reference App, view the video:</p>
+                <br/>
+                <p>
+                  <iframe width="560" height="315" src="https://www.youtube.com/embed/2MGPTJ8yjyc" frameborder="0" allowfullscreen=""></iframe>
+                </p>
+                <br/>
+                <p>You must be signed into Predix to see the demo.</p>
+                <p>To access the code directly, click the View on GitHub link below and search for the repo "predix-rmd-ref-app."</p>
+            </div>
+
+            <a href="https://github.com/predixdev" target="_blank" class="link link--underline">View on GitHub</a>
+          {{  } }}
+
           <nurego-widget style="width:100%;height:350px;"
             name="price_list"
             preview="true"
@@ -37,18 +55,6 @@
             sso="false">
           </nurego-widget>
 
-          <p class="test">{{=obj.service_id}}</p>
-          <p class="test">{{=obj.name}}</p>
-
-          {{ if( obj.service_id == "ser_a0c5-e06b-457c-823d-c8fb00933fec" || obj.name  == "Reference App" ){ }}
-            <br/>
-            <br/>
-            <div>
-                  <iframe width="560" height="315" src="https://www.youtube.com/embed/2MGPTJ8yjyc" frameborder="0" allowfullscreen=""></iframe>
-            </div>
-            <br/>
-            <br/>
-          {{  } }}
 
 	</section>
 </main>
