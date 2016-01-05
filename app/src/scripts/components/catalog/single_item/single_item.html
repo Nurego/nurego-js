@@ -37,7 +37,10 @@
             sso="false">
           </nurego-widget>
 
-          {{ if( obj.service_id == "ser_a0c5-e06b-457c-823d-c8fb00933fec" ){ }}
+          <p class="test">{{=obj.service_id}}</p>
+          <p class="test">{{=obj.name}}</p>
+
+          {{ if( obj.service_id == "ser_a0c5-e06b-457c-823d-c8fb00933fec" || obj.name  == "Reference App" ){ }}
             <br/>
             <br/>
             <div>
