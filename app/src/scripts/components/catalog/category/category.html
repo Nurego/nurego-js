@@ -277,10 +277,10 @@ hr {
 
 {{ if(obj.data.length == 0) {  }}
 
-<div class="alert alert-info ajaxErrorMsg" role="alert" style="display:none">
+<div class="alert alert-info ajaxErrorMsg" role="alert" >
 		<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 		<span class="txt">
-			<h1>No eligible offers found</h1>
+			No eligible offers found
 		</span>
 </div>
 
@@ -294,7 +294,7 @@ hr {
 					{{=obj.data[category].name}}
 			</h1>
 			<h5>
-				 {{=obj.data[category].description}} 
+				 {{=obj.data[category].description}}
 			</h5>
 		</div>
 
