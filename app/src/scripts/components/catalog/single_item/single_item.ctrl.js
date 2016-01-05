@@ -23,8 +23,7 @@ define(["backbone","text!singleItemHTML","utils",
 		  	this.params = utils.URLToArray(window.location.href);
 		  	this.model = model;
 				var parentParams = utils.URLToArray(this.params['parent']);
-				var css = parentParams['css'];
-				this.model.set('css',css); 
+				this.model.set('css',this.params['css']);
 		  	if(customTmpl){
 		  		this.template = _.template(customTmpl);
 		  	}
