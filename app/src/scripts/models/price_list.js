@@ -1,10 +1,10 @@
 define(["backbone","constants"],function(Backbone,constants){
     /*var baseClass = Backbone.Model.extend({
         fetch:function(){
-            this.name 
+            this.name
         }
-    }) 
-    */ 
+    })
+    */
     var priceListModel = Backbone.Model.extend({
         initialize:function(opt){
             this.opt = opt;
@@ -14,6 +14,9 @@ define(["backbone","constants"],function(Backbone,constants){
         url:function(){
             //var key = this.attr.find('apiParams') // {param1:val1,params2:val2}
             var url = constants.nuregoApiUrl() + "/offerings?api_key=" + this.opt.apiKey;
+            if(this.params['product-id']){
+              url = constants.nuregoApiUrl() + "/services/"+this.params['product-id']+"?api_key=" + this.opt.apiKey;
+            }
             /*for(val in key){
                 url += "&" + key +"=" + val;
             }*/
@@ -25,7 +28,7 @@ define(["backbone","constants"],function(Backbone,constants){
             }
 
             return url;
-        	
+
         	//return "https://api.nurego.com/v1/offerings?api_key=lc14de81-587e-49d8-ba0e-487498ae297a&callback=jQuery19108296897902619094_1424775818134&_=1424775818135";
         },
 
@@ -44,7 +47,7 @@ define(["backbone","constants"],function(Backbone,constants){
                     }
                     return plans;
                 }
-        	   
+
               function getOfferingFeatures(plans){
                     var allFtrsArr = [];
                     for(var i = 0; i<plans.length;i++){
@@ -70,15 +73,28 @@ define(["backbone","constants"],function(Backbone,constants){
                     return uniqFtrs;
                }
 
-        	   function customParser(response) {
-		        var raw_plans = response.plans.data;
+            function offeringGotDiscounts(plans){
+              var ans = false;
+              for (var i = 0; plans.length < i; i++){
+                if (plans[i].discounts.data.length != 0){
+                  ans = true;
+                  break;
+                }
+              }
+              return ans;
+            }
+
+        	  function customParser(response) {
+                //if we are showing a product offer or a general offer.
+		            var raw_plans = (response.plans) ? response.plans.data : response.offerings.data[0].plans.data ;
                 var offeringFeatures = getOfferingFeatures(raw_plans);
                 var plansParsedTieredPlans = joinTieredFeatures(raw_plans);
-
+                var gotDiscount = offeringGotDiscounts(plansParsedTieredPlans);
 		        return {
 		            offering_description: response.description,
 		            features: offeringFeatures,
-		            plans: plansParsedTieredPlans
+		            plans: plansParsedTieredPlans,
+                discounts:gotDiscount
 		        };
 		    }
 
@@ -91,4 +107,3 @@ define(["backbone","constants"],function(Backbone,constants){
     return priceListModel;
 
 });
-

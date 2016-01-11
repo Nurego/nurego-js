@@ -10,6 +10,7 @@ define([
 		"registrationViewCtrl",
 		"tosViewCtrl",
 		"categoryViewCtrl",
+		"plansSwitcherViewCtrl",
 		"categoryModel",
 		"singleItemCtrl",
 		"singleItemModel",
@@ -17,15 +18,15 @@ define([
 		"tosStatusModel",
 		"text!absNuregoCss",
 		"jquery"
-		], 
+		],
 	function(constants,utils,widgetFactory,loginModel,registrationModel,
 			priceListModel,loginViewCtrl,priceListViewCtrl,registrationViewCtrl,
-			tosViewCtrl,categoryViewCtrl,categoryModel,singleItemCtrl,singleItemModel,
+			tosViewCtrl,categoryViewCtrl,plansSwitcherViewCtrl,categoryModel,singleItemCtrl,singleItemModel,
 			tosModel,tosStatusModel,absNuregoCss,$Nurego){
 				var app,lib;
 				app = {};
 				lib = {
-					constants:constants, 
+					constants:constants,
 					utils:utils,
 					widgetFactory:widgetFactory,
 					components:{
@@ -37,15 +38,19 @@ define([
 							view:loginViewCtrl,
 							model:loginModel
 						},
+						plans_switcher:{//empty model since data is coming from an attributes
+							view:plansSwitcherViewCtrl,
+							model:Backbone.Model
+						},
 						price_list:{
 							view:priceListViewCtrl,
-							model:priceListModel 
+							model:priceListModel
 						},
 						priceList:{//remove this node after we make sure no one is using this alias anymore.
 							view:priceListViewCtrl,
-							model:priceListModel 
+							model:priceListModel
 						},
-						registration:{ 
+						registration:{
 							view:registrationViewCtrl,
 							model:registrationModel
 						},
@@ -125,21 +130,21 @@ define([
 					    	$nodes.each(lookUpWidgets);
 					    	$childNodes.each(lookUpWidgets);
 					    }
-					  });    
+					  });
 					});
 
 					// Configuration of the observer:
-					var config = { 
-						attributes: true, 
-						childList: true, 
+					var config = {
+						attributes: true,
+						childList: true,
 						characterData: true,
 						subtree:true
 					};
-					 
+
 					// Pass in the target node, as well as the observer options
 					observer.observe(target, config);
 				},
-				
+
 				app.resizeThisWidget = function(){
 					var size = {
 						h:$(document).height(),
@@ -152,7 +157,7 @@ define([
 					//call parent frame to resize me.
 					params = lib.utils.URLToArray(window.location.href);
 					var stretch = (params.stretch) ? true : (params.stretch);
-					if(stretch){ 
+					if(stretch){
 						app.resizeThisWidget();
 					}
 				},
@@ -170,19 +175,37 @@ define([
 
 					var onHTML = function(e){
 						var key = e.message ? "message" : "data";
-		    			var data = e[key];
+		    			var htmlData = e[key];
 		    			thisWidget = lib.components[params.widget];
 				    	widgetModel = new thisWidget.model({apiKey:params.apiKey});
-				    	widgetView = new thisWidget.view(widgetModel,data).$el;
+				    	widgetView = new thisWidget.view(widgetModel,htmlData).$el;
 				    	$Nurego('body').append(widgetView);
 				    	//callback()
 				    	//widgetModel.fetch({dataType:"jsonp",success:callback});
 					};
 
-					if(params.html && params.html != "null"){//widget with html resource to load before drawing.
-						utils.listen(onHTML)
+					var onExternalModelReady = function(e){
+							var key = e.message ? "message" : "data";
+							var data = e[key];
+							try{
+								var jsonData = JSON.parse(data);
+								thisWidget = lib.components[params.widget];
+								widgetModel = new thisWidget.model({offer:data.offer,sub:data.sub});
+								widgetView = new thisWidget.view(widgetModel).$el;
+								$Nurego('body').append(widgetView);
+							}catch(e){
+
+							}
+					}
+
+					//widget with html resource to load before drawing.
+					if(params.model && params.model != "null"){
+						utils.listen(onExternalModelReady);
+					}
+					if(params.html && params.html != "null"){
+						utils.listen(onHTML);
 					}else{//go ahead and draw the widget
-						draw();	
+						draw();
 					}
 				}
 

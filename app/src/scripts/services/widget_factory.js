@@ -1,5 +1,27 @@
 define(["underscore","utils","constants","jquery"],function(_,utils,constants,$Nurego){
 
+	var widgetIframeListener = function(){
+			// Create IE + others compatible event handler
+		var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+		var eventer = window[eventMethod];
+		var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+		// Listen to message from child window widget
+		eventer(messageEvent,function(e) {
+			// console.log('parent received message!:',e.data);
+			var msg = JSON.parse(e.data);
+			if(msg.action == "post"){
+				$.post(msg.url,msg.data,function(a,status,xhr){
+					if(status === "success"){
+						window.location.href = msg.redirectUrl;
+					}
+				}).fail(function() {
+						window.location.reload();
+			  })
+			};
+		},false);
+	}();
+
 	var widgetsFactory = {
 		options:{
 			widget:"",
@@ -19,7 +41,7 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 			iframe.src = compSrc;
 			if(typeof(opt.configParams.uid) != "undefined"){
 				iframe.id = opt.configParams.uid;
-			} 
+			}
 			if(typeof(opt.configParams.fname) != "undefined"){
 				iframe.name = opt.configParams.fname;
 			}
@@ -44,7 +66,7 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 			var onWidgetLoad = function(e){
 				var params = zisUtils.URLToArray(this.src);
 				var iframe = this;
-				
+
 				var fn = function(data){//post html result to init widget with template;
 					iframe.contentWindow.postMessage(data,"*");
 				};
@@ -57,15 +79,15 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 			iframeEl.onload = onWidgetLoad;
 			//TDB:  //iframe.onload(subscribe to js hub events)
 		},
-		
-		buildComponentUrl:function(component,opt){			
+
+		buildComponentUrl:function(component,opt){
 			var nuregoApiParam = constants.getNuregoApiKey();
 			var res = constants.widgetsURL() + "?widget=" + component;
 			res += "&apiKey=" + nuregoApiParam + "&apiBaseUrl=" + constants.nuregoApiUrl();
 			res += "&parent=" + window.location.origin;
 			var indx = 0;
 			_.each(opt.configParams,function(val,key){
-				
+
 				if(key == "api-params"){
 
 					if(val.indexOf('{') === -1){debugger;
