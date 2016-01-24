@@ -9,31 +9,32 @@ define(["backbone","text!singleItemHTML","utils",
         categoryHTML: '../components/catalog/category/category.html',
         categoryModel: '../models/category',
 */
- 
+
 		var singleItem = absNuregoView.extend({
 		  tagName: "div",
 		  className: "single_item_view",
 		  template: _.template(tmpl),
 		  events: {
-		    
+
 		  },
 
 		  initialize: function(model,customTmpl){
 		  	//this.__super__.initialize.apply(this);
 		  	this.params = utils.URLToArray(window.location.href);
-		  	this.model = model; 
-		  	
+		  	this.model = model;
+				var parentParams = utils.URLToArray(this.params['parent']);
+				this.model.set('css',this.params['css']);
 		  	if(customTmpl){
 		  		this.template = _.template(customTmpl);
 		  	}
-		  	
+
 		  	this.listenToOnce(this.model, "change", this.render);
-		  	
+
 		  	this.model.fetch({
 		  			dataType:"jsonp",
 		  			error:_.bind(this.modelHttpErrorsHandler,this),
 		  		});
-		  	this.initStyle();	
+		  	this.initStyle();
 		    this.addStyle();
 		  },
 

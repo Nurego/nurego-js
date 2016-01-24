@@ -4,7 +4,7 @@
 		display:flex;
 		display:-webkit-flex;
 	}
- 
+
 	.cell {
 		  padding: 8px;
 		  border: 1px solid #E8E8E8;
@@ -17,7 +17,6 @@
 	}
 
 	.nr-nurego-tag-line {
-  		text-align: right;
 	}
 
 	.headers div,
@@ -91,7 +90,7 @@
 	    text-decoration: underline;
 	    cursor: pointer;
 	}
-		
+
 	.emailWrapper .invalidEmail{
 		display: none;
 	}
@@ -162,6 +161,7 @@
 	.tieredWrapper ul{
 		padding:0px;
 		margin:0px;
+		list-style: none;
 	}
 	.featureItem.featureTiered.cell {
 	    width: 100%;
@@ -208,11 +208,11 @@
 			<div class="price header cell" title="Credit Cards">
 				Credit Card
 			</div>
-	{{  for(var plan in plans) { }}		        		
-    		
+	{{  for(var plan in plans) { }}
+
     		<div class="header cell">
-				{{if (plans[plan].credit_card) { }} 
-				
+				{{if (plans[plan].credit_card) { }}
+
 					<span class="nr-check nr-yes ion-checkmark"></span>
 
     			{{	}else{	}}
@@ -229,9 +229,9 @@
 
 <div class="plansHeader headers">
 			<div class="featuresHeader header cell">
-				
+
 			</div>
-	{{  for(var plan in plans) { }}		        		
+	{{  for(var plan in plans) { }}
     		<div class="header cell" title="{{=plans[plan].name}}">
 				{{=plans[plan].name}}
     		</div>
@@ -243,43 +243,43 @@
 			<div class="price header cell">
 				Base Price
 			</div>
-	{{  for(var plan in plans) { }}		        		
+	{{  for(var plan in plans) { }}
     		<div class="header cell">
     		{{	if(plans[plan].price != "undefined")	{	}}
-				
+
 				<span class="planPrice">${{=plans[plan].price}}</span>
  				<span class="priceRecurrence"> / {{=plans[plan].billing_period}} </span>
 
 			{{	} }}
-				
+
     		</div>
-    		
+
 	{{ 	}	}}
 </div>
 
 
 <div class="tableWrapper">
-			
+
 			<div class="featuresCol">
 				{{  for(var item in features) { }}
-		        	
+
 		        		<div class="featureName cell" title="{{=features[item].name}}">
 							{{=features[item].name}}
 		        		</div>
 
 		        {{  } }}
-	
+
 			</div>
 
 
 
-			
+
 	{{  for(var plan in plans) { }}
 			<div class="planCol">
-		        			        		
+
 
 		        		<div class="features">
-	        		
+
 						<!-- For each featuer in this plan print the feature cell-->
 
 		        		{{  for(var item in features) { }}
@@ -309,13 +309,13 @@
 														up to {{=plans[plan].features.grouped[features[item].id][featureItem].max_unit}} units
 				        							{{	}else{	}}
 
-				        								from 
+				        								from
 
 			    										{{=plans[plan].features.grouped[features[item].id][featureItem].min_unit}}
 
 			    										{{ if(plans[plan].features.grouped[features[item].id][featureItem].max_unit){ }}
 
-			    											 - {{=plans[plan].features.grouped[features[item].id][featureItem].max_unit}} 
+			    											 - {{=plans[plan].features.grouped[features[item].id][featureItem].max_unit}}
 
 			    										{{	}	}}
 
@@ -326,7 +326,7 @@
 				        						</span>
 			        						</li>
 			        					{{	}	}}
-					        				
+
 		    							</ul>
 
 			        				</div>
@@ -344,7 +344,7 @@
 				        					<span>
 										{{if (plans[plan].features.grouped[features[item].id][0].element_type == 'overage')  { }}
 		    								{{	if(!obj.urlParams["show-feature-price"])	{	}}
-		    									${{=plans[plan].features.grouped[features[item].id][0].price}} per unit 
+		    									${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
 		    									Up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
 		    								{{	}else{	}}
 		    									Up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
@@ -396,23 +396,23 @@
 
 
 
-							{{	}	}}			
+							{{	}	}}
 
-						
+
 
 		        		{{ } }}
 
 		        		</div>
-
-		        		<div class="discount">
-		        			
-								<div class="header planDiscount cell">
-				        			{{for (item in plans[plan].discounts.data) { }}
-										<span>{{=plans[plan].discounts.data[item].days_to_apply}} Days</span>
-										<span>FREE TRIAL</span>
-									{{	}	}}
-					    		</div>
-		        		</div>
+								{{	if(discounts) {	 }}
+									<div class="discount">
+										<div class="header planDiscount cell">
+												{{for (item in plans[plan].discounts.data) { }}
+											<span>{{=plans[plan].discounts.data[item].days_to_apply}} Days</span>
+											<span>FREE TRIAL</span>
+										{{	}	}}
+										</div>
+									</div>
+								{{	}	}}
 
 		        		{{	if(!obj.urlParams["preview"]) {	}}
 		        		<div class="subscribeToPlan">
@@ -442,8 +442,8 @@
 	<div class="nr-nurego-tag-line">
 			 <div class="checkbox" id="checkbox">
 			    <label>
-			      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox"> 
-			      By clicking subscribe you agree to the 
+			      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox">
+			      By clicking subscribe you agree to the
                   <a href="javascript:void(0)" class="terms">Terms of Service</a>
 			    </label>
 			  </div>
