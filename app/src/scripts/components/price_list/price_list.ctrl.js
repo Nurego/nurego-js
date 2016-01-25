@@ -176,6 +176,7 @@ define(["backbone","text!priceListHTML","text!priceListNewHTML","utils",
 		  	if(this.$el.hasClass('unchecked')){
 		  		return;
 		  	}
+				//TODO: need to enable registerWithSSo for "new" price list theme
 		  	if(this.$el.hasClass('noSSO') && !this.params.theme){
 		  		this.registerWithSSo()
 		  	}else{
