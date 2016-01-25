@@ -1,7 +1,7 @@
-define(["backbone","text!priceListHTML","utils",
+define(["backbone","text!priceListHTML","text!priceListNewHTML","utils",
 		"text!priceListCSS","tosModel",
 		"absNuregoView","text!priceListSingleTierHTML","jquery"],
-		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
+		function(bb,tmpl,tmplNew,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
 		var priceList = absNuregoView.extend({
 		  tagName: "div",
 		  className: "login",
@@ -9,7 +9,8 @@ define(["backbone","text!priceListHTML","utils",
 		  events:{
 		    "click .plan-select":   "registration",
 		    "click .terms":   "openTerms",
-		    "click .postNoSSo" : "postRegistration"
+		    "click .postNoSSo" : "postRegistration",
+				"click .nr-no" : "closeDialog"
 		  },
 
 		  initialize: function(model,customTmpl){
@@ -18,7 +19,8 @@ define(["backbone","text!priceListHTML","utils",
 		  	var themes = {
 		  		singleTier:priceListSingleTierHTML,  //deprecated : need to remove camelCode and use camel_code;
 		  		single_tier:priceListSingleTierHTML,
-		  		multitier:tmpl
+		  		multitier:tmpl,
+					new:tmplNew
 		  	};
 		  	if(!this.params.preview){
 		  		this.tosModel = new tosModel();
@@ -48,6 +50,9 @@ define(["backbone","text!priceListHTML","utils",
 		    this.addStyle();
 		  },
 
+			closeDialog:function(){
+				this.$el.removeClass('fillEmail');
+			},
 		  openTerms:function(){
 		  	var url = this.params['terms-of-service-url'];
 		  	if(url.indexOf('http') == -1){//Doron: Absolute URL
@@ -248,7 +253,7 @@ define(["backbone","text!priceListHTML","utils",
 		    	this.$el.addClass('noSSO');
 		    }
 				this.initTiers();
-		    return this; 
+		    return this;
 		  }
 
 		});
