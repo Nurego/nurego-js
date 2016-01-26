@@ -54,12 +54,17 @@ span.nr-no {
     font-size: 24px;
 }
 
+.trial_el span {
+    background: #1acca2;
+    border-radius: 50px;
+    padding: 0px 16px;
+}
+
 .trial_el {
-  background: #1acca2;
   border-radius: 25px;
   padding: 0px 5px;
   position: relative;
-  top: 20px;
+  top: 19px;
   color: white;
   font-size: 12px;
   font-weight: bold;
@@ -74,142 +79,113 @@ span.nr-no {
   cursor: pointer;
   font-weight: bold;
   border-radius: 3px;
-  padding: 5px 5px;
+  padding: 5px 12px;
   margin: 0px 12px;
   display: inline-block;
 }
-
 
 a,
 a:hover{
   color:#16b590;
 }
 
+.emailWrapper .invalidEmail{
+	display: none;
+}
+
+.emailWrapper.has-error .invalidEmail{
+	display: block;
+}
+
+.modal-bg{
+  display: none;
+}
+
+.fillEmail .modal-bg{
+  position:absolute;
+  display: block;
+  top:0px;
+  right:0px;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  background:rgba(255,255,255,0.5);
+}
+
+.noSSO.fillEmail .emailWrapper{
+  display: block;
+  position: absolute;
+  width: 300px;
+  top: 60px;
+  background: white;
+  padding: 20px;
+  z-index: 99999;
+  height: 245px;
+  border: 1px solid gray;
+  border-radius: 3px;
+  left: calc(50% - 150px);
+}
+
+.noSSO.fillEmail.done .emailWrapper,
+.done.fillEmail .modal-bg,
+.emailWrapper,
+.noSSO.fillEmail .nr-nurego-tag-line{
+	display:none;
+}
+
+.thankYou{
+	display: none;
+}
+
+.done .p1 {
+  	font-size: 28px;
+}
+.done .thankYou{
+  display: block;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  text-align: center;
+  background: rgba(255,255,255,1);
+  height: 100%;
+  padding: 10%;
+  z-index: 999;
+}
+
+.unchecked .subscribeToPlan{
+	opacity:0.35;
+}
+
+.checked .subscribeToPlan{
+	opacity:1;
+}
+
+.noSSO.fillEmail .tableWrapper{
+	display:none;
+}
 
 
-
-
-
-
-	.emailWrapper .invalidEmail{
-		display: none;
-	}
-
-	.emailWrapper.has-error .invalidEmail{
-		display: block;
-	}
-
-  .modal-bg{
-    display: none;
-  }
-
-  .fillEmail .modal-bg{
-    position:absolute;
-    display: block;
-    top:0px;
-    right:0px;
-    width: 100%;
-    height: 100%;
-    z-index: 999;
-    background:rgba(255,255,255,0.5);
-  }
-
-	.noSSO.fillEmail .emailWrapper{
-    display: block;
+.emailWrapper span.nr-no {
     position: absolute;
-    width: 300px;
-    top: 60px;
-    background: white;
-    padding: 20px;
-    z-index: 99999;
-    height: 245px;
-    border: 1px solid gray;
-    border-radius: 3px;
-    left: calc(50% - 150px);
-	}
-
-	.noSSO.fillEmail.done .emailWrapper,
-  .done.fillEmail .modal-bg,
-  .emailWrapper,
-	.noSSO.fillEmail .nr-nurego-tag-line{
-		display:none;
-	}
-
-	.thankYou{
-		display: none;
-	}
-
-	.done .p1 {
-    	font-size: 28px;
-	}
-	.done .thankYou{
-	  display: block;
-	  position: absolute;
-	  top: 0px;
-	  width: 100%;
-	  text-align: center;
-	  background: rgba(255,255,255,1);
-	  height: 100%;
-	  padding: 10%;
-    z-index: 999;
-	}
-
-	.unchecked .subscribeToPlan{
-		opacity:0.35;
-	}
-
-	.checked .subscribeToPlan{
-		opacity:1;
-	}
-
-	.noSSO.fillEmail .tableWrapper{
-		display:none;
-	}
+    right: 10px;
+    font-size: 18px;
+    top: 10px;
+    cursor: pointer;
+}
 
 
-  .emailWrapper span.nr-no {
-      position: absolute;
-      right: 10px;
-      font-size: 18px;
-      top: 10px;
-      cursor: pointer;
-  }
+.nr-nurego-tag-line {
+    text-align: right;
+    margin: 0px 10px;
+}
 
+.plan_features_cell.feature_name::first-letter,
+.plan_header_cell::first-letter  {
+    text-transform: capitalize;
+}
 
-  .nr-nurego-tag-line {
-      text-align: right;
-      margin: 0px 10px;
-  }
 
 </style>
-
-
-
-<div class="modal-bg"></div>
-
-<div class="emailWrapper">
-  <span class="nr-check nr-no ion-close-circled"></span>
-	<h4 class="">Please enter your Email:</h4>
-	<input class="form-control email" type="text" placeholder="example@email.com"/>
-
-	<div class="alert alert-danger invalidEmail" role="alert" style="margin-top:12px;">
-		  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-		  <span class="sr-only"></span>
-		  <span class="txt">Error:Invalid Email address, please try again.</span>
-	</div>
-  </br>
-	<div class="postNoSSo nrg-btn">Subscribe</div>
-
-</div>
-
-
-
-
-<div class="thankYou">
-	<div class="p1">Your registration invite has been sent.</div>
-	<div class="p2">Please check your inbox and use the link inside to sign up</div>
-</div>
-
 
 
 
@@ -232,7 +208,6 @@ a:hover{
 
         </div>
 
-
 			{{ 	}	}}
 		</div>
 
@@ -244,7 +219,9 @@ a:hover{
           {{	if(plans[plan].price != "undefined")	{	}}
             <div class="plan_base_price_cell">
               <div class="plan_price">${{=plans[plan].price}}</div>
-              <div class="price_recurrence"> / {{=plans[plan].billing_period}} </div>
+              <div class="price_recurrence">
+                <span> / {{=plans[plan].billing_period}}</span>
+              </div>
             </div>
           {{	} }}
 			{{ 	}	}}
@@ -265,100 +242,23 @@ a:hover{
 
 
               <div class="plan_features_cell tiered_feature_wrapper">
-
                   <div class="plan_tiered_cell" title="{{=features[item].name}}">
                     {{  for(var featureItem in plans[plan].features.grouped[features[item].id] ) { }}
                         <div class="tiered_item">
-
-                              ${{=plans[plan].features.grouped[features[item].id][featureItem].price}}
-                              {{if (plans[plan].features.grouped[features[item].id][featureItem].max_unit != 0) { }}
-                            up to {{=plans[plan].features.grouped[features[item].id][featureItem].max_unit}} units
-                              {{	}else{	}}
-
-                                from
-
-                              {{=plans[plan].features.grouped[features[item].id][featureItem].min_unit}}
-
-                              {{ if(plans[plan].features.grouped[features[item].id][featureItem].max_unit){ }}
-
-                                 - {{=plans[plan].features.grouped[features[item].id][featureItem].max_unit}}
-
-                              {{	}	}}
-
-                              units
-
-                              {{	}	}}
-
-
+                              ${{=plans[plan].features.grouped[features[item].id][featureItem].value_string}}
                         </div>
                     {{	}	}}
 
                   </div>
-
               </div>
-
 
               {{   }else {  }}
                   <div class="plan_features_cell">
-
-
-
-
-
-
-
-                    {{ if(plans[plan].features.grouped[features[item].id][0].max_unit) { }}
-                        {{if (plans[plan].features.grouped[features[item].id][0].element_type == 'overage')  { }}
-                            {{	if(!obj.urlParams["show-feature-price"])	{	}}
-                              ${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
-                              Up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
-                            {{	}else{	}}
-                              Up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
-                            {{	}	}}
-                        {{	}else{	}}
-                            {{=plans[plan].features.grouped[features[item].id][0].max_unit}}
-                        {{	}	}}
-                    {{	}else{	}}
-
-                        <!-- if feature is of type "constant / multi value feature"  -->
-                        {{	if(plans[plan].features.grouped[features[item].id][0].type == "constant")	{	}}
-
-                            {{=plans[plan].features.grouped[features[item].id][0].value}}
-
-                        {{   }else {  }}
-
-                            <!-- if feature has price per unit -->
-                            {{	if(obj.urlParams["show-feature-price"] && plans[plan].features.grouped[features[item].id][0].price != 0)	{	}}
-                                    ${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
-                            {{	} else {	}}
-                            <!-- if feature is available with no units/constants/multi value / etc.. -->
-      												<span class="nr-check nr-yes ion-checkmark-circled"></span>
-                            {{   }   }}
-
-
-
-                        {{   }   }}
-
-
-
-                    {{   }  }}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    {{ if(plans[plan].features.grouped[features[item].id][0].price != 0) {  }}
+                        ${{=plans[plan].features.grouped[features[item].id][0].value_string}}
+                    {{   }else{  }}
+                        <span class="nr-check nr-no ion-close-circled"></span>
+                    {{  }  }}
                   </div>
               {{   } }}
 
@@ -380,14 +280,18 @@ a:hover{
       <div class="subscribe_cell"></div>
       <!-- EMPTY CELL END -->
       {{  for(var plan in plans) { }}
-      <div class="subscribeToPlan subscribe_cell nrg-btn plan-select" data-id="{{=plans[plan].id}}">
-        Subscribe
+      <div class="subscribeToPlan subscribe_cell">
+        <div class="nrg-btn plan-select" data-id="{{=plans[plan].id}}">
+          Subscribe
+        </div>
       </div>
       {{ 	}	}}
     </div>
 	{{	}	}}
 
+
 </div>
+
 
 
 {{ if(obj.urlParams["terms-of-service-url"]) {	}}
@@ -399,7 +303,36 @@ a:hover{
                   <a href="javascript:void(0)" class="terms">Terms of Service</a>
 			    </label>
 			  </div>
-        Pricing Table Crafted by <a href="http://www.nurego.com">Nurego</a>
-
+        <div>
+            Pricing Table Crafted by
+            <a href="http://www.nurego.com">Nurego</a>
+        </div>
 	</div>
 {{	}	}}
+
+
+
+
+
+<div class="modal-bg"></div>
+
+<div class="emailWrapper">
+  <span class="nr-check nr-no ion-close-circled"></span>
+	<h4 class="">Please enter your Email:</h4>
+	<input class="form-control email" type="text" placeholder="example@email.com"/>
+  </br>
+	<div class="postNoSSo nrg-btn">Subscribe</div>
+  <div class="alert alert-danger invalidEmail" role="alert" style="margin-top:12px;">
+      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+      <span class="sr-only"></span>
+      <span class="txt">Error:Invalid Email address, please try again.</span>
+  </div>
+</div>
+
+
+
+
+<div class="thankYou">
+	<div class="p1">Your registration invite has been sent.</div>
+	<div class="p2">Please check your inbox and use the link inside to sign up</div>
+</div>

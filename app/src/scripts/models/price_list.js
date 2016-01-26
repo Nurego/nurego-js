@@ -37,6 +37,12 @@ define(["backbone","constants"],function(Backbone,constants){
 
             function joinTieredFeatures(plans){
                     for(var i = 0; i<plans.length;i++){
+
+                      //parse billling_period
+                      if(plans[i].billing_period == "monthly"){
+                        plans[i].billing_period = "Month"
+                      }
+
                         var featuresArr = plans[i].features.data;
                         var groupedFeatures = _.groupBy(featuresArr,'id');
                         if(groupedFeatures.id){
@@ -84,18 +90,96 @@ define(["backbone","constants"],function(Backbone,constants){
               return ans;
             }
 
+            function setPlansFeatureValues(plans){
+              for(var i = 0; i<plans.length;i++){
+                  var featuresArr = plans[i].features.grouped;
+                  for (ftr in featuresArr){
+                      //ftr = "key-rfrs-sdfsdf-asfdfsa-key";
+                      for (var j = 0; j<featuresArr[ftr].length; j++){
+                        var maxUnits = featuresArr[ftr][j].max_unit;
+                        var minUnits = featuresArr[ftr][j].min_unit;
+                        var price = featuresArr[ftr][j].price;
+                        var value_string = price;
+
+                        if(featuresArr[ftr][j].max_unit != 0){
+                          value_string+= " up to " + maxUnits  + " units";
+                        }else{
+                            value_string+= " from " + minUnits  + " units";
+                            if(maxUnits){
+                              value_string+= " - " + maxUnits + " units";
+                            }
+
+                            if(featuresArr[ftr][j].type == "constant"){
+                              value_string = featuresArr[ftr][j].value;
+                            }else{
+                              value_string = price + " per unit";
+                            }
+                        }
+                        featuresArr[ftr][j].value_string = value_string;
+                      }
+                  }
+              }
+
+              return plans;
+            }
+
+/*
+
+
+                    {{ if(plans[plan].features.grouped[features[item].id][0].max_unit) { }}
+                        {{if (plans[plan].features.grouped[features[item].id][0].element_type == 'overage')  { }}
+                            {{	if(!obj.urlParams["show-feature-price"])	{	}}
+                              ${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
+                              up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
+                            {{	}else{	}}
+                              up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
+                            {{	}	}}
+                        {{	}else{	}}
+                            {{=plans[plan].features.grouped[features[item].id][0].max_unit}}
+                        {{	}	}}
+                    {{	}else{	}}
+
+                        <!-- if feature is of type "constant / multi value feature"  -->
+                        {{	if(plans[plan].features.grouped[features[item].id][0].type == "constant")	{	}}
+
+                            {{=plans[plan].features.grouped[features[item].id][0].value}}
+
+                        {{   }else {  }}
+
+                            <!-- if feature has price per unit -->
+                            {{	if(obj.urlParams["show-feature-price"] && plans[plan].features.grouped[features[item].id][0].price != 0)	{	}}
+                                    ${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
+                            {{	} else {	}}
+                            <!-- if feature is available with no units/constants/multi value / etc.. -->
+      												<span class="nr-check nr-yes ion-checkmark-circled"></span>
+                            {{   }   }}
+
+
+                        {{   }   }}
+
+
+                    {{   }  }}
+
+*/
+
+
         	  function customParser(response) {
                 //if we are showing a product offer or a general offer.
 		            var raw_plans = (response.plans) ? response.plans.data : response.offerings.data[0].plans.data ;
                 var offeringFeatures = getOfferingFeatures(raw_plans);
                 var plansParsedTieredPlans = joinTieredFeatures(raw_plans);
                 var gotDiscount = offeringGotDiscounts(plansParsedTieredPlans);
-		        return {
-		            offering_description: response.description,
-		            features: offeringFeatures,
-		            plans: plansParsedTieredPlans,
-                discounts:gotDiscount
-		        };
+                var plansWithFeaturesValues = setPlansFeatureValues(plansParsedTieredPlans);
+
+
+                var parsed = {
+                   offering_description: response.description,
+                   features: offeringFeatures,
+                   plans: plansWithFeaturesValues,
+                   discounts:gotDiscount
+               };
+                console.log(parsed)
+	              return  parsed;
 		    }
 
 		    var parsed = customParser(data);
