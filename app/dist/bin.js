@@ -10820,16 +10820,25 @@ priceListViewCtrl = function (bb, tmpl, tmplNew, utils, css, tosModel, absNurego
         multitier: tmpl,
         new: tmplNew
       };
+      this.templateEnum = {
+        1: 'new',
+        2: 'custom',
+        3: 'theme_from_param'
+      };
       if (!this.params.preview) {
         this.tosModel = new tosModel();
         this.tosModel.fetch({ dataType: 'jsonp' });
       }
       this.selectedPlan = '';
       this.model = model;
+      this.template = _.template(themes['new']);
+      this.selectedTemplate = this.templateEnum[1];
       if (customTmpl) {
         this.template = _.template(customTmpl);
+        this.selectedTemplate = this.templateEnum[2];
       } else if (this.params.theme && themes[this.params.theme]) {
         this.template = _.template(themes[this.params.theme]);
+        this.selectedTemplate = this.templateEnum[3];
       }
       this.listenToOnce(this.model, 'change', this.render);
       this.model.fetch({
@@ -10953,6 +10962,10 @@ priceListViewCtrl = function (bb, tmpl, tmplNew, utils, css, tosModel, absNurego
         return;
       }
       //TODO: need to enable registerWithSSo for "new" price list theme
+      if (this.$el.hasClass('noSSO') && this.selectedTemplate == this.templateEnum[1]) {
+        this.registerWithSSo();
+        return;
+      }
       if (this.$el.hasClass('noSSO') && !this.params.theme) {
         this.registerWithSSo();
       } else {
