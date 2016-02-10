@@ -10579,19 +10579,21 @@ priceListModel = function (Backbone, constants) {
             for (var j = 0; j < featuresArr[ftr].length; j++) {
               var maxUnits = featuresArr[ftr][j].max_unit;
               var minUnits = featuresArr[ftr][j].min_unit;
+              var unit_of_measure_value = featuresArr[ftr][j].unit_of_measure_name;
+              var ftr_uom = unit_of_measure_value ? unit_of_measure_value : 'units';
               var price = featuresArr[ftr][j].price;
               var value_string = price;
               if (featuresArr[ftr][j].max_unit != 0) {
-                value_string += ' up to ' + maxUnits + ' units';
+                value_string += ' up to ' + maxUnits + ' ' + ftr_uom;
               } else {
-                value_string += ' from ' + minUnits + ' units';
+                value_string += ' from ' + minUnits + ' ' + ftr_uom;
                 if (maxUnits) {
-                  value_string += ' - ' + maxUnits + ' units';
+                  value_string += ' - ' + maxUnits + ' ' + ftr_uom;
                 }
                 if (featuresArr[ftr][j].type == 'constant') {
                   value_string = featuresArr[ftr][j].value;
                 } else {
-                  value_string = price + ' per unit';
+                  value_string = price + ' per ' + ftr_uom;
                 }
               }
               featuresArr[ftr][j].value_string = value_string;
