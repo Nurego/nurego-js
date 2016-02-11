@@ -34,6 +34,14 @@ define(["backbone","constants"],function(Backbone,constants){
 
         parse:function(data,req){
 
+          function ReplaceNumberWithCommas(yourNumber) {
+            //Seperates the components of the number
+            var n= yourNumber.toString().split(".");
+            //Comma-fies the first part
+            n[0] = n[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            //Combines the two sections
+            return n.join(".");
+          }
 
             function joinTieredFeatures(plans){
                     for(var i = 0; i<plans.length;i++){
@@ -42,6 +50,14 @@ define(["backbone","constants"],function(Backbone,constants){
                       if(plans[i].billing_period == "monthly"){
                         plans[i].billing_period = "Month"
                       }
+                      if(plans[i].billing_period == "daily"){
+                        plans[i].billing_period = "Day"
+                      }
+                      if(plans[i].billing_period == "yearly"){
+                        plans[i].billing_period = "Year"
+                      }
+                      
+                      plans[i].price = ReplaceNumberWithCommas(plans[i].price);
 
                         var featuresArr = plans[i].features.data;
                         var groupedFeatures = _.groupBy(featuresArr,'id');

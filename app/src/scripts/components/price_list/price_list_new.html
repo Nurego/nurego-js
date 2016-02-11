@@ -1,5 +1,11 @@
 <style>
 
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .subscribe_cell,
 .plan_header_cell,
 .plan_features_cell,
@@ -15,7 +21,7 @@
     border-bottom: 2px solid #e8ebed;
     padding: 20px 0px;
     align-items: center;
-    /*justify-content: center;*/ 
+    /*justify-content: center;*/
 }
 
 .table_row.plans_header{
@@ -34,6 +40,7 @@
 .plan_price {
     color: #1acca2;
     font-size: 32px;
+    max-width: 225px;
 }
 
 .price_recurrence {
@@ -201,7 +208,7 @@ a:hover{
       <div class="plan_header_cell"></div>
       <!-- EMPTY CELL END -->
 			{{  for(var plan in plans) { }}
-  			<div class="plan_header_cell"  title="{{=plans[plan].name}}">
+  			<div class="plan_header_cell ellipsis"  title="{{=plans[plan].name}}">
           {{=plans[plan].name}}
 
           {{for (item in plans[plan].discounts.data) { }}
@@ -222,7 +229,7 @@ a:hover{
 			{{  for(var plan in plans) { }}
           {{	if(plans[plan].price != "undefined")	{	}}
             <div class="plan_base_price_cell">
-              <div class="plan_price">${{=plans[plan].price}}</div>
+              <div class="plan_price ellipsis" title="${{=plans[plan].price}}">${{=plans[plan].price}}</div>
               <div class="price_recurrence">
                 <span> / {{=plans[plan].billing_period}}</span>
               </div>
