@@ -56,7 +56,10 @@ define(["backbone","constants"],function(Backbone,constants){
                       if(plans[i].billing_period == "yearly"){
                         plans[i].billing_period = "Year"
                       }
-                      
+                      if(plans[i].billing_period == "weekly"){
+                        plans[i].billing_period = "Week"
+                      }
+
                       plans[i].price = ReplaceNumberWithCommas(plans[i].price);
 
                         var featuresArr = plans[i].features.data;
