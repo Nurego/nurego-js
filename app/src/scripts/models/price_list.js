@@ -91,7 +91,7 @@ define(["backbone","constants"],function(Backbone,constants){
                         var uFtr = _.uniq(ftr, function(item, key, a) {
                              return item.a;
                         });
-                        if(uFtr[0].name != "recurring"){
+                        if(uFtr[0].name != "recurring" && uFtr[0].name != "Stripe element"){
                             uniqFtrs.push(uFtr[0])
                         }
                     });
