@@ -1,0 +1,367 @@
+<style>
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subscribe_cell,
+.plan_header_cell,
+.plan_features_cell,
+.plan_base_price_cell {
+    flex: 1;
+    text-align: center;
+    min-width: 175px;
+    overflow: hidden;
+    max-width: 275px;
+}
+
+.table_row{
+    display: inline-flex;
+    border-bottom: 2px solid #e8ebed;
+    padding: 20px 0px;
+    align-items: center;
+    width: 100%;
+    /*justify-content: center;*/
+}
+
+.table_row.plans_header{
+  border-bottom: 2px solid #1acca2;
+  padding:10px 0px;
+}
+
+
+.plan_header_cell {
+  color: #1acca2;
+  font-size: 16px;
+  font-weight: bold;
+  height: 30px;
+  overflow: visible;
+  position: relative;
+}
+
+.plan_price {
+    color: #1acca2;
+    font-size: 32px;
+    max-width: 275px;
+    min-width: 175px;
+}
+
+.price_recurrence {
+    color: #adb0b0;
+}
+
+.plan_features_cell.feature_name,
+.plan_base_price_cell:first-child  {
+    text-indent: 8px;
+    text-align: left;
+    font-weight: bold;
+}
+
+
+span.nr-yes{
+    color: #1acca2;
+    font-size: 24px;
+}
+
+span.nr-no {
+    color: #adb0b0;
+    font-size: 24px;
+}
+
+.trial_el span {
+    background: #1acca2;
+    border-radius: 50px;
+    padding: 0px 16px;
+}
+
+.trial_el {
+  border-radius: 25px;
+  padding: 0px 5px;
+  position: absolute;
+  top: 33px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  overflow: hidden;
+  max-height: 16px;
+  width: 175px;
+  overflow: hidden;
+  left: 40px;
+}
+
+.nrg-btn{
+  background: #16b590;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 5px 12px;
+  margin: 0px 12px;
+  display: inline-block;
+}
+
+a,
+a:hover{
+  color:#16b590;
+}
+
+.emailWrapper .invalidEmail{
+	display: none;
+}
+
+.emailWrapper.has-error .invalidEmail{
+	display: block;
+}
+
+.modal-bg{
+  display: none;
+}
+
+.fillEmail .modal-bg{
+  position:absolute;
+  display: block;
+  top:0px;
+  right:0px;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  background:rgba(255,255,255,0.5);
+}
+
+.noSSO.fillEmail .emailWrapper{
+  display: block;
+  position: absolute;
+  width: 300px;
+  top: 60px;
+  background: white;
+  padding: 20px;
+  z-index: 99999;
+  height: 245px;
+  border: 1px solid gray;
+  border-radius: 3px;
+  left: calc(50% - 150px);
+}
+
+.noSSO.fillEmail.done .emailWrapper,
+.done.fillEmail .modal-bg,
+.emailWrapper,
+.noSSO.fillEmail .nr-nurego-tag-line{
+	display:none;
+}
+
+.thankYou{
+	display: none;
+}
+
+.done .p1 {
+  	font-size: 28px;
+}
+.done .thankYou{
+  display: block;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  text-align: center;
+  background: rgba(255,255,255,1);
+  height: 100%;
+  padding: 10%;
+  z-index: 999;
+}
+
+.unchecked .subscribeToPlan{
+	opacity:0.35;
+}
+
+.checked .subscribeToPlan{
+	opacity:1;
+}
+
+.noSSO.fillEmail .tableWrapper{
+	display:none;
+}
+
+
+.emailWrapper span.nr-no {
+    position: absolute;
+    right: 10px;
+    font-size: 18px;
+    top: 10px;
+    cursor: pointer;
+}
+
+
+.nr-nurego-tag-line {
+    text-align: right;
+    margin: 0px 10px;
+}
+
+.plan_features_cell.feature_name::first-letter,
+.plan_header_cell::first-letter  {
+    text-transform: capitalize;
+}
+
+.plan_header_name {
+    color: #1acca2;
+    font-size: 16px;
+    font-weight: bold;
+    height: 38px;
+    text-align: center;
+    max-width: 275px;
+    min-width: 175px;
+}
+
+</style>
+
+
+
+
+<div class="table_wrapper">
+
+    <div class="table_row plans_header">
+      <!-- EMPTY CELL -->
+      <div class="plan_header_cell"></div>
+      <!-- EMPTY CELL END -->
+			{{  for(var plan in plans) { }}
+  			<div class="plan_header_cell"  title="{{=plans[plan].name}}">
+          <div class="ellipsis plan_header_name">
+              {{=plans[plan].name}}
+          </div>
+
+          {{for (item in plans[plan].discounts.data) { }}
+            <div class="trial_el ellipsis">
+              <span>{{=plans[plan].discounts.data[item].days_to_apply}} Days Free Trial </span>
+            </div>
+          {{	}	}}
+
+        </div>
+
+			{{ 	}	}}
+		</div>
+
+    <div class="table_row plans_base_price">
+      <div class="plan_base_price_cell">
+        Base Price
+      </div>
+			{{  for(var plan in plans) { }}
+          {{	if(plans[plan].price != "undefined")	{	}}
+            <div class="plan_base_price_cell">
+              <div class="plan_price ellipsis" title="${{=plans[plan].price}}">${{=plans[plan].price}}</div>
+              <div class="price_recurrence">
+                <span> / {{=plans[plan].billing_period}}</span>
+              </div>
+            </div>
+          {{	} }}
+			{{ 	}	}}
+		</div>
+
+
+		{{  for(var item in features) { }}
+		<div class="table_row plans_features">
+        <div class="plan_features_cell feature_name" title="{{=features[item].name}}">
+					{{=features[item].name}}
+				</div>
+        {{  for(var plan in plans) { }}
+
+          {{	if(plans[plan].features.grouped[features[item].id])	{	}}
+
+            <!-- if not nissing and is a tiered feature - print all tiers for this feature -->
+            {{ if(plans[plan].features.grouped[features[item].id].length > 1) { }}
+
+
+              <div class="plan_features_cell tiered_feature_wrapper">
+                  <div class="plan_tiered_cell" title="{{=features[item].name}}">
+                    {{  for(var featureItem in plans[plan].features.grouped[features[item].id] ) { }}
+                        <div class="tiered_item">
+                              ${{=plans[plan].features.grouped[features[item].id][featureItem].value_string}}
+                        </div>
+                    {{	}	}}
+
+                  </div>
+              </div>
+
+              {{   }else {  }}
+                  <div class="plan_features_cell">
+                    {{ if(plans[plan].features.grouped[features[item].id][0].price != 0) {  }}
+                        ${{=plans[plan].features.grouped[features[item].id][0].value_string}}
+                    {{   }else{  }}
+                        <span class="nr-check nr-yes ion-checkmark-circled"></span>
+                    {{  }  }}
+                  </div>
+              {{   } }}
+
+					{{	} else{	}}
+            <!-- FEATURE IS MISSING IN THIS PLAN -->
+						<div class="plan_features_cell">
+							<span class="nr-check nr-no ion-close-circled"></span>
+						</div>
+            <!-- FEATURE IS MISSING IN THIS PLAN -->
+					{{	}	}}
+        {{ 	}	}}
+		</div>
+		{{  }  }}
+
+
+	{{	if(!obj.urlParams["preview"]) {	}}
+    <div class="table_row subscribe_row">
+      <!-- EMPTY CELL -->
+      <div class="subscribe_cell"></div>
+      <!-- EMPTY CELL END -->
+      {{  for(var plan in plans) { }}
+      <div class="subscribeToPlan subscribe_cell">
+        <div class="nrg-btn plan-select" data-id="{{=plans[plan].id}}">
+          Subscribe
+        </div>
+      </div>
+      {{ 	}	}}
+    </div>
+	{{	}	}}
+
+
+</div>
+
+
+
+{{ if(obj.urlParams["terms-of-service-url"]) {	}}
+	<div class="nr-nurego-tag-line">
+			 <div class="checkbox" id="checkbox">
+			    <label>
+			      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox">
+			      By clicking subscribe you agree to the
+                  <a href="javascript:void(0)" class="terms">Terms of Service</a>
+			    </label>
+			  </div>
+        <div>
+            Pricing Table Crafted by
+            <a href="http://www.nurego.com">Nurego</a>
+        </div>
+	</div>
+{{	}	}}
+
+
+
+
+
+<div class="modal-bg"></div>
+
+<div class="emailWrapper">
+  <span class="nr-check nr-no ion-close-circled"></span>
+	<h4 class="">Please enter your Email:</h4>
+	<input class="form-control email" type="text" placeholder="example@email.com"/>
+  </br>
+	<div class="postNoSSo nrg-btn">Subscribe</div>
+  <div class="alert alert-danger invalidEmail" role="alert" style="margin-top:12px;">
+      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+      <span class="sr-only"></span>
+      <span class="txt">Error:Invalid Email address, please try again.</span>
+  </div>
+</div>
+
+
+
+
+<div class="thankYou">
+	<div class="p1">Your registration invite has been sent.</div>
+	<div class="p2">Please check your inbox and use the link inside to sign up</div>
+</div>

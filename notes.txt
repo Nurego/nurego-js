@@ -1,3 +1,19 @@
+25/01/2016
+- check divisions up to 0.001
+
+
+done:
+---------
+- monthly = month
+- plan names, features names-  first letter cap
+- subscribe btn alignment
+- tiered features normalize capitalization.
+
+
+
+
+----------------------------------------
+
 jquery 1.10.2 conflict
 ______________________________
 
@@ -55,7 +71,7 @@ V* html resources managment
 
 
 - camelCase or camel_case (best practices)
-- css html, do we need to inc version to see default templates changes. 
+- css html, do we need to inc version to see default templates changes.
   or do we want to allow external loading of resources, or both.
 
 - lodash and 3rd party libs - dont cross the 100kb benchmark.
@@ -66,9 +82,8 @@ V* html resources managment
 - capture widget frame on load to post the clients html overwrite after loading it via ajax from the clients site and saving it to a var.
 
 LOGIN{
-	
-	- ask for server url and pass plan 
+
+	- ask for server url and pass plan
 	- redirecto to callback url
 
 }
-
