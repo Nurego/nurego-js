@@ -18,7 +18,7 @@
 }
 
 .table_row{
-    display: flex;
+    display: inline-flex;
     border-bottom: 2px solid #e8ebed;
     padding: 20px 0px;
     align-items: center;
@@ -35,7 +35,7 @@
     color: #1acca2;
     font-size: 16px;
     font-weight: bold;
-    height:38px;
+    height:30px;
 }
 
 .plan_price {
@@ -75,14 +75,17 @@ span.nr-no {
 .trial_el {
   border-radius: 25px;
   padding: 0px 5px;
-  position: relative;
-  top: 19px;
+  position: absolute;
+  top: 42px;
   color: white;
   font-size: 12px;
   font-weight: bold;
   overflow: hidden;
   max-height: 16px;
-  margin: 0px 5px;
+  width: 175px;
+  overflow: hidden;
+  margin-left: 3px;
+  left: auto;
 }
 
 .nrg-btn{
@@ -196,6 +199,14 @@ a:hover{
     text-transform: capitalize;
 }
 
+.plan_header_name {
+    color: #1acca2;
+    font-size: 16px;
+    font-weight: bold;
+    height: 38px;
+    text-align: center;
+    max-width: 175px;
+}
 
 </style>
 
@@ -209,11 +220,13 @@ a:hover{
       <div class="plan_header_cell"></div>
       <!-- EMPTY CELL END -->
 			{{  for(var plan in plans) { }}
-  			<div class="plan_header_cell ellipsis"  title="{{=plans[plan].name}}">
-          {{=plans[plan].name}}
+  			<div class="plan_header_cell"  title="{{=plans[plan].name}}">
+          <div class="ellipsis plan_header_name">
+              {{=plans[plan].name}}
+          </div>
 
           {{for (item in plans[plan].discounts.data) { }}
-            <div class="trial_el">
+            <div class="trial_el ellipsis">
               <span>{{=plans[plan].discounts.data[item].days_to_apply}} Days Free Trial </span>
             </div>
           {{	}	}}
