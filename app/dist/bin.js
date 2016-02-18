@@ -10598,15 +10598,15 @@ priceListModel = function (Backbone, constants) {
               var maxUnits = featuresArr[ftr][j].max_unit;
               var minUnits = featuresArr[ftr][j].min_unit;
               var unit_of_measure_value = featuresArr[ftr][j].unit_of_measure_name;
-              var ftr_uom = unit_of_measure_value ? unit_of_measure_value : 'units';
+              var ftr_uom = unit_of_measure_value ? unit_of_measure_value : 'unit';
               var price = ReplaceNumberWithCommas(featuresArr[ftr][j].price);
               var value_string = price;
               if (maxUnits !== 0 && maxUnits !== null) {
-                value_string += ' up to ' + maxUnits + ' ' + ftr_uom;
+                value_string += ' up to ' + maxUnits + ' ' + ftr_uom + 's';
               } else {
-                value_string += ' from ' + minUnits + ' ' + ftr_uom;
+                value_string += ' from ' + minUnits + ' ' + ftr_uom + 's';
                 if (maxUnits) {
-                  value_string += ' - ' + maxUnits + ' ' + ftr_uom;
+                  value_string += ' - ' + maxUnits + ' ' + ftr_uom + 's';
                 }
                 if (featuresArr[ftr][j].type == 'constant') {
                   value_string = featuresArr[ftr][j].value;
