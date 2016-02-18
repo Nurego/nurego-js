@@ -122,7 +122,7 @@ define(["backbone","constants"],function(Backbone,constants){
                         var price = ReplaceNumberWithCommas(featuresArr[ftr][j].price);
                         var value_string = price;
 
-                        if(maxUnits){
+                        if(maxUnits !== 0 && maxUnits !== null){
                           value_string+= " up to " + maxUnits  + " " + ftr_uom;
                         }else{
                             value_string+= " from " + minUnits  +  " " + ftr_uom;
