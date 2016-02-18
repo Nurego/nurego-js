@@ -119,7 +119,7 @@ define(["backbone","constants"],function(Backbone,constants){
                         var minUnits = featuresArr[ftr][j].min_unit;
                         var unit_of_measure_value = featuresArr[ftr][j].unit_of_measure_name;
                         var ftr_uom = (unit_of_measure_value) ? unit_of_measure_value : "units";
-                        var price = featuresArr[ftr][j].price;
+                        var price = ReplaceNumberWithCommas(featuresArr[ftr][j].price);
                         var value_string = price;
 
                         if(featuresArr[ftr][j].max_unit != 0){
@@ -143,45 +143,6 @@ define(["backbone","constants"],function(Backbone,constants){
 
               return plans;
             }
-
-/*
-
-
-                    {{ if(plans[plan].features.grouped[features[item].id][0].max_unit) { }}
-                        {{if (plans[plan].features.grouped[features[item].id][0].element_type == 'overage')  { }}
-                            {{	if(!obj.urlParams["show-feature-price"])	{	}}
-                              ${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
-                              up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
-                            {{	}else{	}}
-                              up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
-                            {{	}	}}
-                        {{	}else{	}}
-                            {{=plans[plan].features.grouped[features[item].id][0].max_unit}}
-                        {{	}	}}
-                    {{	}else{	}}
-
-                        <!-- if feature is of type "constant / multi value feature"  -->
-                        {{	if(plans[plan].features.grouped[features[item].id][0].type == "constant")	{	}}
-
-                            {{=plans[plan].features.grouped[features[item].id][0].value}}
-
-                        {{   }else {  }}
-
-                            <!-- if feature has price per unit -->
-                            {{	if(obj.urlParams["show-feature-price"] && plans[plan].features.grouped[features[item].id][0].price != 0)	{	}}
-                                    ${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
-                            {{	} else {	}}
-                            <!-- if feature is available with no units/constants/multi value / etc.. -->
-      												<span class="nr-check nr-yes ion-checkmark-circled"></span>
-                            {{   }   }}
-
-
-                        {{   }   }}
-
-
-                    {{   }  }}
-
-*/
 
 
         	  function customParser(response) {
