@@ -6,15 +6,20 @@
   text-overflow: ellipsis;
 }
 
+.plan_tiered_cell {
+  text-align: left;
+  display: inline-block;
+  max-width: 130px;
+}
+
 .subscribe_cell,
 .plan_header_cell,
 .plan_features_cell,
 .plan_base_price_cell {
     flex: 1;
     text-align: center;
-    min-width: 175px;
     overflow: hidden;
-    max-width: 275px;
+    width:200px;
 }
 
 .table_row{
@@ -44,8 +49,7 @@
 .plan_price {
     color: #1acca2;
     font-size: 32px;
-    max-width: 275px;
-    min-width: 175px;
+    width:200px;
 }
 
 .price_recurrence {
@@ -208,8 +212,7 @@ a:hover{
     font-weight: bold;
     height: 38px;
     text-align: center;
-    max-width: 275px;
-    min-width: 175px;
+    width:200px;
 }
 
 </style>
@@ -240,6 +243,8 @@ a:hover{
 			{{ 	}	}}
 		</div>
 
+    <div class="row_clear"></div>
+
     <div class="table_row plans_base_price">
       <div class="plan_base_price_cell">
         Base Price
@@ -256,9 +261,10 @@ a:hover{
 			{{ 	}	}}
 		</div>
 
-
 		{{  for(var item in features) { }}
-		<div class="table_row plans_features">
+    <div class="row_clear"></div>
+
+    <div class="table_row plans_features">
         <div class="plan_features_cell feature_name" title="{{=features[item].name}}">
 					{{=features[item].name}}
 				</div>
@@ -304,6 +310,7 @@ a:hover{
 
 
 	{{	if(!obj.urlParams["preview"]) {	}}
+    <div class="row_clear"></div>
     <div class="table_row subscribe_row">
       <!-- EMPTY CELL -->
       <div class="subscribe_cell"></div>
