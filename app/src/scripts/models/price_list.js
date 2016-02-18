@@ -115,8 +115,8 @@ define(["backbone","constants"],function(Backbone,constants){
                   for (ftr in featuresArr){
                       //ftr = "key-rfrs-sdfsdf-asfdfsa-key";
                       for (var j = 0; j<featuresArr[ftr].length; j++){
-                        var maxUnits = featuresArr[ftr][j].max_unit;
-                        var minUnits = featuresArr[ftr][j].min_unit;
+                        var maxUnits = ReplaceNumberWithCommas(featuresArr[ftr][j].max_unit);
+                        var minUnits = ReplaceNumberWithCommas(featuresArr[ftr][j].min_unit);
                         var unit_of_measure_value = featuresArr[ftr][j].unit_of_measure_name;
                         var ftr_uom = (unit_of_measure_value) ? unit_of_measure_value : "unit";
                         var price = ReplaceNumberWithCommas(featuresArr[ftr][j].price);
@@ -133,7 +133,11 @@ define(["backbone","constants"],function(Backbone,constants){
                             if(featuresArr[ftr][j].type == "constant"){
                               value_string = featuresArr[ftr][j].value;
                             }else{
-                              value_string = price + " per " + ftr_uom;
+                              if(minUnits){
+                                value_string = price + " per " + ftr_uom + " from " + minUnits + " " + ftr_uom + "s";
+                              }else{
+                                value_string = price + " per " + ftr_uom;
+                              }
                             }
                         }
                         featuresArr[ftr][j].value_string = value_string;
