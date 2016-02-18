@@ -10601,7 +10601,7 @@ priceListModel = function (Backbone, constants) {
               var ftr_uom = unit_of_measure_value ? unit_of_measure_value : 'units';
               var price = ReplaceNumberWithCommas(featuresArr[ftr][j].price);
               var value_string = price;
-              if (featuresArr[ftr][j].max_unit != 0) {
+              if (maxUnits) {
                 value_string += ' up to ' + maxUnits + ' ' + ftr_uom;
               } else {
                 value_string += ' from ' + minUnits + ' ' + ftr_uom;
