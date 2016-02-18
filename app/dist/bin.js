@@ -10611,7 +10611,11 @@ priceListModel = function (Backbone, constants) {
                 if (featuresArr[ftr][j].type == 'constant') {
                   value_string = featuresArr[ftr][j].value;
                 } else {
-                  value_string = price + ' per ' + ftr_uom;
+                  if (minUnits) {
+                    value_string = price + ' per ' + ftr_uom + ' from ' + minUnits + ' ' + ftr_uom + 's';
+                  } else {
+                    value_string = price + ' per ' + ftr_uom;
+                  }
                 }
               }
               featuresArr[ftr][j].value_string = value_string;
