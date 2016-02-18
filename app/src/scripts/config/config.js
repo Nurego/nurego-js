@@ -26,6 +26,7 @@ require.config({
         registrationViewCtrl: '../components/registration/registration.ctrl',
         loginHTML: '../components/login/login.html',
         priceListHTML: '../components/price_list/price_list.html',
+        priceListNewHTML: '../components/price_list/price_list_new.html',
         plansSwitcherHTML: '../components/plans_switcher/plans_switcher.html',
         plansSwitcherCSS: '../components/plans_switcher/plans_switcher.css',
         plansSwitcherViewCtrl: '../components/plans_switcher/plans_switcher.ctrl',

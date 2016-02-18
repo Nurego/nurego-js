@@ -1,7 +1,7 @@
-define(["backbone","text!priceListHTML","utils",
+define(["backbone","text!priceListHTML","text!priceListNewHTML","utils",
 		"text!priceListCSS","tosModel",
 		"absNuregoView","text!priceListSingleTierHTML","jquery"],
-		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
+		function(bb,tmpl,tmplNew,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
 		var priceList = absNuregoView.extend({
 		  tagName: "div",
 		  className: "login",
@@ -9,7 +9,8 @@ define(["backbone","text!priceListHTML","utils",
 		  events:{
 		    "click .plan-select":   "registration",
 		    "click .terms":   "openTerms",
-		    "click .postNoSSo" : "postRegistration"
+		    "click .postNoSSo" : "postRegistration",
+				"click .nr-no" : "closeDialog"
 		  },
 
 		  initialize: function(model,customTmpl){
@@ -18,8 +19,16 @@ define(["backbone","text!priceListHTML","utils",
 		  	var themes = {
 		  		singleTier:priceListSingleTierHTML,  //deprecated : need to remove camelCode and use camel_code;
 		  		single_tier:priceListSingleTierHTML,
-		  		multitier:tmpl
+		  		multitier:tmpl,
+					new:tmplNew
 		  	};
+
+				this.templateEnum = {
+					1:"new",
+					2:"custom",
+					3:"theme_from_param"
+				};
+
 		  	if(!this.params.preview){
 		  		this.tosModel = new tosModel();
 		    	this.tosModel.fetch({dataType:"jsonp"});
@@ -27,10 +36,14 @@ define(["backbone","text!priceListHTML","utils",
 
 		    this.selectedPlan = "";
 		  	this.model = model;
+				this.template = _.template(themes["new"]);
+				this.selectedTemplate = this.templateEnum[1]
 		  	if(customTmpl){
 		  		this.template = _.template(customTmpl);
+					this.selectedTemplate = this.templateEnum[2]
 		  	}else if(this.params.theme && themes[this.params.theme]){
 		  		this.template = _.template(themes[this.params.theme])
+					this.selectedTemplate = this.templateEnum[3]
 		  	}
 		    this.listenToOnce(this.model, "change", this.render);
 		    this.model.fetch({
@@ -48,6 +61,9 @@ define(["backbone","text!priceListHTML","utils",
 		    this.addStyle();
 		  },
 
+			closeDialog:function(){
+				this.$el.removeClass('fillEmail');
+			},
 		  openTerms:function(){
 		  	var url = this.params['terms-of-service-url'];
 		  	if(url.indexOf('http') == -1){//Doron: Absolute URL
@@ -171,10 +187,16 @@ define(["backbone","text!priceListHTML","utils",
 		  	if(this.$el.hasClass('unchecked')){
 		  		return;
 		  	}
-		  	if(this.$el.hasClass('noSSO') && !this.params.theme){
-		  		this.registerWithSSo()
-		  	}else{
-			 	this.postRegistration();
+				//TODO: need to enable registerWithSSo for "new" price list theme
+				if(this.$el.hasClass('noSSO') && this.selectedTemplate == this.templateEnum[1]){
+					this.registerWithSSo()
+					return;
+				}
+				if(this.$el.hasClass('noSSO') && !this.params.theme){
+						this.registerWithSSo()
+				}
+		  	else{
+			 		this.postRegistration();
 		  	}
 		  },
 
@@ -248,7 +270,7 @@ define(["backbone","text!priceListHTML","utils",
 		    	this.$el.addClass('noSSO');
 		    }
 				this.initTiers();
-		    return this; 
+		    return this;
 		  }
 
 		});
