@@ -58,7 +58,7 @@
 
 .plan_features_cell.feature_name,
 .plan_base_price_cell:first-child  {
-    text-indent: 8px;
+    padding-left: 8px;
     text-align: left;
     font-weight: bold;
 }
@@ -215,160 +215,170 @@ a:hover{
     width:200px;
 }
 
+.nurego_widget_wrapper{
+  text-align:center;
+}
+
+.table_wrapper{
+  display:inline-block;
+  background:white;
+}
+
 </style>
 
 
 
+<div class="nurego_widget_wrapper">
+  <div class="table_wrapper">
 
-<div class="table_wrapper">
+      <div class="table_row plans_header">
+        <!-- EMPTY CELL -->
+        <div class="plan_header_cell"></div>
+        <!-- EMPTY CELL END -->
+  			{{  for(var plan in plans) { }}
+    			<div class="plan_header_cell"  title="{{=plans[plan].name}}">
+            <div class="ellipsis plan_header_name">
+                {{=plans[plan].name}}
+            </div>
 
-    <div class="table_row plans_header">
-      <!-- EMPTY CELL -->
-      <div class="plan_header_cell"></div>
-      <!-- EMPTY CELL END -->
-			{{  for(var plan in plans) { }}
-  			<div class="plan_header_cell"  title="{{=plans[plan].name}}">
-          <div class="ellipsis plan_header_name">
-              {{=plans[plan].name}}
+            {{for (item in plans[plan].discounts.data) { }}
+              <div class="trial_el ellipsis">
+                <span>{{=plans[plan].discounts.data[item].days_to_apply}} Days Free Trial </span>
+              </div>
+            {{	}	}}
+
           </div>
 
-          {{for (item in plans[plan].discounts.data) { }}
-            <div class="trial_el ellipsis">
-              <span>{{=plans[plan].discounts.data[item].days_to_apply}} Days Free Trial </span>
-            </div>
-          {{	}	}}
+  			{{ 	}	}}
+  		</div>
 
+      <div class="row_clear"></div>
+
+      <div class="table_row plans_base_price">
+        <div class="plan_base_price_cell">
+          Base Price
         </div>
-
-			{{ 	}	}}
-		</div>
-
-    <div class="row_clear"></div>
-
-    <div class="table_row plans_base_price">
-      <div class="plan_base_price_cell">
-        Base Price
-      </div>
-			{{  for(var plan in plans) { }}
-          {{	if(plans[plan].price != "undefined")	{	}}
-            <div class="plan_base_price_cell">
-              <div class="plan_price ellipsis" title="${{=plans[plan].price}}">${{=plans[plan].price}}</div>
-              <div class="price_recurrence">
-                <span> / {{=plans[plan].billing_period}}</span>
+  			{{  for(var plan in plans) { }}
+            {{	if(plans[plan].price != "undefined")	{	}}
+              <div class="plan_base_price_cell">
+                <div class="plan_price ellipsis" title="${{=plans[plan].price}}">${{=plans[plan].price}}</div>
+                <div class="price_recurrence">
+                  <span> / {{=plans[plan].billing_period}}</span>
+                </div>
               </div>
-            </div>
-          {{	} }}
-			{{ 	}	}}
-		</div>
+            {{	} }}
+  			{{ 	}	}}
+  		</div>
 
-		{{  for(var item in features) { }}
-    <div class="row_clear"></div>
+  		{{  for(var item in features) { }}
+      <div class="row_clear"></div>
 
-    <div class="table_row plans_features">
-        <div class="plan_features_cell feature_name" title="{{=features[item].name}}">
-					{{=features[item].name}}
-				</div>
+      <div class="table_row plans_features">
+          <div class="plan_features_cell feature_name" title="{{=features[item].name}}">
+  					{{=features[item].name}}
+  				</div>
+          {{  for(var plan in plans) { }}
+
+            {{	if(plans[plan].features.grouped[features[item].id])	{	}}
+
+              <!-- if not nissing and is a tiered feature - print all tiers for this feature -->
+              {{ if(plans[plan].features.grouped[features[item].id].length > 1) { }}
+
+
+                <div class="plan_features_cell tiered_feature_wrapper">
+                    <div class="plan_tiered_cell" title="{{=features[item].name}}">
+                      {{  for(var featureItem in plans[plan].features.grouped[features[item].id] ) { }}
+                          <div class="tiered_item">
+                                ${{=plans[plan].features.grouped[features[item].id][featureItem].value_string}}
+                          </div>
+                      {{	}	}}
+
+                    </div>
+                </div>
+
+                {{   }else {  }}
+                    <div class="plan_features_cell">
+                      {{ if(plans[plan].features.grouped[features[item].id][0].price != 0) {  }}
+                          ${{=plans[plan].features.grouped[features[item].id][0].value_string}}
+                      {{   }else{  }}
+                          <span class="nr-check nr-yes ion-checkmark-circled"></span>
+                      {{  }  }}
+                    </div>
+                {{   } }}
+
+  					{{	} else{	}}
+              <!-- FEATURE IS MISSING IN THIS PLAN -->
+  						<div class="plan_features_cell">
+  							<span class="nr-check nr-no ion-close-circled"></span>
+  						</div>
+              <!-- FEATURE IS MISSING IN THIS PLAN -->
+  					{{	}	}}
+          {{ 	}	}}
+  		</div>
+  		{{  }  }}
+
+
+  	{{	if(!obj.urlParams["preview"]) {	}}
+      <div class="row_clear"></div>
+      <div class="table_row subscribe_row">
+        <!-- EMPTY CELL -->
+        <div class="subscribe_cell"></div>
+        <!-- EMPTY CELL END -->
         {{  for(var plan in plans) { }}
-
-          {{	if(plans[plan].features.grouped[features[item].id])	{	}}
-
-            <!-- if not nissing and is a tiered feature - print all tiers for this feature -->
-            {{ if(plans[plan].features.grouped[features[item].id].length > 1) { }}
-
-
-              <div class="plan_features_cell tiered_feature_wrapper">
-                  <div class="plan_tiered_cell" title="{{=features[item].name}}">
-                    {{  for(var featureItem in plans[plan].features.grouped[features[item].id] ) { }}
-                        <div class="tiered_item">
-                              ${{=plans[plan].features.grouped[features[item].id][featureItem].value_string}}
-                        </div>
-                    {{	}	}}
-
-                  </div>
-              </div>
-
-              {{   }else {  }}
-                  <div class="plan_features_cell">
-                    {{ if(plans[plan].features.grouped[features[item].id][0].price != 0) {  }}
-                        ${{=plans[plan].features.grouped[features[item].id][0].value_string}}
-                    {{   }else{  }}
-                        <span class="nr-check nr-yes ion-checkmark-circled"></span>
-                    {{  }  }}
-                  </div>
-              {{   } }}
-
-					{{	} else{	}}
-            <!-- FEATURE IS MISSING IN THIS PLAN -->
-						<div class="plan_features_cell">
-							<span class="nr-check nr-no ion-close-circled"></span>
-						</div>
-            <!-- FEATURE IS MISSING IN THIS PLAN -->
-					{{	}	}}
+        <div class="subscribeToPlan subscribe_cell">
+          <div class="nrg-btn plan-select" data-id="{{=plans[plan].id}}">
+            Subscribe
+          </div>
+        </div>
         {{ 	}	}}
-		</div>
-		{{  }  }}
-
-
-	{{	if(!obj.urlParams["preview"]) {	}}
-    <div class="row_clear"></div>
-    <div class="table_row subscribe_row">
-      <!-- EMPTY CELL -->
-      <div class="subscribe_cell"></div>
-      <!-- EMPTY CELL END -->
-      {{  for(var plan in plans) { }}
-      <div class="subscribeToPlan subscribe_cell">
-        <div class="nrg-btn plan-select" data-id="{{=plans[plan].id}}">
-          Subscribe
-        </div>
       </div>
-      {{ 	}	}}
-    </div>
-	{{	}	}}
+  	{{	}	}}
 
 
-</div>
-
-
-
-{{ if(obj.urlParams["terms-of-service-url"]) {	}}
-	<div class="nr-nurego-tag-line">
-			 <div class="checkbox" id="checkbox">
-			    <label>
-			      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox">
-			      By clicking subscribe you agree to the
-                  <a href="javascript:void(0)" class="terms">Terms of Service</a>
-			    </label>
-			  </div>
-        <div>
-            Pricing Table Crafted by
-            <a href="http://www.nurego.com">Nurego</a>
-        </div>
-	</div>
-{{	}	}}
-
-
-
-
-
-<div class="modal-bg"></div>
-
-<div class="emailWrapper">
-  <span class="nr-check nr-no ion-close-circled"></span>
-	<h4 class="">Please enter your Email:</h4>
-	<input class="form-control email" type="text" placeholder="example@email.com"/>
-  </br>
-	<div class="postNoSSo nrg-btn">Subscribe</div>
-  <div class="alert alert-danger invalidEmail" role="alert" style="margin-top:12px;">
-      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      <span class="sr-only"></span>
-      <span class="txt">Error:Invalid Email address, please try again.</span>
   </div>
-</div>
+
+
+
+  {{ if(obj.urlParams["terms-of-service-url"]) {	}}
+  	<div class="nr-nurego-tag-line">
+  			 <div class="checkbox" id="checkbox">
+  			    <label>
+  			      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox">
+  			      By clicking subscribe you agree to the
+                    <a href="javascript:void(0)" class="terms">Terms of Service</a>
+  			    </label>
+  			  </div>
+          <div>
+              Pricing Table Crafted by
+              <a href="http://www.nurego.com">Nurego</a>
+          </div>
+  	</div>
+  {{	}	}}
 
 
 
 
-<div class="thankYou">
-	<div class="p1">Your registration invite has been sent.</div>
-	<div class="p2">Please check your inbox and use the link inside to sign up</div>
+
+  <div class="modal-bg"></div>
+
+  <div class="emailWrapper">
+    <span class="nr-check nr-no ion-close-circled"></span>
+  	<h4 class="">Please enter your Email:</h4>
+  	<input class="form-control email" type="text" placeholder="example@email.com"/>
+    </br>
+  	<div class="postNoSSo nrg-btn">Subscribe</div>
+    <div class="alert alert-danger invalidEmail" role="alert" style="margin-top:12px;">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only"></span>
+        <span class="txt">Error:Invalid Email address, please try again.</span>
+    </div>
+  </div>
+
+
+
+
+  <div class="thankYou">
+  	<div class="p1">Your registration invite has been sent.</div>
+  	<div class="p2">Please check your inbox and use the link inside to sign up</div>
+  </div>
 </div>
