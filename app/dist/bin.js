@@ -10545,6 +10545,9 @@ priceListModel = function (Backbone, constants) {
           if (plans[i].billing_period == 'weekly') {
             plans[i].billing_period = 'Week';
           }
+          //show 2 decimal places after the price
+          plans[i].price = plans[i].price.toFixed(2);
+          //add commas to price
           plans[i].price = ReplaceNumberWithCommas(plans[i].price);
           var featuresArr = plans[i].features.data;
           var groupedFeatures = _.groupBy(featuresArr, 'id');
