@@ -58,6 +58,10 @@ define(["backbone","constants"],function(Backbone,constants){
                         plans[i].billing_period = "Week"
                       }
 
+                      //show 2 decimal places after the price
+                      //plans[i].price = plans[i].price.toFixed(2);
+
+                      //add commas to price
                       plans[i].price = ReplaceNumberWithCommas(plans[i].price);
 
                         var featuresArr = plans[i].features.data;
@@ -117,7 +121,7 @@ define(["backbone","constants"],function(Backbone,constants){
                         var minUnits = (featuresArr[ftr][j].min_unit) ? ReplaceNumberWithCommas(featuresArr[ftr][j].min_unit) : featuresArr[ftr][j].min_unit;
                         var unit_of_measure_value = featuresArr[ftr][j].unit_of_measure_name;
                         var ftr_uom = (unit_of_measure_value) ? unit_of_measure_value : "unit";
-                        var price = ReplaceNumberWithCommas(featuresArr[ftr][j].price);
+                        var price = ReplaceNumberWithCommas(featuresArr[ftr][j].price.toFixed(2));
                         var value_string = price;
 
                         if(maxUnits !== 0 && maxUnits !== null){

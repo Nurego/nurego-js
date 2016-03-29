@@ -1,83 +1,86 @@
-<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">
-      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-      <span class="sr-only">Error:</span>
-      <span class="txt"></span>
-</div>
+<center>
 
-<main>
-	<section>
-		<div>
-			<h1>
-				{{=obj.name}}
-			</h1>
-			<h3>
-				Published April 28, 2015
-			</h3>
-		</div>
-	</section>
-	<section>
-        <div>
-					<p>
-						<!-- <img src="http://www.alberttoledo.com/img/icons/social/github.png" id="IMG_47" alt='' />  -->
-						<!-- <img src="{{=obj.icon}}" alt='' /> -->
-						<!-- <a href="https://livesample.grc-apps.svc.ice.ge.com/">View Live Sample</a> -->
-					</p>
-        </div>
-					<div>
-						<p>
-							{{=obj.description}}
-							<!-- The Predix Asset Service provides asset modeling and data management with real time intelligence, and provides insight into the relationships and connections between independently managed assets. Industrial Internet applications are generally machine-focused. The Asset service enables application developers to import, create, and store asset models that describe machine types, as well as create instance representations for those machines. -->
-						</p>
-					</div>
+  <div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        <span class="txt"></span>
+  </div>
 
-          {{ if( obj.service_id == "reference_app" ){ }}
+  <main>
+  	<section>
+  		<div>
+  			<h1>
+  				{{=obj.name}}
+  			</h1>
+  			<h3>
+  				Published April 28, 2015
+  			</h3>
+  		</div>
+  	</section>
+  	<section>
+          <div>
+  					<p>
+  						<!-- <img src="http://www.alberttoledo.com/img/icons/social/github.png" id="IMG_47" alt='' />  -->
+  						<!-- <img src="{{=obj.icon}}" alt='' /> -->
+  						<!-- <a href="https://livesample.grc-apps.svc.ice.ge.com/">View Live Sample</a> -->
+  					</p>
+          </div>
+  					<div>
+  						<p>
+  							{{=obj.description}}
+  							<!-- The Predix Asset Service provides asset modeling and data management with real time intelligence, and provides insight into the relationships and connections between independently managed assets. Industrial Internet applications are generally machine-focused. The Asset service enables application developers to import, create, and store asset models that describe machine types, as well as create instance representations for those machines. -->
+  						</p>
+  					</div>
 
-            <div class="text--small">
-                <p>Use the Reference App to create an app that monitors machine operations, reports irregularities, and analyzes patterns of behavior and performance over time. The app integrates major components of Predix, including Asset, Time Series, and Predix Machine services.</p>
-                <p>To gain a better understanding of the Reference App, view the video:</p>
-                <br/>
-                <p>
-                  <iframe width="560" height="315" src="https://www.youtube.com/embed/2MGPTJ8yjyc" frameborder="0" allowfullscreen=""></iframe>
-                </p>
-                <br/>
-                <p>You must be signed into Predix to see the demo.</p>
-                <p>To access the code directly, click the View on GitHub link below and search for the repo "predix-rmd-ref-app."</p>
-            </div>
+            {{ if( obj.service_id == "reference_app" ){ }}
 
-            <a href="https://github.com/predixdev" target="_blank" class="link link--underline">View on GitHub</a>
-            <br/>
-          {{  } }}
+              <div class="text--small">
+                  <p>Use the Reference App to create an app that monitors machine operations, reports irregularities, and analyzes patterns of behavior and performance over time. The app integrates major components of Predix, including Asset, Time Series, and Predix Machine services.</p>
+                  <p>To gain a better understanding of the Reference App, view the video:</p>
+                  <br/>
+                  <p>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/2MGPTJ8yjyc" frameborder="0" allowfullscreen=""></iframe>
+                  </p>
+                  <br/>
+                  <p>You must be signed into Predix to see the demo.</p>
+                  <p>To access the code directly, click the View on GitHub link below and search for the repo "predix-rmd-ref-app."</p>
+              </div>
 
-          <nurego-widget style="width:100%;height:350px;"
-            name="price_list"
-            preview="true"
-            css="{{=obj.css}}"
-            product-id="{{=obj.service_id}}"
-            sso="false">
-          </nurego-widget>
+              <a href="https://github.com/predixdev" target="_blank" class="link link--underline">View on GitHub</a>
+              <br/>
+            {{  } }}
 
-
-	</section>
-</main>
+            <nurego-widget style="width:100%;height:550px;"
+              name="price_list"
+              preview="true"
+              css="{{=obj.css}}"
+              product-id="{{=obj.service_id}}"
+              sso="false">
+            </nurego-widget>
 
 
+  	</section>
+  </main>
 
-<style>
-h1 {
-    font-size: 18px !important;
-}
 
-h4,h3 {
-    font-size: 14px !important;
-}
 
-body , html {
-  width: 98%;
-  max-width: 73.125rem;
-  margin-right: auto;
-  margin-left: auto;
-  padding-right: 1%;
-  padding-left: 1%;
-  padding-top:65px;
-}
-</style>
+  <style>
+  h1 {
+      font-size: 18px !important;
+  }
+
+  h4,h3 {
+      font-size: 14px !important;
+  }
+
+  body , html {
+    width: 98%;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 1%;
+    padding-left: 1%;
+    padding-top:65px;
+  }
+  </style>
+
+</center>
