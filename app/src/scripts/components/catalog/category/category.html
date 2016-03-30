@@ -62,7 +62,8 @@
 		left:15px;
 		font-weight: bold;
 		font-size:14px;
-		color:#46ad00;
+		/*color:#46ad00;*/
+		color:#1acca2;
 		cursor: pointer;
 	}
 
@@ -133,7 +134,7 @@
 	    bottom: 0;
 	    left: 0;
 	    padding: 1.1875rem;
-	    border: 1px solid #46ad00;
+	    border: 1px solid #1acca2;
 	    background: #fff;
 	}
 
@@ -163,14 +164,16 @@
 	    position: absolute;
 	    bottom: 1.1875rem;
 	    left: 1.1875rem;
-	    height: 30px;
+	    /*height: 30px;*/
+			height: 20px;
 	    border: 0px;
 	}
 
 	.catalog-tile__content:focus, .catalog-tile__content:hover{
 		padding: 1.0625rem;
     border-width: 3px;
-    box-shadow: 0 3px 4px -1px rgba(209,219,208,.8);
+    /*box-shadow: 0 3px 4px -1px rgba(209,219,208,.8);*/
+		box-shadow: 0 3px 4px -1px #1acca2;
 	}
 
 	.catalog-tile__content::after {
@@ -181,7 +184,8 @@
     height: 23px;
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
-    border-bottom: 1px solid #46ad00;
+    /*border-bottom: 1px solid #46ad00;*/
+		border-bottom: 1px solid #1acca2;
     background-color: #eaeaea;
     content: '';
 }
@@ -190,7 +194,8 @@
 .catalog-tile__content:hover::after {
     top: -7px;
     right: -15px;
-    border-bottom: 3px solid #46ad00;
+    /*border-bottom: 3px solid #46ad00;*/
+		border-bottom: 3px solid #1acca2;
 }
 
 	div.section{
@@ -261,16 +266,19 @@ hr {
     font-weight: 400;
 }
 .banner__image--dark {
-    background-image: url(https://www.predix.io/assets/images/catalog/banner-dark.png);
+    /*background-image: url(https://www.predix.io/assets/images/catalog/banner-dark.png);*/
 }
 
 </style>
 
 
 <section class="banner banner--dark" role="region">
+	<img src="http://nurego.com/wp-content/uploads/2015/09/Complete_ElectricRain.-Transparent-website-30pct-pdn.png" style="position: relative;top: 65px;right: -60px;">
 	<div class="vw banner__image banner__image--dark">
-		<h1 class="alpha banner__labels banner__labels--light">
-			Predix Catalog
+		<h1 class="alpha banner__labels banner__labels--light" style="text-align:center; margin-top: -35px;">
+			<!-- <h1 class="alpha banner__labels banner__labels--light"> -->
+			Catalog
+			<!-- Predix Catalog -->
 		</h1>
 	</div>
 </section>
@@ -312,7 +320,10 @@ hr {
 					<div class="catalog-tile__shortdescription">
 						{{=obj.data[category].services.data[item].description}}
 					</div>
-					<img ng-src="https://www.predix.com/sites/default/files/catalog_4p_logo.png" class="catalog-tile__icon" alt="Service Icon" src="https://www.predix.com/sites/default/files/catalog_4p_logo.png">
+
+					<!-- <img ng-src="https://www.predix.com/sites/default/files/catalog_4p_logo.png" class="catalog-tile__icon" alt="Service Icon" src="https://www.predix.com/sites/default/files/catalog_4p_logo.png"> -->
+					<img src="http://gdurl.com/Otz2" class="catalog-tile__icon" alt="Service Icon">
+
 				</div>
 			</div>
 		</div>
