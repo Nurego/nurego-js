@@ -166,7 +166,6 @@ define(["backbone","constants"],function(Backbone,constants){
                    plans: plansWithFeaturesValues,
                    discounts:gotDiscount
                };
-                console.log(parsed)
 	              return  parsed;
 		    }
 

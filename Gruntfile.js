@@ -9,18 +9,21 @@
 
 module.exports = function (grunt){
 
+  var serveStatic = require('serve-static');
+
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
 
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
+
   //grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-plato');
   grunt.loadNpmTasks('grunt-bower-requirejs');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
   //grunt.loadNpmTasks('grunt-autoprefixer');
-  grunt.loadNpmTasks("grunt-remove-logging");
+  grunt.loadNpmTasks('grunt-remove-logging');
 
 
 
@@ -46,8 +49,8 @@ module.exports = function (grunt){
 
     removelogging:{
       dist: {
-        src: "app/dist/bin.js",
-        dist: "app/dist/bin.js",
+        src: 'app/dist/bin.js',
+        dist: 'app/dist/bin.js',
         options: {
           //replaceWith:"0;"
           // see below for options. this is optional.
@@ -64,19 +67,19 @@ module.exports = function (grunt){
                 outputFile = data.path,
                 cleanedCode = amdclean.clean({
                   'filePath': outputFile,
-                  'globalModules':["NuregoWidgets"]
+                  'globalModules':['NuregoWidgets']
                 });
 
               fs.writeFileSync(outputFile, cleanedCode);
             },
             baseUrl: 'app/src/scripts/config',
-            mainConfigFile: "app/src/scripts/config/config.js",
-            out: "app/dist/bin.js",
+            mainConfigFile: 'app/src/scripts/config/config.js',
+            out: 'app/dist/bin.js',
             paths:{ //Include require js lib in our optimized super script.
               //requireLib: 'app/src/bower_components/requirejs/require'
               //requireLib: '../../bower_components/requirejs/require'
             },
-            include: ["NuregoWidgets"],
+            include: ['NuregoWidgets'],
             //include:["requireLib"],
             stubModules: ['text'],
             //findNestedDependencies: true,
@@ -87,15 +90,15 @@ module.exports = function (grunt){
       prod: {
           options: {
             baseUrl: 'app/src/scripts/config',
-            mainConfigFile: "app/src/scripts/config/config.js",
-            name: "config",
-            out: "app/dist/bin.js",
+            mainConfigFile: 'app/src/scripts/config/config.js',
+            name: 'config',
+            out: 'app/dist/bin.js',
             wrap: true,
             /*paths:{ //Include require js lib in our optimized super script.
               //requireLib: 'app/src/bower_components/requirejs/require'
               //requireLib: '../../bower_components/requirejs/require'
             },*/
-            include: ["../../bower_components/almond/almond","main_app"],
+            include: ['../../bower_components/almond/almond','main_app'],
             stubModules: ['text'],
             //findNestedDependencies: true,
             //include: 'requireLib',
@@ -150,7 +153,7 @@ module.exports = function (grunt){
                 '<%= yeoman.app %>/src/scripts/{,*/}{,*/}*.html',
                 '<%= yeoman.app %>/src/scripts/{,*/}{,*/}{,*/}*.html',
                 '<%= yeoman.app %>/src/scripts/{,*/}{,*/}{,*/}*.js'],
-        tasks: [/*'karma',*/'requirejs:dev'], //'newer:jshint:all'
+        tasks: [/*'karma',*/ 'requirejs:dev'], //'newer:jshint:all'
         options: {
           livereload: '<%= connect.options.livereload %>'
         }
@@ -196,12 +199,12 @@ module.exports = function (grunt){
           open: true,
           middleware: function (connect) {
             return [
-              connect.static('.tmp'),
+              serveStatic('.tmp'),
               connect().use(
                 '/app/src/bower_components',
-                connect.static('./app/src/bower_components')
+                serveStatic('./app/src/bower_components')
               ),
-              connect.static(appConfig.app)
+              serveStatic(appConfig.app)
             ];
           }
         }
@@ -211,13 +214,13 @@ module.exports = function (grunt){
           port: 9001,
           middleware: function (connect) {
             return [
-              connect.static('.tmp'),
-              connect.static('test'),
+              serveStatic('.tmp'),
+              serveStatic('test'),
               connect().use(
                 '/app/src/bower_components',
-                connect.static('./app/src/bower_components')
+                serveStatic('./app/src/bower_components')
               ),
-              connect.static(appConfig.app)
+              serveStatic(appConfig.app)
             ];
           }
         }
