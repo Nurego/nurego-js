@@ -50,7 +50,6 @@ define(["backbone","text!singleItemHTML","utils",
 		  },
 
 		  render: function(){
-		  	console.log(this.model.toJSON())
 		  	var html = this.template(this.model.toJSON());
 		    this.$el.html(	html );
 		    return this;

@@ -1,22 +1,21 @@
-/* line 1, ../../../styles/main.scss */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eyal\/Repos\/nurego-js\/app\/src\/styles\/main\.scss}line{font-family:\000031}}
 nurego-widget {
   display: block;
   height: 100%;
   width: 100%;
-  flex:1;
 }
 
-/* line 7, ../../../styles/main.scss */
-.alert.ajaxErrorMsg {
-  position: relative;
-  z-index: 99999999999; 	
-  width: 90%;
-  margin: 45px auto;
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eyal\/Repos\/nurego-js\/app\/src\/styles\/main\.scss}line{font-family:\000037}}
+.alert {
+  display: relative;
+  z-index: 9999999;
 }
 
-/* line 12, ../../../styles/main.scss */
+@media -sass-debug-info{filename{font-family:file\:\/\/\/home\/eyal\/Repos\/nurego-js\/app\/src\/styles\/main\.scss}line{font-family:\0000312}}
 #checkbox label {
   line-height: 175%;
 }
 
 /******************CHECK BOXES ******************/
+
+/*# sourceMappingURL=main.css.map */

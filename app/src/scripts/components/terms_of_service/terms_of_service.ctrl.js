@@ -10,15 +10,18 @@ define(["backbone","text!tosHTML","utils",
 		  events: {
 		    "click .acceptTerms": "acceptTerms"
 		  },
-  
+
 		  initialize: function(model,customTmpl){
 		  	//this.__super__.initialize.apply(this);
 		  	this.params = utils.URLToArray(window.location.href);
-		  	
+
+				this.userID = (this.params['user-id'] || this.params['userId'] || this.params['userID']);
+				// constants.setUserId(this.userID);
+
 		  	if(customTmpl){
 		  		this.template = _.template(customTmpl);
 		  	}
-		  	
+
 		  	if(this.params['preRegistration'] === "true" || this.params['pre-registration'] === "true"){
 		  		this.model = model;
 		  	}else{
@@ -68,18 +71,19 @@ define(["backbone","text!tosHTML","utils",
   		  	for(var i = 0; i <docs.data.length; i++){
   		  		var doc_id = docs.data[i].id;
   		  		//POST /v1/legaldocs/accept?api_key=l22085b6-7062-4b57-8869-cccb2f66f6fb&doc_id=leg_0b06-d678-4675-bd16-efd4f60f2b47
-	  		  	var url = constants.nuregoApiUrl() + "/legaldocs/accept?doc_id=" + doc_id;
+
+	  		  	var url = constants.nuregoApiUrl() + '/users/' + this.userID + '/legaldocs/' + doc_id + '/accept';
 	            $Nurego.ajax({
 			  		url:url,
 			  		type:"post",
-			  		//async:false, //firefox dont like async 
+			  		//async:false, //firefox dont like async
 			  		xhrFields:{
 				        withCredentials: true
 				    },
 				    error:_.bind(this.genericHttpErrorsHandler,this),
 				    crossDomain: true,
-			  		
-				    dataType: 'json', 
+
+				    dataType: 'json',
 				    contentType: "application/x-www-form-urlencoded",
 			  		//data:"plan_id=" + params.plan_id + "&email=" + params.email,
 					//data: { plan_id: params.plan_id, email:params.email},

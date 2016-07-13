@@ -6,17 +6,17 @@
     "doronzzz <gourdoron@gmail.com>"
   ],
   "dependencies": {
-    "requirejs": "~2.1.16",
-    "requirejs-text": "~2.0.13",
+    "requirejs": "*",
+    "requirejs-text": "*",
     "backbone": "*",
     "jquery": "*",
-    "underscore": "~1.7.0",
+    "underscore": "*",
     "json2": "*",
-    "almond": "~0.3.0",
+    "almond": "*",
     "prism": "https://github.com/PrismJS/prism.git#gh-pages",
-    "iCheck": "~1.0.2",
-    "awesome-bootstrap-checkbox": "~0.3.4",
-    "font-awesome": "~4.3.0"
+    "iCheck": "*",
+    "awesome-bootstrap-checkbox": "*",
+    "font-awesome": "*"
   },
   "description": "Nurego js",
   "license": "MIT",

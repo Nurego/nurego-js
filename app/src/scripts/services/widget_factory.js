@@ -8,7 +8,6 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 
 		// Listen to message from child window widget
 		eventer(messageEvent,function(e) {
-			// console.log('parent received message!:',e.data);
 			var msg = JSON.parse(e.data);
 			if(msg.action == "post"){
 				$.post(msg.url,msg.data,function(a,status,xhr){
@@ -90,7 +89,7 @@ define(["underscore","utils","constants","jquery"],function(_,utils,constants,$N
 
 				if(key == "api-params"){
 
-					if(val.indexOf('{') === -1){debugger;
+					if(val.indexOf('{') === -1){
 						val = "{" +encodeURIComponent(val)+ "}";
 						//if this api-param key is a json this will throw
 					}
