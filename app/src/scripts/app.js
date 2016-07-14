@@ -91,7 +91,6 @@ define([
 									comp.configParams = widgetAttrs;
 									comp.configParams.urlParams = lib.utils.URLToArray(window.location.href);
 
-									console.log(comps)
 									app.init({components:comps});
 					    		}
 					    	});

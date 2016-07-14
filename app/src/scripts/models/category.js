@@ -1,12 +1,11 @@
 define(["backbone","constants"],function(Backbone,constants){
-	
+
     var categoryMod = Backbone.Model.extend({
         initialize:function(opt){
-            //console.log('category model init');
             this.opt = opt;
             this.params = utils.URLToArray(window.location.href);
         },
-        
+
         url:function(){
             //var str = constants.nuregoApiUrl() + "/legaldocs/";
             var str = constants.nuregoApiUrl() + "/catalog";
@@ -26,5 +25,5 @@ define(["backbone","constants"],function(Backbone,constants){
     });
 
     return categoryMod;
- 
+
 });
