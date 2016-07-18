@@ -34,7 +34,7 @@ var NuregoWidgets = window.NuregoWidgets = {
 			NuregoLib.widgetsFactory.build(zis.options);
 		},false);
 
-/*		window.addEventListener("messsage",function(e){debugger;
+/*		window.addEventListener("messsage",function(e){
 				var NuregoLib = e.data;
 				NuregoLib.widgetsFactory.build(zis.options);
 		});*/

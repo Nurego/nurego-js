@@ -2,7 +2,7 @@ define(['utils','jquery'],function(utils,$Nurego){
 	return {
 		jsBaseURL:function(){
 			var scriptSrc, nuregoScript,url,stagingURL,masterURL,baseUrlEl,prodURL,prodVersion;
-			
+
 			//baseUrlEl = $Nurego("nurego-js-baseurl").attr('url');
 			baseUrlEl = $Nurego( "meta[property='nrg:js-base-url']" ).attr('content');
 			if(_.isUndefined(baseUrlEl)){
@@ -17,7 +17,7 @@ define(['utils','jquery'],function(utils,$Nurego){
 				stagingURL = "//rawgit.com/Nurego/nurego-js/staging/app/src";
 				masterURL = "//rawgit.com/Nurego/nurego-js/master/app/src";
 				url = masterURL;
-				
+
 				if(nuregoScript && (typeof(nuregoScript) !== "undefined") && nuregoScript.length != 0 ){
 					scriptSrc = nuregoScript.attr('src');
 					if(scriptSrc.indexOf('js.nurego.com') !== -1){
@@ -53,7 +53,7 @@ define(['utils','jquery'],function(utils,$Nurego){
 				return false;
 			}
 		},
-		
+
 		nuregoApiUrl:function(){
 
 			/*<meta property="nrg:nurego-api-baseurl" url="staging.nurego.com/v1"/>*/
@@ -81,4 +81,3 @@ define(['utils','jquery'],function(utils,$Nurego){
 		}
 	};
 })
- 
