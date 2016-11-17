@@ -1481,9 +1481,8 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
     }();
   }
 }.call(this));
-/*eslint-disable no-unused-vars*/
 /*!
- * jQuery JavaScript Library v3.1.0
+ * jQuery JavaScript Library v3.1.1
  * https://jquery.com/
  *
  * Includes Sizzle.js
@@ -1493,7 +1492,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
  * Released under the MIT license
  * https://jquery.org/license
  *
- * Date: 2016-07-07T21:44Z
+ * Date: 2016-09-22T22:30Z
  */
 (function (global, factory) {
   'use strict';
@@ -1540,9 +1539,9 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
     doc.head.appendChild(script).parentNode.removeChild(script);
   }
   /* global Symbol */
-  // Defining this global in .eslintrc would create a danger of using the global
+  // Defining this global in .eslintrc.json would create a danger of using the global
   // unguarded in another place, it seems safer to define global only for this module
-  var version = '3.1.0',
+  var version = '3.1.1',
     // Define a local copy of jQuery
     jQuery = function (selector, context) {
       // The jQuery object is actually just the init constructor 'enhanced'
@@ -1570,8 +1569,12 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
     // Get the Nth element in the matched element set OR
     // Get the whole matched element set as a clean array
     get: function (num) {
-      return num != null ? num < 0 ? this[num + this.length] : this[num] : // Return all the elements in a clean array
-      slice.call(this);
+      // Return all the elements in a clean array
+      if (num == null) {
+        return slice.call(this);
+      }
+      // Return just the one element from the set
+      return num < 0 ? this[num + this.length] : this[num];
     },
     // Take an array of elements and push it onto the stack
     // (returning the new matched element set)
@@ -1865,14 +1868,14 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
     return type === 'array' || length === 0 || typeof length === 'number' && length > 0 && length - 1 in obj;
   }
   var Sizzle = /*!
-   * Sizzle CSS Selector Engine v2.3.0
+   * Sizzle CSS Selector Engine v2.3.3
    * https://sizzlejs.com/
    *
    * Copyright jQuery Foundation and other contributors
    * Released under the MIT license
    * http://jquery.org/license
    *
-   * Date: 2016-01-04
+   * Date: 2016-08-08
    */
   function (window) {
     var i, support, Expr, getText, isXML, tokenize, compile, select, outermostContext, sortInput, hasDuplicate,
@@ -1939,7 +1942,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       },
       // CSS string/identifier serialization
       // https://drafts.csswg.org/cssom/#common-serializing-idioms
-      rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\x80-\uFFFF\w-]/g, fcssescape = function (ch, asCodePoint) {
+      rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\0-\x1f\x7f-\uFFFF\w-]/g, fcssescape = function (ch, asCodePoint) {
         if (asCodePoint) {
           // U+0000 NULL becomes U+FFFD REPLACEMENT CHARACTER
           if (ch === '\0') {
@@ -1958,7 +1961,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       unloadHandler = function () {
         setDocument();
       }, disabledAncestor = addCombinator(function (elem) {
-        return elem.disabled === true;
+        return elem.disabled === true && ('form' in elem || 'label' in elem);
       }, {
         dir: 'parentNode',
         next: 'legend'
@@ -2181,17 +2184,42 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
      * @param {Boolean} disabled true for :disabled; false for :enabled
      */
     function createDisabledPseudo(disabled) {
-      // Known :disabled false positives:
-      // IE: *[disabled]:not(button, input, select, textarea, optgroup, option, menuitem, fieldset)
-      // not IE: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
+      // Known :disabled false positives: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
       return function (elem) {
-        // Check form elements and option elements for explicit disabling
-        return 'label' in elem && elem.disabled === disabled || 'form' in elem && elem.disabled === disabled || // Check non-disabled form elements for fieldset[disabled] ancestors
-        'form' in elem && elem.disabled === false && // Support: IE6-11+
-        // Ancestry is covered for us
-        (elem.isDisabled === disabled || // Otherwise, assume any non-<option> under fieldset[disabled] is disabled
-        /* jshint -W018 */
-        elem.isDisabled !== !disabled && ('label' in elem || !disabledAncestor(elem)) !== disabled);
+        // Only certain elements can match :enabled or :disabled
+        // https://html.spec.whatwg.org/multipage/scripting.html#selector-enabled
+        // https://html.spec.whatwg.org/multipage/scripting.html#selector-disabled
+        if ('form' in elem) {
+          // Check for inherited disabledness on relevant non-disabled elements:
+          // * listed form-associated elements in a disabled fieldset
+          //   https://html.spec.whatwg.org/multipage/forms.html#category-listed
+          //   https://html.spec.whatwg.org/multipage/forms.html#concept-fe-disabled
+          // * option elements in a disabled optgroup
+          //   https://html.spec.whatwg.org/multipage/forms.html#concept-option-disabled
+          // All such elements have a "form" property.
+          if (elem.parentNode && elem.disabled === false) {
+            // Option elements defer to a parent optgroup if present
+            if ('label' in elem) {
+              if ('label' in elem.parentNode) {
+                return elem.parentNode.disabled === disabled;
+              } else {
+                return elem.disabled === disabled;
+              }
+            }
+            // Support: IE 6 - 11
+            // Use the isDisabled shortcut property to check for disabled fieldset ancestors
+            return elem.isDisabled === disabled || // Where there is no isDisabled, check manually
+            /* jshint -W018 */
+            elem.isDisabled !== !disabled && disabledAncestor(elem) === disabled;
+          }
+          return elem.disabled === disabled;  // Try to winnow out elements that can't be disabled before trusting the disabled property.
+                                              // Some victims get caught in our net (label, legend, menu, track), but it shouldn't
+                                              // even exist on them, let alone have a boolean value.
+        } else if ('label' in elem) {
+          return elem.disabled === disabled;
+        }
+        // Remaining elements are neither :enabled nor :disabled
+        return false;
       };
     }
     /**
@@ -2284,30 +2312,51 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         docElem.appendChild(el).id = expando;
         return !document.getElementsByName || !document.getElementsByName(expando).length;
       });
-      // ID find and filter
+      // ID filter and find
       if (support.getById) {
-        Expr.find['ID'] = function (id, context) {
-          if (typeof context.getElementById !== 'undefined' && documentIsHTML) {
-            var m = context.getElementById(id);
-            return m ? [m] : [];
-          }
-        };
         Expr.filter['ID'] = function (id) {
           var attrId = id.replace(runescape, funescape);
           return function (elem) {
             return elem.getAttribute('id') === attrId;
           };
         };
+        Expr.find['ID'] = function (id, context) {
+          if (typeof context.getElementById !== 'undefined' && documentIsHTML) {
+            var elem = context.getElementById(id);
+            return elem ? [elem] : [];
+          }
+        };
       } else {
-        // Support: IE6/7
-        // getElementById is not reliable as a find shortcut
-        delete Expr.find['ID'];
         Expr.filter['ID'] = function (id) {
           var attrId = id.replace(runescape, funescape);
           return function (elem) {
             var node = typeof elem.getAttributeNode !== 'undefined' && elem.getAttributeNode('id');
             return node && node.value === attrId;
           };
+        };
+        // Support: IE 6 - 7 only
+        // getElementById is not reliable as a find shortcut
+        Expr.find['ID'] = function (id, context) {
+          if (typeof context.getElementById !== 'undefined' && documentIsHTML) {
+            var node, i, elems, elem = context.getElementById(id);
+            if (elem) {
+              // Verify the id attribute
+              node = elem.getAttributeNode('id');
+              if (node && node.value === id) {
+                return [elem];
+              }
+              // Fall back on getElementsByName
+              elems = context.getElementsByName(id);
+              i = 0;
+              while (elem = elems[i++]) {
+                node = elem.getAttributeNode('id');
+                if (node && node.value === id) {
+                  return [elem];
+                }
+              }
+            }
+            return [];
+          }
         };
       }
       // Tag
@@ -3079,6 +3128,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
             return matcher(elem, context, xml);
           }
         }
+        return false;
       } : // Check against all ancestor/preceding elements
       function (elem, context, xml) {
         var oldCache, uniqueCache, outerCache, newCache = [
@@ -3117,6 +3167,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
             }
           }
         }
+        return false;
       };
     }
     function elementMatcher(matchers) {
@@ -3375,7 +3426,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       if (match.length === 1) {
         // Reduce context if the leading compound selector is an ID
         tokens = match[0] = match[0].slice(0);
-        if (tokens.length > 2 && (token = tokens[0]).type === 'ID' && support.getById && context.nodeType === 9 && documentIsHTML && Expr.relative[tokens[1].type]) {
+        if (tokens.length > 2 && (token = tokens[0]).type === 'ID' && context.nodeType === 9 && documentIsHTML && Expr.relative[tokens[1].type]) {
           context = (Expr.find['ID'](token.matches[0].replace(runescape, funescape), context) || [])[0];
           if (!context) {
             return results;  // Precompiled matchers will still verify ancestry, so step up a level
@@ -3506,17 +3557,24 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         return !!qualifier.call(elem, i, elem) !== not;
       });
     }
+    // Single element
     if (qualifier.nodeType) {
       return jQuery.grep(elements, function (elem) {
         return elem === qualifier !== not;
       });
     }
-    if (typeof qualifier === 'string') {
-      if (risSimple.test(qualifier)) {
-        return jQuery.filter(qualifier, elements, not);
-      }
-      qualifier = jQuery.filter(qualifier, elements);
+    // Arraylike of elements (jQuery, arguments, Array)
+    if (typeof qualifier !== 'string') {
+      return jQuery.grep(elements, function (elem) {
+        return indexOf.call(qualifier, elem) > -1 !== not;
+      });
     }
+    // Simple selector that can be filtered directly, removing non-Elements
+    if (risSimple.test(qualifier)) {
+      return jQuery.filter(qualifier, elements, not);
+    }
+    // Complex selector, compare the two sets, removing non-Elements
+    qualifier = jQuery.filter(qualifier, elements);
     return jQuery.grep(elements, function (elem) {
       return indexOf.call(qualifier, elem) > -1 !== not && elem.nodeType === 1;
     });
@@ -3526,7 +3584,10 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
     if (not) {
       expr = ':not(' + expr + ')';
     }
-    return elems.length === 1 && elem.nodeType === 1 ? jQuery.find.matchesSelector(elem, expr) ? [elem] : [] : jQuery.find.matches(expr, jQuery.grep(elems, function (elem) {
+    if (elems.length === 1 && elem.nodeType === 1) {
+      return jQuery.find.matchesSelector(elem, expr) ? [elem] : [];
+    }
+    return jQuery.find.matches(expr, jQuery.grep(elems, function (elem) {
       return elem.nodeType === 1;
     }));
   };
@@ -3761,11 +3822,11 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       return this.pushStack(matched);
     };
   });
-  var rnotwhite = /\S+/g;
+  var rnothtmlwhite = /[^\x20\t\r\n\f]+/g;
   // Convert String-formatted options into Object-formatted ones
   function createOptions(options) {
     var object = {};
-    jQuery.each(options.match(rnotwhite) || [], function (_, flag) {
+    jQuery.each(options.match(rnothtmlwhite) || [], function (_, flag) {
       object[flag] = true;
     });
     return object;
@@ -4323,8 +4384,14 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         }
       }
     }
-    return chainable ? elems : // Gets
-    bulk ? fn.call(elems) : len ? fn(elems[0], key) : emptyGet;
+    if (chainable) {
+      return elems;
+    }
+    // Gets
+    if (bulk) {
+      return fn.call(elems);
+    }
+    return len ? fn(elems[0], key) : emptyGet;
   };
   var acceptData = function (owner) {
     // Accepts only:
@@ -4425,7 +4492,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
           key = jQuery.camelCase(key);
           // If a key with the spaces exists, use it.
           // Otherwise, create an array by matching non-whitespace
-          key = key in cache ? [key] : key.match(rnotwhite) || [];
+          key = key in cache ? [key] : key.match(rnothtmlwhite) || [];
         }
         i = key.length;
         while (i--) {
@@ -4462,6 +4529,25 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
   //	5. Avoid exposing implementation details on user objects (eg. expando properties)
   //	6. Provide a clear path for implementation upgrade to WeakMap in 2014
   var rbrace = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/, rmultiDash = /[A-Z]/g;
+  function getData(data) {
+    if (data === 'true') {
+      return true;
+    }
+    if (data === 'false') {
+      return false;
+    }
+    if (data === 'null') {
+      return null;
+    }
+    // Only convert to a number if it doesn't change the string
+    if (data === +data + '') {
+      return +data;
+    }
+    if (rbrace.test(data)) {
+      return JSON.parse(data);
+    }
+    return data;
+  }
   function dataAttr(elem, key, data) {
     var name;
     // If nothing was found internally, try to fetch any
@@ -4471,8 +4557,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       data = elem.getAttribute(name);
       if (typeof data === 'string') {
         try {
-          data = data === 'true' ? true : data === 'false' ? false : data === 'null' ? null : // Only convert to a number if it doesn't change the string
-          +data + '' === data ? +data : rbrace.test(data) ? JSON.parse(data) : data;
+          data = getData(data);
         } catch (e) {
         }
         // Make sure we set the data so it isn't changed later
@@ -4751,7 +4836,8 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
     if (display) {
       return display;
     }
-    temp = doc.body.appendChild(doc.createElement(nodeName)), display = jQuery.css(temp, 'display');
+    temp = doc.body.appendChild(doc.createElement(nodeName));
+    display = jQuery.css(temp, 'display');
     temp.parentNode.removeChild(temp);
     if (display === 'none') {
       display = 'block';
@@ -4864,8 +4950,18 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
   function getAll(context, tag) {
     // Support: IE <=9 - 11 only
     // Use typeof to avoid zero-argument method invocation on host objects (#15151)
-    var ret = typeof context.getElementsByTagName !== 'undefined' ? context.getElementsByTagName(tag || '*') : typeof context.querySelectorAll !== 'undefined' ? context.querySelectorAll(tag || '*') : [];
-    return tag === undefined || tag && jQuery.nodeName(context, tag) ? jQuery.merge([context], ret) : ret;
+    var ret;
+    if (typeof context.getElementsByTagName !== 'undefined') {
+      ret = context.getElementsByTagName(tag || '*');
+    } else if (typeof context.querySelectorAll !== 'undefined') {
+      ret = context.querySelectorAll(tag || '*');
+    } else {
+      ret = [];
+    }
+    if (tag === undefined || tag && jQuery.nodeName(context, tag)) {
+      return jQuery.merge([context], ret);
+    }
+    return ret;
   }
   // Mark scripts as having already been evaluated
   function setGlobalEval(elems, refElements) {
@@ -5064,7 +5160,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         };
       }
       // Handle multiple events separated by a space
-      types = (types || '').match(rnotwhite) || [''];
+      types = (types || '').match(rnothtmlwhite) || [''];
       t = types.length;
       while (t--) {
         tmp = rtypenamespace.exec(types[t]) || [];
@@ -5125,7 +5221,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         return;
       }
       // Once for each type.namespace in types; type may be omitted
-      types = (types || '').match(rnotwhite) || [''];
+      types = (types || '').match(rnothtmlwhite) || [''];
       t = types.length;
       while (t--) {
         tmp = rtypenamespace.exec(types[t]) || [];
@@ -5214,43 +5310,47 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       return event.result;
     },
     handlers: function (event, handlers) {
-      var i, matches, sel, handleObj, handlerQueue = [], delegateCount = handlers.delegateCount, cur = event.target;
-      // Support: IE <=9
+      var i, handleObj, sel, matchedHandlers, matchedSelectors, handlerQueue = [], delegateCount = handlers.delegateCount, cur = event.target;
       // Find delegate handlers
-      // Black-hole SVG <use> instance trees (#13180)
-      //
-      // Support: Firefox <=42
-      // Avoid non-left-click in FF but don't block IE radio events (#3861, gh-2343)
-      if (delegateCount && cur.nodeType && (event.type !== 'click' || isNaN(event.button) || event.button < 1)) {
+      if (delegateCount && // Support: IE <=9
+        // Black-hole SVG <use> instance trees (trac-13180)
+        cur.nodeType && // Support: Firefox <=42
+        // Suppress spec-violating clicks indicating a non-primary pointer button (trac-3861)
+        // https://www.w3.org/TR/DOM-Level-3-Events/#event-type-click
+        // Support: IE 11 only
+        // ...but not arrow key "clicks" of radio inputs, which can have `button` -1 (gh-2343)
+        !(event.type === 'click' && event.button >= 1)) {
         for (; cur !== this; cur = cur.parentNode || this) {
           // Don't check non-elements (#13208)
           // Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
-          if (cur.nodeType === 1 && (cur.disabled !== true || event.type !== 'click')) {
-            matches = [];
+          if (cur.nodeType === 1 && !(event.type === 'click' && cur.disabled === true)) {
+            matchedHandlers = [];
+            matchedSelectors = {};
             for (i = 0; i < delegateCount; i++) {
               handleObj = handlers[i];
               // Don't conflict with Object.prototype properties (#13203)
               sel = handleObj.selector + ' ';
-              if (matches[sel] === undefined) {
-                matches[sel] = handleObj.needsContext ? jQuery(sel, this).index(cur) > -1 : jQuery.find(sel, this, null, [cur]).length;
+              if (matchedSelectors[sel] === undefined) {
+                matchedSelectors[sel] = handleObj.needsContext ? jQuery(sel, this).index(cur) > -1 : jQuery.find(sel, this, null, [cur]).length;
               }
-              if (matches[sel]) {
-                matches.push(handleObj);
+              if (matchedSelectors[sel]) {
+                matchedHandlers.push(handleObj);
               }
             }
-            if (matches.length) {
+            if (matchedHandlers.length) {
               handlerQueue.push({
                 elem: cur,
-                handlers: matches
+                handlers: matchedHandlers
               });
             }
           }
         }
       }
       // Add the remaining (directly-bound) handlers
+      cur = this;
       if (delegateCount < handlers.length) {
         handlerQueue.push({
-          elem: this,
+          elem: cur,
           handlers: handlers.slice(delegateCount)
         });
       }
@@ -5437,7 +5537,16 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       }
       // Add which for click: 1 === left; 2 === middle; 3 === right
       if (!event.which && button !== undefined && rmouseEvent.test(event.type)) {
-        return button & 1 ? 1 : button & 2 ? 3 : button & 4 ? 2 : 0;
+        if (button & 1) {
+          return 1;
+        }
+        if (button & 2) {
+          return 3;
+        }
+        if (button & 4) {
+          return 2;
+        }
+        return 0;
       }
       return event.which;
     }
@@ -5998,9 +6107,13 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
     Math.max(0, matches[2] - (subtract || 0)) + (matches[3] || 'px') : value;
   }
   function augmentWidthOrHeight(elem, name, extra, isBorderBox, styles) {
-    var i = extra === (isBorderBox ? 'border' : 'content') ? // If we already have the right measurement, avoid augmentation
-      4 : // Otherwise initialize for horizontal or vertical properties
-      name === 'width' ? 1 : 0, val = 0;
+    var i, val = 0;
+    // If we already have the right measurement, avoid augmentation
+    if (extra === (isBorderBox ? 'border' : 'content')) {
+      i = 4;  // Otherwise initialize for horizontal or vertical properties
+    } else {
+      i = name === 'width' ? 1 : 0;
+    }
     for (; i < 4; i += 2) {
       // Both box models exclude margin, so add it if we want it
       if (extra === 'margin') {
@@ -6645,7 +6758,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         callback = props;
         props = ['*'];
       } else {
-        props = props.match(rnotwhite);
+        props = props.match(rnothtmlwhite);
       }
       var prop, index = 0, length = props.length;
       for (; index < length; index++) {
@@ -6673,7 +6786,13 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
     if (jQuery.fx.off || document.hidden) {
       opt.duration = 0;
     } else {
-      opt.duration = typeof opt.duration === 'number' ? opt.duration : opt.duration in jQuery.fx.speeds ? jQuery.fx.speeds[opt.duration] : jQuery.fx.speeds._default;
+      if (typeof opt.duration !== 'number') {
+        if (opt.duration in jQuery.fx.speeds) {
+          opt.duration = jQuery.fx.speeds[opt.duration];
+        } else {
+          opt.duration = jQuery.fx.speeds._default;
+        }
+      }
     }
     // Normalize opt.queue - true/undefined/null -> "fx"
     if (opt.queue == null || opt.queue === true) {
@@ -6937,7 +7056,10 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       }
     },
     removeAttr: function (elem, value) {
-      var name, i = 0, attrNames = value && value.match(rnotwhite);
+      var name, i = 0,
+        // Attribute names can contain non-HTML whitespace characters
+        // https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
+        attrNames = value && value.match(rnothtmlwhite);
       if (attrNames && elem.nodeType === 1) {
         while (name = attrNames[i++]) {
           elem.removeAttribute(name);
@@ -7014,7 +7136,13 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
           // https://web.archive.org/web/20141116233347/http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
           // Use proper attribute retrieval(#12072)
           var tabindex = jQuery.find.attr(elem, 'tabindex');
-          return tabindex ? parseInt(tabindex, 10) : rfocusable.test(elem.nodeName) || rclickable.test(elem.nodeName) && elem.href ? 0 : -1;
+          if (tabindex) {
+            return parseInt(tabindex, 10);
+          }
+          if (rfocusable.test(elem.nodeName) || rclickable.test(elem.nodeName) && elem.href) {
+            return 0;
+          }
+          return -1;
         }
       }
     },
@@ -7029,9 +7157,12 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
   // on the option
   // The getter ensures a default option is selected
   // when in an optgroup
+  // eslint rule "no-unused-expressions" is disabled for this code
+  // since it considers such accessions noop
   if (!support.optSelected) {
     jQuery.propHooks.selected = {
       get: function (elem) {
+        /* eslint no-unused-expressions: "off" */
         var parent = elem.parentNode;
         if (parent && parent.parentNode) {
           parent.parentNode.selectedIndex;
@@ -7039,6 +7170,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         return null;
       },
       set: function (elem) {
+        /* eslint no-unused-expressions: "off" */
         var parent = elem.parentNode;
         if (parent) {
           parent.selectedIndex;
@@ -7063,7 +7195,12 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
   ], function () {
     jQuery.propFix[this.toLowerCase()] = this;
   });
-  var rclass = /[\t\r\n\f]/g;
+  // Strip and collapse whitespace according to HTML spec
+  // https://html.spec.whatwg.org/multipage/infrastructure.html#strip-and-collapse-whitespace
+  function stripAndCollapse(value) {
+    var tokens = value.match(rnothtmlwhite) || [];
+    return tokens.join(' ');
+  }
   function getClass(elem) {
     return elem.getAttribute && elem.getAttribute('class') || '';
   }
@@ -7076,10 +7213,10 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         });
       }
       if (typeof value === 'string' && value) {
-        classes = value.match(rnotwhite) || [];
+        classes = value.match(rnothtmlwhite) || [];
         while (elem = this[i++]) {
           curValue = getClass(elem);
-          cur = elem.nodeType === 1 && (' ' + curValue + ' ').replace(rclass, ' ');
+          cur = elem.nodeType === 1 && ' ' + stripAndCollapse(curValue) + ' ';
           if (cur) {
             j = 0;
             while (clazz = classes[j++]) {
@@ -7088,7 +7225,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
               }
             }
             // Only assign if different to avoid unneeded rendering.
-            finalValue = jQuery.trim(cur);
+            finalValue = stripAndCollapse(cur);
             if (curValue !== finalValue) {
               elem.setAttribute('class', finalValue);
             }
@@ -7108,11 +7245,11 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         return this.attr('class', '');
       }
       if (typeof value === 'string' && value) {
-        classes = value.match(rnotwhite) || [];
+        classes = value.match(rnothtmlwhite) || [];
         while (elem = this[i++]) {
           curValue = getClass(elem);
           // This expression is here for better compressibility (see addClass)
-          cur = elem.nodeType === 1 && (' ' + curValue + ' ').replace(rclass, ' ');
+          cur = elem.nodeType === 1 && ' ' + stripAndCollapse(curValue) + ' ';
           if (cur) {
             j = 0;
             while (clazz = classes[j++]) {
@@ -7122,7 +7259,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
               }
             }
             // Only assign if different to avoid unneeded rendering.
-            finalValue = jQuery.trim(cur);
+            finalValue = stripAndCollapse(cur);
             if (curValue !== finalValue) {
               elem.setAttribute('class', finalValue);
             }
@@ -7147,7 +7284,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
           // Toggle individual class names
           i = 0;
           self = jQuery(this);
-          classNames = value.match(rnotwhite) || [];
+          classNames = value.match(rnothtmlwhite) || [];
           while (className = classNames[i++]) {
             // Check each className given, space separated list
             if (self.hasClass(className)) {
@@ -7176,14 +7313,14 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       var className, elem, i = 0;
       className = ' ' + selector + ' ';
       while (elem = this[i++]) {
-        if (elem.nodeType === 1 && (' ' + getClass(elem) + ' ').replace(rclass, ' ').indexOf(className) > -1) {
+        if (elem.nodeType === 1 && (' ' + stripAndCollapse(getClass(elem)) + ' ').indexOf(className) > -1) {
           return true;
         }
       }
       return false;
     }
   });
-  var rreturn = /\r/g, rspaces = /[\x20\t\r\n\f]+/g;
+  var rreturn = /\r/g;
   jQuery.fn.extend({
     val: function (value) {
       var hooks, ret, isFunction, elem = this[0];
@@ -7194,9 +7331,12 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
             return ret;
           }
           ret = elem.value;
-          return typeof ret === 'string' ? // Handle most common string cases
-          ret.replace(rreturn, '') : // Handle cases where value is null/undef or number
-          ret == null ? '' : ret;
+          // Handle most common string cases
+          if (typeof ret === 'string') {
+            return ret.replace(rreturn, '');
+          }
+          // Handle cases where value is null/undef or number
+          return ret == null ? '' : ret;
         }
         return;
       }
@@ -7238,12 +7378,17 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
           // option.text throws exceptions (#14686, #14858)
           // Strip and collapse whitespace
           // https://html.spec.whatwg.org/#strip-and-collapse-whitespace
-          jQuery.trim(jQuery.text(elem)).replace(rspaces, ' ');
+          stripAndCollapse(jQuery.text(elem));
         }
       },
       select: {
         get: function (elem) {
-          var value, option, options = elem.options, index = elem.selectedIndex, one = elem.type === 'select-one', values = one ? null : [], max = one ? index + 1 : options.length, i = index < 0 ? max : one ? index : 0;
+          var value, option, i, options = elem.options, index = elem.selectedIndex, one = elem.type === 'select-one', values = one ? null : [], max = one ? index + 1 : options.length;
+          if (index < 0) {
+            i = max;
+          } else {
+            i = one ? index : 0;
+          }
           // Loop through all the selected options
           for (; i < max; i++) {
             option = options[i];
@@ -7552,19 +7697,25 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         return this.name && !jQuery(this).is(':disabled') && rsubmittable.test(this.nodeName) && !rsubmitterTypes.test(type) && (this.checked || !rcheckableType.test(type));
       }).map(function (i, elem) {
         var val = jQuery(this).val();
-        return val == null ? null : jQuery.isArray(val) ? jQuery.map(val, function (val) {
-          return {
-            name: elem.name,
-            value: val.replace(rCRLF, '\r\n')
-          };
-        }) : {
+        if (val == null) {
+          return null;
+        }
+        if (jQuery.isArray(val)) {
+          return jQuery.map(val, function (val) {
+            return {
+              name: elem.name,
+              value: val.replace(rCRLF, '\r\n')
+            };
+          });
+        }
+        return {
           name: elem.name,
           value: val.replace(rCRLF, '\r\n')
         };
       }).get();
     }
   });
-  var r20 = /%20/g, rhash = /#.*$/, rts = /([?&])_=[^&]*/, rheaders = /^(.*?):[ \t]*([^\r\n]*)$/gm,
+  var r20 = /%20/g, rhash = /#.*$/, rantiCache = /([?&])_=[^&]*/, rheaders = /^(.*?):[ \t]*([^\r\n]*)$/gm,
     // #7653, #8125, #8152: local protocol detection
     rlocalProtocol = /^(?:about|app|app-storage|.+-extension|file|res|widget):$/, rnoContent = /^(?:GET|HEAD)$/, rprotocol = /^\/\//,
     /* Prefilters
@@ -7596,7 +7747,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
         func = dataTypeExpression;
         dataTypeExpression = '*';
       }
-      var dataType, i = 0, dataTypes = dataTypeExpression.toLowerCase().match(rnotwhite) || [];
+      var dataType, i = 0, dataTypes = dataTypeExpression.toLowerCase().match(rnothtmlwhite) || [];
       if (jQuery.isFunction(func)) {
         // For each dataType in the dataTypeExpression
         while (dataType = dataTypes[i++]) {
@@ -7959,7 +8110,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
       // Alias method option to type as per ticket #12004
       s.type = options.method || options.type || s.method || s.type;
       // Extract dataTypes list
-      s.dataTypes = (s.dataType || '*').toLowerCase().match(rnotwhite) || [''];
+      s.dataTypes = (s.dataType || '*').toLowerCase().match(rnothtmlwhite) || [''];
       // A cross-domain request is in order when the origin doesn't match the current origin.
       if (s.crossDomain == null) {
         urlAnchor = document.createElement('a');
@@ -8013,9 +8164,9 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
           // #9682: remove data so that it's not used in an eventual retry
           delete s.data;
         }
-        // Add anti-cache in uncached url if needed
+        // Add or update anti-cache param if needed
         if (s.cache === false) {
-          cacheURL = cacheURL.replace(rts, '');
+          cacheURL = cacheURL.replace(rantiCache, '$1');
           uncached = (rquery.test(cacheURL) ? '&' : '?') + '_=' + nonce++ + uncached;
         }
         // Put hash and anti-cache on the URL that will be requested (gh-1732)
@@ -8578,7 +8729,7 @@ var underscore, jquery, utils, constants, widgetFactory, backbone, loginModel, r
   jQuery.fn.load = function (url, params, callback) {
     var selector, type, response, self = this, off = url.indexOf(' ');
     if (off > -1) {
-      selector = jQuery.trim(url.slice(off));
+      selector = stripAndCollapse(url.slice(off));
       url = url.slice(0, off);
     }
     // If it's a function
@@ -11592,7 +11743,7 @@ registrationViewCtrl = function (bb, tmpl, utils, css, absNuregoView, $Nurego) {
   });
   return activation;
 }(backbone, text_registrationHTML, utils, text_registrationCSS, absNuregoView, jquery);
-text_tosHTML = '<style type="text/css">\n\tbody{\n\t\tpadding-bottom: 75px;\n\t}\n\t.termsWrapper{\n\t\tposition: fixed;\n\t\t  bottom: 14px;\n\t\t  width: 100%;\n\t\t  background: #fff;\n\t\t  height: auto;\n\t\t  padding: 14px;\n\t}\n\n\t.acceptTerms{\n\t\tpadding:6px;\n\t}\n\n\t.pageHeader{\n\t\theight: 250px;\n\t \twidth: 100%;\n\t\tposition: relative;\n\t\tbackground: rgb(216, 216, 216);\n\t\tcolor: gray;\n\t}\n\n\t.pageHeader h2{\n\t\tposition:absolute;\n\t\ttop:100px;\n\t\twidth: 100%;\n\t\ttext-align: center;\n\t}\n</style>\n\n<div class="well container">\n\t<div class="pageHeader">\n\t\t<h2>Terms of Service</h2>\n\t</div>\n\t\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t  <span class="sr-only">Error:</span>\n\t  <span class="txt"></span>\n\t</div>\n\t\n\n\t{{\tif(obj[\'doc_html\']){\t}}\n\t\t\n\t\t<h3>{{=obj.name}}</h3>\n\t\t<div>{{=\tobj[\'doc_html\']\t}}</div>\n\n\t{{\t}else if(obj[\'legal_docs\'])\t{\t}}\n\n\t\t{{ for(doc in obj.legal_docs.data){\t}}\n\t\t\t\t<h3>{{=obj.legal_docs.data[doc].name}}</h3>\n\t\t\t\t<div>{{=obj.legal_docs.data[doc].doc_html}}</div>\n\t\t\t\t<br/>\n\t\t\t\t<br/>\n\n\t\t{{\t}\t}}\n\n\t<nav class="navbar navbar-default navbar-fixed-bottom">\n\t  <div class="container">\n\n\n\t  \t<ul class="nav navbar-nav">\n\t        <li class="acceptTerms">\n\t        \t<span class="btn btn-primary" href="#">Accept</span>\n\t        </li>\n\t        <!-- <li>\n\t        \t<span class="btn-xs btn btn-default" style="margin-top: 12px;">Decline</span>\n\t        </li>\n\t          <li>\n\t        \t<span class="btn-xs btn btn-default" style="margin-top: 12px;">Remind me later</span>\n\t        </li> -->\n\t    </ul>\n\n\t  </div>\n\t</nav>\n\n\n\t{{\t}\t}}\n\t\n</div>\n\n';
+text_tosHTML = '<style type="text/css">\n\tbody{\n\t\tpadding-bottom: 75px;\n\t}\n\t.termsWrapper{\n\t\tposition: fixed;\n\t\t  bottom: 14px;\n\t\t  width: 100%;\n\t\t  background: #fff;\n\t\t  height: auto;\n\t\t  padding: 14px;\n\t}\n\n\t.acceptTerms{\n\t\tpadding:6px;\n\t}\n\n\t.pageHeader{\n\t\theight: 250px;\n\t \twidth: 100%;\n\t\tposition: relative;\n\t\tbackground: rgb(216, 216, 216);\n\t\tcolor: gray;\n\t}\n\n\t.pageHeader h2{\n\t\tposition:absolute;\n\t\ttop:100px;\n\t\twidth: 100%;\n\t\ttext-align: center;\n\t}\n</style>\n\n<div class="well container">\n\t<div class="pageHeader">\n\t\t<h2>Terms of Service</h2>\n\t</div>\n\n\t<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">\n\t  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>\n\t  <span class="sr-only">Error:</span>\n\t  <span class="txt"></span>\n\t</div>\n\n\n\t{{\tif(obj[\'doc_html\']){\t}}\n\n\t\t<h3>{{=obj.name}}</h3>\n\t\t<div>{{=\tobj[\'doc_html\']\t}}</div>\n\n\t{{\t}else if(obj[\'legal_docs\'])\t{\t}}\n\n\t\t{{ for(doc in obj.legal_docs.data){\t}}\n\t\t\t\t<h3>{{=obj.legal_docs.data[doc].name}}</h3>\n\t\t\t\t<div>{{=obj.legal_docs.data[doc].doc_html}}</div>\n\t\t\t\t<br/>\n\t\t\t\t<br/>\n\n\t\t{{\t}\t}}\n\n\t<nav class="navbar navbar-default navbar-fixed-bottom">\n\t  <div class="container">\n\n\n\t  \t<ul class="nav navbar-nav">\n\t        <li class="acceptTerms">\n\t        \t<span class="btn btn-primary" href="#">Accept</span>\n\t        </li>\n\t        <!-- <li>\n\t        \t<span class="btn-xs btn btn-default" style="margin-top: 12px;">Decline</span>\n\t        </li>\n\t          <li>\n\t        \t<span class="btn-xs btn btn-default" style="margin-top: 12px;">Remind me later</span>\n\t        </li> -->\n\t    </ul>\n\n\t  </div>\n\t</nav>\n\n\n\t{{\t}\t}}\n\n</div>\n';
 text_termsOfServiceCSS = 'div{\n    \n}';
 tosStatusModel = function (Backbone, constants) {
   var tosStatus = Backbone.Model.extend({
@@ -11601,7 +11752,7 @@ tosStatusModel = function (Backbone, constants) {
       this.params = utils.URLToArray(window.location.href);
     },
     url: function () {
-      var str = constants.nuregoApiUrl() + '/users/' + (this.params['user-id'] || this.params['userId'] || this.params['userID']) + '/legaldocs/status?all_docs=true';
+      var str = constants.nuregoApiUrl() + '/organizations/' + (this.params['org-id'] || this.params['orgId'] || this.params['orgID']) + '/users/' + (this.params['user-id'] || this.params['userId'] || this.params['userID']) + '/legaldocs/status';
       var apiKey = constants.getNuregoApiKey();
       if (apiKey !== 'false') {
         str += '?api_key=' + apiKey;
@@ -11620,6 +11771,7 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
     initialize: function (model, customTmpl) {
       //this.__super__.initialize.apply(this);
       this.params = utils.URLToArray(window.location.href);
+      this.orgID = this.params['org-id'] || this.params['orgId'] || this.params['orgID'];
       this.userID = this.params['user-id'] || this.params['userId'] || this.params['userID'];
       // constants.setUserId(this.userID);
       if (customTmpl) {
@@ -11644,12 +11796,12 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
     },
     redirect: function () {
       var redirectURL = this.params['redirect-url'];
-      if (redirectURL.indexOf('http') != -1) {
+      if (redirectURL.indexOf('http') !== -1) {
         //Doron: Absolute URL
-        window.top.location.href = redirectURL;
+        window.location.href = redirectURL;
       } else {
         //Doron: Relative URL
-        window.top.location.href = this.params.parent + redirectURL;
+        window.location.href = this.params.parent + redirectURL;
       }
     },
     acceptTerms: function () {
@@ -11669,12 +11821,12 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
       for (var i = 0; i < docs.data.length; i++) {
         var doc_id = docs.data[i].id;
         //POST /v1/legaldocs/accept?api_key=l22085b6-7062-4b57-8869-cccb2f66f6fb&doc_id=leg_0b06-d678-4675-bd16-efd4f60f2b47
-        var url = constants.nuregoApiUrl() + '/users/' + this.userID + '/legaldocs/' + doc_id + '/accept';
+        var url = constants.nuregoApiUrl() + '/organizations/' + this.orgID + '/users/' + this.userID + '/legaldocs/' + doc_id + '/accept?api_key=' + constants.getNuregoApiKey();
         $Nurego.ajax({
           url: url,
           type: 'post',
           //async:false, //firefox dont like async
-          xhrFields: { withCredentials: true },
+          xhrFields: { withCredentials: false },
           error: _.bind(this.genericHttpErrorsHandler, this),
           crossDomain: true,
           dataType: 'json',
