@@ -11798,10 +11798,10 @@ tosViewCtrl = function (bb, tmpl, utils, css, tosStatusModel, tosModel, absNureg
       var redirectURL = this.params['redirect-url'];
       if (redirectURL.indexOf('http') !== -1) {
         //Doron: Absolute URL
-        window.location.href = redirectURL;
+        window.top.location.href = redirectURL;
       } else {
         //Doron: Relative URL
-        window.location.href = this.params.parent + redirectURL;
+        window.top.location.href = this.params.parent + redirectURL;
       }
     },
     acceptTerms: function () {
