@@ -14,8 +14,8 @@
 	<meta property="nrg:nurego-public-customer-id" content="l402b7a9-dc19-43fd-89cd-64e8fe101347"/>
 
 	<!--nurego-public-customer-id id="lff49a59-f1fc-47af-8adf-f795d5baa065" type="anat/sasha"> </nurego-public-customer-id-->
-	<!--<nurego-js-baseurl url="http://localhost:9000/src"></nurego-js-baseurl>-->
-	<!--<nurego-api-baseurl url="http://localhost:31001/v1"> </nurego-api-baseurl>-->
+	<!-- <nurego-js-baseurl url="http://localhost:9000/src"></nurego-js-baseurl> -->
+	<!-- <nurego-api-baseurl url="http://localhost:31001/v1"> </nurego-api-baseurl> -->
 
 
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
@@ -314,13 +314,10 @@
 	  	</pre>
 	</div>
 
-
+<!--
 	<div class="bs-docs-section" id="login">
 		<h1  class="page-header">2) Nurego login</h1>
-		<!--p>
-			Description text.. Description text.. Description text..
-			Description text.. Description text.. Description text..
-		</p-->
+
 		<h3>2.1) Login Directive</h3>
 		<div style="height:300px;" id="login1" class="well white">
 		    <nurego-widget name="login"></nurego-widget>
@@ -331,7 +328,7 @@
 	  	</pre>
 
 	</div>
-
+-->
 
 
 	<div class="bs-docs-section" id="registration">
@@ -365,12 +362,13 @@
 		<h3>4.1)Terms Of Service Directive</h3>
 		<div style="height:300px;" id="terms_of_service1" class="well white">
 		    <nurego-widget name="terms_of_service"
-         user-id="123"
+         org-id="org_123"
+         user-id="1234"
 			   redirect-url="/app.html">
 			 </nurego-widget>
 		</div>
 		<pre class="language-markup nowrap codeBox">
-		  <code class="nowrap">&lt;nurego-widget name="terms_of_service" redirect-url="/app.html" &gt;&lt;/nurego-widget&gt;
+		  <code class="nowrap">&lt;nurego-widget name="terms_of_service" user-id="123" org-id="123" redirect-url="/app.html" &gt;&lt;/nurego-widget&gt;
 		  </code>
 	  	</pre>
 
@@ -403,11 +401,11 @@
 		</p-->
 		<h3>6.1) Nurego Catalog single item</h3>
 		<div style="height:300px;" id="terms_of_service1" class="well white">
-		    <nurego-widget name="single_item" service_id="ser_ed89-b138-4dda-971c-7ac91c9a2ad2">
+		    <nurego-widget name="single_item" service_id="ser_a650-bd1a-4148-ab85-921ecf6e7c2e">
 			 </nurego-widget>
 		</div>
 		<pre class="language-markup nowrap codeBox">
-		  <code class="nowrap">&lt;nurego-widget name="single_item" service_id="ser_ed89-b138-4dda-971c-7ac91c9a2ad2" &gt;&lt;/nurego-widget&gt;
+		  <code class="nowrap">&lt;nurego-widget name="single_item" service_id="ser_a650-bd1a-4148-ab85-921ecf6e7c2e" &gt;&lt;/nurego-widget&gt;
 		  </code>
 	  	</pre>
 	</div>
@@ -415,11 +413,11 @@
 
 
 </div>
-    <!--script src="//rawgit.com/Nurego/nurego-js/staging/app/dist/bin.js" type="text/javascript" rel="nurego">
-    </script-->
 
+    <!--script src="//rawgit.com/Nurego/nurego-js/staging/app/dist/bin.js" type="text/javascript" rel="nurego"></script-->
+    <script src="//rawgit.com/Nurego/nurego-js/master/app/dist/bin.js" type="text/javascript" rel="nurego"></script>
     <!-- <script src="//js.nurego.com/latest/bin.js" type="text/javascript" rel="nurego"></script> -->
-    <script src="/dist/bin.js" type="text/javascript" rel="nurego"></script>
+    <!-- <script src="/dist/bin.js" type="text/javascript" rel="nurego"></script> -->
 
 	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js" type="text/javascript">
     </script>

@@ -34,7 +34,6 @@ module.exports = function (grunt){
     dist: 'dist'
   };
 
-
   // Define the configuration for all the tasks
   grunt.initConfig({
 
@@ -449,7 +448,7 @@ module.exports = function (grunt){
         }, {
           expand: true,
           cwd: '.',
-          src: 'bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*',
+          src: './app/src/bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*',
           dest: '<%= yeoman.dist %>'
         }]
       },
@@ -527,6 +526,7 @@ module.exports = function (grunt){
     //'concat',
     'copy:dist',
     //'cssmin',
+    'requirejs',
     'uglify',
     'filerev',
     'usemin',
