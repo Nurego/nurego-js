@@ -47,7 +47,7 @@ function(bb,tmpl,utils,css,tosStatusModel,tosModel,absNuregoView,$Nurego){
 			var redirectURL = this.params['redirect-url'];
 			if(redirectURL.indexOf('http') !== -1){ //Doron: Absolute URL
 				window.top.location.href = redirectURL;
-			}else{//Doron: Relative URL
+			}else{ //Doron: Relative URL
 				window.top.location.href = this.params.parent + redirectURL;
 			}
 		},
