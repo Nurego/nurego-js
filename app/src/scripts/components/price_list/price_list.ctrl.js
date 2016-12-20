@@ -1,7 +1,5 @@
-define(["backbone","text!priceListHTML","text!priceListNewHTML","utils",
-		"text!priceListCSS","tosModel",
-		"absNuregoView","text!priceListSingleTierHTML","jquery"],
-		function(bb,tmpl,tmplNew,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
+define(["backbone", "text!priceListHTML", "utils", "text!priceListCSS", "tosModel", "absNuregoView", "text!priceListSingleTierHTML", "jquery"],
+		function(bb,tmpl,utils,css,tosModel,absNuregoView,priceListSingleTierHTML,$Nurego){
 		var priceList = absNuregoView.extend({
 		  tagName: "div",
 		  className: "login",
@@ -14,24 +12,22 @@ define(["backbone","text!priceListHTML","text!priceListNewHTML","utils",
 		  },
 
 		  initialize: function(model,customTmpl){
-		  	//this.__super__.initialize.apply(this);
 		  	this.params = utils.URLToArray(window.location.href);
 		  	var themes = {
-		  		singleTier:priceListSingleTierHTML,  //deprecated : need to remove camelCode and use camel_code;
-		  		single_tier:priceListSingleTierHTML,
-		  		multitier:tmpl,
-					new:tmplNew
+		  		singleTier: priceListSingleTierHTML,  //deprecated : need to remove camelCode and use camel_code;
+		  		single_tier: priceListSingleTierHTML,
+					new: tmpl
 		  	};
 
 				this.templateEnum = {
-					1:"new",
-					2:"custom",
-					3:"theme_from_param"
+					1: "new",
+					2: "custom",
+					3: "theme_from_param"
 				};
 
 		  	if(!this.params.preview){
 		  		this.tosModel = new tosModel();
-		    	this.tosModel.fetch({dataType:"jsonp"});
+		    	this.tosModel.fetch({ dataType:"jsonp" });
 		  	}
 
 		    this.selectedPlan = "";
@@ -49,22 +45,15 @@ define(["backbone","text!priceListHTML","text!priceListNewHTML","utils",
 		    this.model.fetch({
 		    	dataType:"jsonp",
 		    	error:_.bind(this.modelHttpErrorsHandler,this)
-		    	//error:function(a,b,c){debugger;}
-		    	//complete:function(a,b,c){debugger;},
-		    	/*statusCode:{
-				    404: function() {
-				      alert( "page not found" );
-				    }
-				}*/
 		    });
 		    this.initStyle();
 		    this.addStyle();
 		  },
 
-			closeDialog:function(){
+			closeDialog: function(){
 				this.$el.removeClass('fillEmail');
 			},
-		  openTerms:function(){
+		  openTerms: function(){
 		  	var url = this.params['terms-of-service-url'];
 		  	if(url.indexOf('http') == -1){//Doron: Absolute URL
 		  		url = this.params.parent + url;//Doron: Relative URL
@@ -105,14 +94,12 @@ define(["backbone","text!priceListHTML","text!priceListNewHTML","utils",
 		    	valid = re.test(	email	);
 		    }
 
-		    //if(!re.test(email)) {
 		    if(!valid){
 		    	this.$el.find('.emailWrapper').addClass('has-error');
 		    	return false;
 		    }else{
 		    	return true;
 		    }
-		    //return re.test(email);
 		},
 
 		  postRegistration:function(){

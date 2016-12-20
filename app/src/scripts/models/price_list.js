@@ -41,48 +41,41 @@ define(["backbone","constants"],function(Backbone,constants){
             return n.join(".");
           }
 
-            function joinTieredFeatures(plans){
-                    for(var i = 0; i<plans.length;i++){
+          function parsePlanBasic(plans){
+            for(var i = 0; i<plans.length;i++){
 
-                      //parse billling_period
-                      if(plans[i].billing_period == "monthly"){
-                        plans[i].billing_period = "Month"
-                      }
-                      if(plans[i].billing_period == "daily"){
-                        plans[i].billing_period = "Day"
-                      }
-                      if(plans[i].billing_period == "yearly"){
-                        plans[i].billing_period = "Year"
-                      }
-                      if(plans[i].billing_period == "weekly"){
-                        plans[i].billing_period = "Week"
-                      }
+              //parse billling_period
+              if(plans[i].subscription_cycle == "monthly"){
+                plans[i].subscription_cycle = "Month"
+              }
+              if(plans[i].subscription_cycle == "daily"){
+                plans[i].subscription_cycle = "Day"
+              }
+              if(plans[i].subscription_cycle == "yearly"){
+                plans[i].subscription_cycle = "Year"
+              }
+              if(plans[i].subscription_cycle == "weekly"){
+                plans[i].subscription_cycle = "Week"
+              }
 
-                      //show 2 decimal places after the price
-                      //plans[i].price = plans[i].price.toFixed(2);
+              //show 2 decimal places after the price
+              //plans[i].price = plans[i].price.toFixed(2);
 
-                      //add commas to price
-                      plans[i].price = ReplaceNumberWithCommas(plans[i].price);
+              //add commas to price
+              plans[i].price = ReplaceNumberWithCommas(plans[i].price);
 
-                        var featuresArr = plans[i].features.data;
-                        var groupedFeatures = _.groupBy(featuresArr,'id');
-                        if(groupedFeatures.id){
-                            //recurring element not needed
-                            delete groupedFeatures.id;
-                        }
-                        plans[i].features.grouped = groupedFeatures;
-                    }
-                    return plans;
-                }
+            }
+            return plans;
+          }
 
-              function getOfferingFeatures(plans){
+            function getOfferingFeatures(plans){
                     var allFtrsArr = [];
                     for(var i = 0; i<plans.length;i++){
-                        var planFeaturesArr = plans[i].features.data;
+                        var planFeaturesArr = plans[i].plan_elements ? plans[i].plan_elements.data : [];
                         for(var j = 0; j<planFeaturesArr.length; j++){
                             allFtrsArr.push({
-                                id:plans[i].features.data[j].id,
-                                name:plans[i].features.data[j].name
+                                id:plans[i].plan_elements.data[j].id,
+                                name:plans[i].plan_elements.data[j].name
                             });
                         }
                     }
@@ -100,74 +93,103 @@ define(["backbone","constants"],function(Backbone,constants){
                     return uniqFtrs;
                }
 
-            function offeringGotDiscounts(plans){
-              var ans = false;
+            function offeringWithTrial(plans){
+              var has_trial = false;
               for (var i = 0; plans.length < i; i++){
-                if (plans[i].discounts.data.length != 0){
-                  ans = true;
+                if (plans[i].trial_period){
+                  has_trial = true;
                   break;
                 }
               }
-              return ans;
+              return has_trial;
             }
 
             function setPlansFeatureValues(plans){
-              for(var i = 0; i<plans.length;i++){
-                  var featuresArr = plans[i].features.grouped;
-                  for (ftr in featuresArr){
-                      //ftr = "key-rfrs-sdfsdf-asfdfsa-key";
-                      for (var j = 0; j<featuresArr[ftr].length; j++){
-                        var maxUnits = (featuresArr[ftr][j].max_unit) ? ReplaceNumberWithCommas(featuresArr[ftr][j].max_unit) : featuresArr[ftr][j].max_unit;
-                        var minUnits = (featuresArr[ftr][j].min_unit) ? ReplaceNumberWithCommas(featuresArr[ftr][j].min_unit) : featuresArr[ftr][j].min_unit;
-                        var unit_of_measure_value = featuresArr[ftr][j].unit_of_measure_name;
-                        var ftr_uom = (unit_of_measure_value) ? unit_of_measure_value : "unit";
-                        var price = ReplaceNumberWithCommas(featuresArr[ftr][j].price.toFixed(2));
-                        var value_string = price;
 
-                        if(maxUnits !== 0 && maxUnits !== null){
-                          value_string+= " up to " + maxUnits  + " " + ftr_uom + "s";
-                        }else{
-                            value_string+= " from " + minUnits  +  " " + ftr_uom + "s";
-                            if(maxUnits){
-                              value_string+= " - " + maxUnits +  " " + ftr_uom + "s";
-                            }
-
-                            if(featuresArr[ftr][j].type == "constant"){
-                              value_string = featuresArr[ftr][j].value;
-                            }else{
-                              if(minUnits){
-                                value_string = price + " per " + ftr_uom + " from " + minUnits + " " + ftr_uom + "s";
-                              }else{
-                                value_string = price + " per " + ftr_uom;
-                              }
-                            }
-                        }
-                        featuresArr[ftr][j].value_string = value_string;
-                      }
+              function getValueString(maxUnits, minUnits, value_string, uom, plan_type, plan_value, limit) {
+                if((maxUnits && maxUnits !== 0) || limit){
+                  if(value_string){
+                    value_string += " up to " + (maxUnits || limit)  + " " + uom + "s";
+                  }else{
+                    value_string = "Up to " + (maxUnits || limit)  + " " + uom + "s";
                   }
+                }else{
+                    if(minUnits){
+                      value_string += " from " + minUnits  +  " " + uom + "s";
+                    }
+                    if(maxUnits){
+                      value_string += " - " + maxUnits +  " " + uom + "s";
+                    }
+
+                    if(price){
+                      if(plan_type === "constant"){
+                        value_string = plan_value;
+                      }else{
+                        if(minUnits){
+                          value_string = price + " per " + uom + " from " + minUnits + " " + uom + "s";
+                        }else{
+                          value_string = price + " per " + uom;
+                        }
+                      }
+                    }
+                }
+                return value_string;
+              }
+
+              for(var i = 0; i < plans.length; i++){
+                var plan_elements = plans[i].plan_elements ? plans[i].plan_elements.data : [];
+                for (var f in plan_elements){
+                  var planElement = plan_elements[f];
+                  if(planElement.rating.tiers){
+                    for (var t in planElement.rating.tiers.data){
+                      var tier = planElement.rating.tiers.data[t];
+                      var maxUnits = tier.max_unit ? ReplaceNumberWithCommas(tier.max_unit) : tier.max_unit;
+                      var minUnits = tier.min_unit ? ReplaceNumberWithCommas(tier.min_unit) : tier.min_unit;
+                      var uom = planElement.rating.uom ? planElement.rating.uom.name : "Unit";
+                      var price = ReplaceNumberWithCommas(tier.price.toFixed(2));
+                      var value_string = price;
+
+                      tier.value_string = getValueString(maxUnits, minUnits, value_string, uom, tier.type, tier.value);
+                    }
+                  }else{
+
+                    var maxUnits = planElement.rating.max_unit ? ReplaceNumberWithCommas(planElement.rating.max_unit) : planElement.rating.max_unit;
+                    var minUnits = planElement.rating.min_unit ? ReplaceNumberWithCommas(planElement.rating.min_unit) : planElement.rating.min_unit;
+                    var uom = planElement.entitlements && planElement.entitlements.uom ? planElement.entitlements.uom.name : "Unit";
+                    var price = planElement.rating.price ? ReplaceNumberWithCommas(planElement.rating.price.toFixed(2)) : undefined;
+                    var value_string = price;
+                    var limit = planElement.entitlements ? planElement.entitlements.limit : undefined;
+
+                    if(planElement.entitlements && planElement.entitlements.value){
+                      plan_elements[f].rating.value_string = planElement.entitlements.value;
+                    }else{
+                      plan_elements[f].rating.value_string = getValueString(maxUnits, minUnits, value_string, uom, tier.type, tier.value, limit);
+                    }
+                  }
+
+                }
               }
 
               return plans;
             }
 
-
         	  function customParser(response) {
                 //if we are showing a product offer or a general offer.
 		            var raw_plans = (response.plans) ? response.plans.data : response.offerings.data[0].plans.data ;
                 var offeringFeatures = getOfferingFeatures(raw_plans);
-                var plansParsedTieredPlans = joinTieredFeatures(raw_plans);
-                var gotDiscount = offeringGotDiscounts(plansParsedTieredPlans);
-                var plansWithFeaturesValues = setPlansFeatureValues(plansParsedTieredPlans);
-
+                var plansParsedBasic = parsePlanBasic(raw_plans);
+                var withTrial = offeringWithTrial(plansParsedBasic);
+                var plansWithFeaturesValues = setPlansFeatureValues(plansParsedBasic);
 
                 var parsed = {
                    offering_description: response.description,
                    features: offeringFeatures,
                    plans: plansWithFeaturesValues,
-                   discounts:gotDiscount
+                   discounts: withTrial
                };
-	              return  parsed;
-		    }
+
+               return  parsed;
+		        }
 
 		    var parsed = customParser(data);
 		    return parsed;

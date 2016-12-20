@@ -1,467 +1,409 @@
 <style>
-	.headers,
-	.tableWrapper{
-		display:flex;
-		display:-webkit-flex;
-	}
 
-	.cell {
-		  padding: 8px;
-		  border: 1px solid #E8E8E8;
-		  min-height: 50px;
-		  max-height: 50px;
-		  overflow: hidden;
-		  white-space: nowrap;
-		  overflow: hidden;
-		  text-overflow: ellipsis;
-	}
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-	.nr-nurego-tag-line {
-	}
+.plan_tiered_cell{
+  display: inline-block;
+}
 
-	.headers div,
-	.tableWrapper div{
-		flex:1;
-	  	-webkit-flex: 1;
-		text-align:center;
-		color:#9799A2;
-		min-width: 160px;
-	}
+.subscribe_cell,
+.plan_header_cell,
+.plan_features_cell,
+.plan_base_price_cell {
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+    width:200px;
+}
 
-	.plansHeader .header{
-		text-transform:uppercase;
-		color:#9799A2;
-		font-weight:bold;
-		font-size:14px;
-	}
+.table_row{
+    display: inline-flex;
+    border-bottom: 2px solid #e8ebed;
+    padding: 20px 0px;
+    align-items: center;
+}
 
-	.priceRecurrence{
-		color:#8EBE2E;
-		font-size:14px;
-	}
+.table_row.plans_header{
+  border-bottom: 2px solid #1acca2;
+  padding:10px 0px;
+}
 
-	.planPrice{
-		color:#F26522;
-		font-size:16px;
-		font-weight:bold;
-	}
 
-	.planDiscount{
-		background: #F26522;
-		font-weight: bold;
-	}
+.plan_header_cell {
+  color: #1acca2;
+  font-size: 16px;
+  font-weight: bold;
+  height: 30px;
+  overflow: visible;
+  position: relative;
+}
 
-	.planDiscount span{
-		color: #fff !important;
-		border:0px;
-		display:block;
-	}
+.plan_price {
+    color: #1acca2;
+    font-size: 32px;
+    width:200px;
+}
 
-	.nr-check.nr-no {
-		color:#FB6B5B;
-		font-size:16px;
-	}
+.price_recurrence {
+    color: #adb0b0;
+}
 
-	.nr-check.nr-yes {
-		color:#92CF5C;
-		font-size:16px;
-	}
+.plan_features_cell.feature_name,
+.plan_base_price_cell:first-child  {
+    padding-left: 8px;
+    text-align: left;
+    font-weight: bold;
+}
 
-	.planCol .features div:nth-of-type(odd),
-	.featuresCol .featureName:nth-of-type(odd){
-		background: #F9F9F9;
-	}
 
-	.subscribeToPlan {
-		background: gray;
-		color: #fff;
-		border: 0px;
-		padding: 6px;
-		font-size: 16px;
-		/*margin: 8px 1px 0px 1px;*/
-	}
+span.nr-yes{
+    color: #1acca2;
+    font-size: 24px;
+}
 
-	.subscribeToPlan span {
-	    color: white;
-	    font-weight: bold;
-	}
+span.nr-no {
+    color: #adb0b0;
+    font-size: 24px;
+}
 
-	.subscribeToPlan span:hover {
-	    text-decoration: underline;
-	    cursor: pointer;
-	}
+.trial_el span {
+    background: #1acca2;
+    border-radius: 50px;
+    padding: 0px 16px;
+}
 
-	.emailWrapper .invalidEmail{
-		display: none;
-	}
+.trial_el {
+  border-radius: 25px;
+  padding: 0px 5px;
+  position: absolute;
+  top: 33px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  overflow: hidden;
+  max-height: 16px;
+  width: 100%;
+  overflow: hidden;
+  left: 0px;
+}
 
-	.emailWrapper.has-error .invalidEmail{
-		display: block;
-	}
+.nrg-btn{
+  background: #16b590;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 3px;
+  padding: 5px 12px;
+  margin: 0px 12px;
+  display: inline-block;
+}
 
-	.noSSO.fillEmail .emailWrapper{
-	  display: block;
-	  position: absolute;
-	  width: 100%;
-	  top: 0px;
-	  background: white;
-	  height: 100%;
-	  padding: 20px;
-	}
+a,
+a:hover{
+  color:#16b590;
+}
 
-	.noSSO.fillEmail.done .emailWrapper, .emailWrapper,
-	.noSSO.fillEmail .nr-nurego-tag-line{
-		display:none;
-	}
+.emailWrapper .invalidEmail{
+	display: none;
+}
 
-	.btn.btn-primary.postNoSSo {
-    	margin-top: 10px;
-	}
+.emailWrapper.has-error .invalidEmail{
+	display: block;
+}
 
-	.thankYou{
-		display: none;
-	}
+.modal-bg{
+  display: none;
+}
 
-	.done .p1 {
-    	font-size: 28px;
-	}
-	.done .thankYou{
-	  display: block;
-	  position: absolute;
-	  top: 0px;
-	  width: 100%;
-	  text-align: center;
-	  background: rgba(255,255,255,1);
-	  height: 100%;
-	  padding: 10%;
-	}
+.fillEmail .modal-bg{
+  position:absolute;
+  display: block;
+  top:0px;
+  right:0px;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  background:rgba(255,255,255,0.5);
+}
 
-	.unchecked .subscribeToPlan{
-		opacity:0.35;
-	}
+.noSSO.fillEmail .emailWrapper{
+  display: block;
+  position: absolute;
+  width: 300px;
+  top: 60px;
+  background: white;
+  padding: 20px;
+  z-index: 99999;
+  height: 245px;
+  border: 1px solid gray;
+  border-radius: 3px;
+  left: calc(50% - 150px);
+}
 
-	.checked .subscribeToPlan{
-		opacity:1;
-	}
+.noSSO.fillEmail.done .emailWrapper,
+.done.fillEmail .modal-bg,
+.emailWrapper,
+.noSSO.fillEmail .nr-nurego-tag-line{
+	display:none;
+}
 
-	.noSSO.fillEmail .tableWrapper{
-		display:none;
-	}
+.thankYou{
+	display: none;
+}
 
-	.period{
-		text-transform: uppercase;
-	}
-	.tieredWrapper {
-    position: relative;
-    min-height: 50px;
-    margin: 0px 0px 0px 0px;
-    border: 1px solid #E8E8E8;
-	}
+.done .p1 {
+  	font-size: 28px;
+}
+.done .thankYou{
+  display: block;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  text-align: center;
+  background: rgba(255,255,255,1);
+  height: 100%;
+  padding: 10%;
+  z-index: 999;
+}
 
-	.tieredWrapper ul{
-		padding:0px;
-		margin:0px;
-		list-style: none;
-	}
-	.featureItem.featureTiered.cell {
-	    width: 100%;
-    	border: 0px;
-	}
+.unchecked .subscribeToPlan{
+	opacity:0.35;
+}
 
-	.featureItem.featureTiered {
-		visibility: hidden;
-		position:absolute;
-	    opacity: 0;
-	}
+.checked .subscribeToPlan{
+	opacity:1;
+}
 
-	.featureItem.featureTiered.active {
-		visibility: visible;
-	   -webkit-transition: opacity 0.65s ease-in-out;
-	    -moz-transition: opacity 0.65s ease-in-out;
-	    -ms-transition: opacity 0.65s ease-in-out;
-	    -o-transition: opacity 0.65s ease-in-out;
-	     opacity: 1;
-	}
+.noSSO.fillEmail .tableWrapper{
+	display:none;
+}
 
-	.featureTiered i.ion-arrow-right-b {
-    	float: right;
-	}
-	.featureTiered i.ion-arrow-left-b {
-	    float: left;
-	}
 
-	.featureTiered i.ion-arrow-left-b,
-	.featureTiered i.ion-arrow-right-b {
-	    font-size: 20px;
-	    cursor: pointer;
-	}
+.emailWrapper span.nr-no {
+    position: absolute;
+    right: 10px;
+    font-size: 18px;
+    top: 10px;
+    cursor: pointer;
+}
 
-	.featureTiered span {
-	    position: relative;
-	    top: 4px;
-	}
+
+.nr-nurego-tag-line {
+    text-align: right;
+    margin: 0px 10px;
+}
+
+.plan_features_cell.feature_name::first-letter,
+.plan_header_cell::first-letter  {
+    text-transform: capitalize;
+}
+
+.plan_header_name {
+    color: #1acca2;
+    font-size: 16px;
+    font-weight: bold;
+    height: 38px;
+    text-align: center;
+    width:200px;
+}
+
+.nurego_widget_wrapper{
+  text-align:center;
+}
+
+.table_wrapper{
+  display:inline-block;
+  background:white;
+}
 
 </style>
 
-<!--Credit cards template
-<div class="ccHeaders headers">
-			<div class="price header cell" title="Credit Cards">
-				Credit Card
-			</div>
-	{{  for(var plan in plans) { }}
 
-    		<div class="header cell">
-				{{if (plans[plan].credit_card) { }}
 
-					<span class="nr-check nr-yes ion-checkmark"></span>
-
-    			{{	}else{	}}
-
-    				<span class="nr-check nr-no ion-close "></span>
-
-    			{{	}	}}
-
-    		</div>
-
-	{{ 	}	}}
-</div-->
-
-
-<div class="plansHeader headers">
-			<div class="featuresHeader header cell">
-
-			</div>
-	{{  for(var plan in plans) { }}
-    		<div class="header cell" title="{{=plans[plan].name}}">
-				{{=plans[plan].name}}
-    		</div>
-
-	{{ 	}	}}
-</div>
-
-<div class="priceHeaders headers">
-			<div class="price header cell">
-				Base Price
-			</div>
-	{{  for(var plan in plans) { }}
-    		<div class="header cell">
-    		{{	if(plans[plan].price != "undefined")	{	}}
-
-				<span class="planPrice">${{=plans[plan].price}}</span>
- 				<span class="priceRecurrence"> / {{=plans[plan].billing_period}} </span>
-
-			{{	} }}
-
-    		</div>
-
-	{{ 	}	}}
-</div>
-
-
-<div class="tableWrapper">
-
-			<div class="featuresCol">
-				{{  for(var item in features) { }}
-
-		        		<div class="featureName cell" title="{{=features[item].name}}">
-							{{=features[item].name}}
-		        		</div>
-
-		        {{  } }}
-
-			</div>
-
-
-
-
-	{{  for(var plan in plans) { }}
-			<div class="planCol">
-
-
-		        		<div class="features">
-
-						<!-- For each featuer in this plan print the feature cell-->
-
-		        		{{  for(var item in features) { }}
-
-		        			<!-- print missing feature if is missing -->
-
-		        			{{	if(typeof(plans[plan].features.grouped[features[item].id]) == "undefined"){	}}
-									<div class="featureItemMissing cell" title="{{=features[item].name}}">
-										<span class="nr-check nr-no ion-close "></span>
-		        					</div>
-							{{	}else{	}}
-
-
-								<!-- if not nissing and is a tiered feature - print all tiers for this feature -->
-								{{ if(plans[plan].features.grouped[features[item].id].length > 1) { }}
-
-
-									<div class="tieredWrapper">
-			        					<ul>
-			        					{{  for(var featureItem in plans[plan].features.grouped[features[item].id] ) { }}
-											<li class="featureItem featureTiered cell" title="{{=features[item].name}}">
-												<i class="ion-arrow-right-b"></i>
-												<i class="ion-arrow-left-b"></i>
-				        						<span>
-				        							${{=plans[plan].features.grouped[features[item].id][featureItem].price}}
-				        							{{if (plans[plan].features.grouped[features[item].id][featureItem].max_unit != 0) { }}
-														up to {{=plans[plan].features.grouped[features[item].id][featureItem].max_unit}} units
-				        							{{	}else{	}}
-
-				        								from
-
-			    										{{=plans[plan].features.grouped[features[item].id][featureItem].min_unit}}
-
-			    										{{ if(plans[plan].features.grouped[features[item].id][featureItem].max_unit){ }}
-
-			    											 - {{=plans[plan].features.grouped[features[item].id][featureItem].max_unit}}
-
-			    										{{	}	}}
-
-			    										units
-
-				        							{{	}	}}
-
-				        						</span>
-			        						</li>
-			        					{{	}	}}
-
-		    							</ul>
-
-			        				</div>
-
-
-			        			<!-- not missing and not tiered so print what you can -->
-
-								{{	}else{	}}
-
-
-									<!-- if feature has max_unit -->
-
-									{{ if(plans[plan].features.grouped[features[item].id][0].max_unit) { }}
-										<div class="featureItem cell" title="{{=features[item].name}}">
-				        					<span>
-										{{if (plans[plan].features.grouped[features[item].id][0].element_type == 'overage')  { }}
-		    								{{	if(!obj.urlParams["show-feature-price"])	{	}}
-		    									${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
-		    									Up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
-		    								{{	}else{	}}
-		    									Up to {{=plans[plan].features.grouped[features[item].id][0].max_unit}} units
-		    								{{	}	}}
-		    							{{	}else{	}}
-		    								{{=plans[plan].features.grouped[features[item].id][0].max_unit}}
-		    							{{	}	}}
-		    								</span>
-		    							</div>
-									{{	}else{	}}
-
-
-									<!-- if feature has price per unit -->
-										{{	if(obj.urlParams["show-feature-price"] && plans[plan].features.grouped[features[item].id][0].price != 0)	{	}}
-
-										<div class="featureItem cell" title="{{=features[item].name}}">
-					        						<span>
-		        								${{=plans[plan].features.grouped[features[item].id][0].price}} per unit
-		        									</span>
-		        							</div>
-
-		        						{{	}	}}
-
-
-		        						<!-- if feature is of type "constant / multi value feature"  -->
-		        						{{	if(plans[plan].features.grouped[features[item].id][0].type == "constant")	{	}}
-
-										<div class="featureItem cell" title="{{=features[item].name}}">
-					        						<span>
-		        								{{=plans[plan].features.grouped[features[item].id][0].value}}
-		        									</span>
-		        							</div>
-
-
-										{{	}else{	}}
-
-		        							<div class="featureItemMissing cell" title="{{=features[item].name}}">
-												<span class="nr-check nr-yes ion-checkmark"></span>
-				        					</div>
-
-										{{	}	}}
-
-									{{  }  }}
-
-
-
-								{{	}	}}
-
-
-
-
-							{{	}	}}
-
-
-
-		        		{{ } }}
-
-		        		</div>
-								{{	if(discounts) {	 }}
-									<div class="discount">
-										<div class="header planDiscount cell">
-												{{for (item in plans[plan].discounts.data) { }}
-											<span>{{=plans[plan].discounts.data[item].days_to_apply}} Days</span>
-											<span>FREE TRIAL</span>
-										{{	}	}}
-										</div>
-									</div>
-								{{	}	}}
-
-		        		{{	if(!obj.urlParams["preview"]) {	}}
-		        		<div class="subscribeToPlan">
-							<span class="plan-select" data-id="{{=plans[plan].id}}">Subscribe</span>
-						</div>
-						{{	}	}}
-			</div>
-	{{ }  }}
-
-</div>
-
-<div class="emailWrapper">
-	<h4 class="">Please enter your Email:</h4>
-	<input class="form-control email" type="text" placeholder="example@email.com"/>
-
-	<div class="alert alert-danger invalidEmail" role="alert" style="margin-top:12px;">
-		  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-		  <span class="sr-only"></span>
-		  <span class="txt">Error:Invalid Email address, please try again.</span>
-	</div>
-
-	<div class="btn btn-primary postNoSSo">Subscribe</div>
-
-</div>
-
-{{ if(obj.urlParams["terms-of-service-url"]) {	}}
-	<div class="nr-nurego-tag-line">
-			 <div class="checkbox" id="checkbox">
-			    <label>
-			      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox">
-			      By clicking subscribe you agree to the
-                  <a href="javascript:void(0)" class="terms">Terms of Service</a>
-			    </label>
-			  </div>
-	</div>
-{{	}	}}
-
-<div class="thankYou">
-	<div class="p1">Your registration invite has been sent.</div>
-	<div class="p2">Please check your inbox and use the link inside to sign up</div>
-</div>
-
-<div class="nr-nurego-tag-line">
-	Pricing Table Crafted by <a href="http://www.nurego.com">Nurego</a>
-</div>
-
-
-<div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">
-	  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-	  <span class="sr-only">Error:</span>
-	  <span class="txt"></span>
+<div class="nurego_widget_wrapper">
+  <div class="table_wrapper">
+
+    <div class="table_row plans_header">
+      <!-- EMPTY CELL -->
+      <div class="plan_header_cell"></div>
+      <!-- // EMPTY CELL -->
+
+			{{  for(var plan in plans) { }}
+  			<div class="plan_header_cell"  title="{{=plans[plan].name}}">
+          <div class="ellipsis plan_header_name">
+            {{=plans[plan].name}}
+          </div>
+
+          {{ if(plans[plan].trial_period) { }}
+            <div class="trial_el ellipsis">
+              <span>{{=plans[plan].trial_period_interval}} Days Free Trial </span>
+            </div>
+          {{	}	}}
+        </div>
+			{{ 	}	}}
+
+		</div>
+
+    <div class="row_clear"></div>
+
+    <div class="table_row plans_base_price">
+      <div class="plan_base_price_cell">
+        Base Price
+      </div>
+			{{  for(var plan in plans) { }}
+        {{ var price = plans[plan].price }}
+        {{	if(price)	{	}}
+          <div class="plan_base_price_cell">
+            <div class="plan_price ellipsis" title="${{=price}}">${{=price}}</div>
+            {{	if(plans[plan].subscription_cycle)	{	}}
+              <div class="price_recurrence">
+                <span> / {{=plans[plan].subscription_cycle}}</span>
+              </div>
+            {{ 	}	}}
+          </div>
+        {{	} }}
+			{{ 	}	}}
+		</div>
+
+    {{  for(var feature in features) { }}
+      <div class="row_clear"></div>
+      <div class="table_row plans_features">
+
+        <!--  Draw Feature Cell-->
+        <div class="plan_features_cell feature_name" title="{{=features[feature].name}}">
+          {{=features[feature].name}}
+        </div>
+
+    		{{  for(var plan in plans) { }}
+
+          {{ if(plans[plan].plan_elements) { }}
+            <!--  find the current feature -->
+            {{ var planElement = plans[plan].plan_elements.data.filter(function(p){ return p.id === features[feature].id; } ) }}
+
+            {{ if(planElement.length) { }}
+              {{ planElement = planElement[0]; }}
+              {{	if(planElement.rating)	{	}}
+
+
+                {{ if(planElement.rating.type === 'tiered') { }}
+                  <!-- TIERED -->
+                  {{ var tiers = planElement.rating.tiers.data; }}
+                  <div class="plan_features_cell tiered_feature_wrapper">
+                    <div class="plan_tiered_cell" title="{{=plans[plan].name}}">
+                      {{  for(var tier in tiers ) { }}
+                        <div class="tiered_item">
+                          ${{=tiers[tier].value_string}}
+                        </div>
+                      {{	}	}}
+                    </div>
+                  </div>
+                  <!-- // TIERED -->
+
+                {{   }else {  }}
+                  <!-- NOT TIERED -->
+                  <div class="plan_features_cell">
+                    {{ if(planElement.rating.price) {  }}
+                        ${{=planElement.rating.value_string}}
+                    {{   }else{  }}
+                        {{ if(planElement.rating.value_string){ }}
+                          {{=planElement.rating.value_string}}
+                        {{   }else{  }}
+                          <span class="nr-check nr-yes ion-checkmark-circled"></span>
+                        {{  }  }}
+                    {{  }  }}
+                  </div>
+                  <!-- // NOT TIERED -->
+                {{   } }}
+
+    					{{	} else{	}}
+
+                <!-- Empty Cell - FEATURE IS MISSING IN THIS PLAN -->
+    						<div class="plan_features_cell">
+    							<span class="nr-check nr-no ion-close-circled"></span>
+    						</div>
+                <!-- // Empty Cell -->
+
+    					{{	}	}}
+
+              <!--//  Draw Feature Cell-->
+            {{ }else{ }}
+
+              <!-- Empty Cell - FEATURE IS MISSING IN THIS PLAN -->
+              <div class="plan_features_cell">
+                <span class="nr-check nr-no ion-close-circled"></span>
+              </div>
+              <!-- // Empty Cell -->
+
+            {{ } }}
+
+          {{ }else{ }}
+
+            <!-- Empty Cell - FEATURE IS MISSING IN THIS PLAN -->
+            <div class="plan_features_cell">
+              <span class="nr-check nr-no ion-close-circled"></span>
+            </div>
+            <!-- // Empty Cell -->
+
+          {{ } }}
+
+        {{ 	}	}}
+      </div>
+    {{ 	}	}}
+
+  	{{	if(!obj.urlParams["preview"]) {	}}
+      <div class="row_clear"></div>
+      <div class="table_row subscribe_row">
+        <!-- EMPTY CELL -->
+        <div class="subscribe_cell"></div>
+        <!-- EMPTY CELL END -->
+        {{  for(var plan in plans) { }}
+        <div class="subscribeToPlan subscribe_cell">
+          <div class="nrg-btn plan-select" data-id="{{=plans[plan].id}}">
+            Subscribe
+          </div>
+        </div>
+        {{ 	}	}}
+      </div>
+  	{{	}	}}
+  </div>
+
+  {{ if(obj.urlParams["terms-of-service-url"]) {	}}
+  <div class="nr-nurego-tag-line">
+		 <div class="checkbox" id="checkbox">
+		    <label>
+		      <input name="terms" checked="checked" class="termsCheckbox" type="checkbox">
+		      By clicking subscribe you agree to the
+                <a href="javascript:void(0)" class="terms">Terms of Service</a>
+		    </label>
+		  </div>
+      <div>
+          Pricing Table Crafted by
+          <a href="http://www.nurego.com">Nurego</a>
+      </div>
+  </div>
+  {{	}	}}
+
+  <div class="modal-bg"></div>
+
+  <div class="emailWrapper">
+    <span class="nr-check nr-no ion-close-circled"></span>
+  	<h4 class="">Please enter your Email:</h4>
+  	<input class="form-control email" type="text" placeholder="example@email.com"/>
+    </br>
+  	<div class="postNoSSo nrg-btn">Subscribe</div>
+    <div class="alert alert-danger invalidEmail" role="alert" style="margin-top:12px;">
+      <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+      <span class="sr-only"></span>
+      <span class="txt">Error:Invalid Email address, please try again.</span>
+    </div>
+  </div>
+
+  <div class="thankYou">
+  	<div class="p1">Your registration invite has been sent.</div>
+  	<div class="p2">Please check your inbox and use the link inside to sign up</div>
+  </div>
 </div>
