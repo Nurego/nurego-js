@@ -136,7 +136,7 @@ define(["backbone","constants"],function(Backbone,constants){
               var tier = planElement.rating.tiers.data[t];
               var maxUnits = tier.max_unit ? ReplaceNumberWithCommas(tier.max_unit) : tier.max_unit;
               var minUnits = tier.min_unit ? ReplaceNumberWithCommas(tier.min_unit) : tier.min_unit;
-              var uom = planElement.rating.uom ? planElement.rating.uom.name : "Unit";
+              var uom = planElement.rating.unit_of_measure ? planElement.rating.unit_of_measure : "Unit";
               var price = ReplaceNumberWithCommas(tier.price.toFixed(2));
               var value_string = price;
 
@@ -146,7 +146,7 @@ define(["backbone","constants"],function(Backbone,constants){
 
             var maxUnits = planElement.rating.max_unit ? ReplaceNumberWithCommas(planElement.rating.max_unit) : planElement.rating.max_unit;
             var minUnits = planElement.rating.min_unit ? ReplaceNumberWithCommas(planElement.rating.min_unit) : planElement.rating.min_unit;
-            var uom = planElement.entitlements && planElement.entitlements.uom ? planElement.entitlements.uom.name : "Unit";
+            var uom = planElement.entitlements && planElement.entitlements.unit_of_measure ? planElement.entitlements.unit_of_measure : "Unit";
             var price = planElement.rating.price ? ReplaceNumberWithCommas(planElement.rating.price.toFixed(2)) : undefined;
             var value_string = price;
             var limit = planElement.entitlements ? planElement.entitlements.limit : undefined;
@@ -154,7 +154,7 @@ define(["backbone","constants"],function(Backbone,constants){
             if(planElement.entitlements && planElement.entitlements.value){
               plan_elements[f].rating.value_string = planElement.entitlements.value;
             }else{
-              plan_elements[f].rating.value_string = getValueString(maxUnits, minUnits, value_string, uom, tier.type, tier.value, limit);
+              plan_elements[f].rating.value_string = getValueString(maxUnits, minUnits, value_string, uom, tier && tier.type, tier && tier.value, limit);
             }
           }
 

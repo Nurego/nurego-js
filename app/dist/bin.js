@@ -11144,12 +11144,6 @@ registrationModel = function (Backbone, constants) {
   return registrationModel;
 }(backbone, constants);
 priceListModel = function (Backbone, constants) {
-  /*var baseClass = Backbone.Model.extend({
-      fetch:function(){
-          this.name
-      }
-  })
-  */
   var priceListModel = Backbone.Model.extend({
     initialize: function (opt) {
       this.opt = opt;
@@ -11162,7 +11156,7 @@ priceListModel = function (Backbone, constants) {
         url = constants.nuregoApiUrl() + '/services/' + this.params['product-id'] + '?api_key=' + this.opt.apiKey;
       }
       /*for(val in key){
-          url += "&" + key +"=" + val;
+        url += "&" + key +"=" + val;
       }*/
       if (this.params['api-params']) {
         var customApiParams = JSON.parse(this.params['api-params']);
@@ -11196,8 +11190,6 @@ priceListModel = function (Backbone, constants) {
           if (plans[i].subscription_cycle == 'weekly') {
             plans[i].subscription_cycle = 'Week';
           }
-          //show 2 decimal places after the price
-          //plans[i].price = plans[i].price.toFixed(2);
           //add commas to price
           plans[i].price = ReplaceNumberWithCommas(plans[i].price);
         }
@@ -11266,7 +11258,6 @@ priceListModel = function (Backbone, constants) {
           return value_string;
         }
         for (var i = 0; i < plans.length; i++) {
-          console.log(plans[i]);
           var plan_elements = plans[i].plan_elements ? plans[i].plan_elements.data : [];
           for (var f in plan_elements) {
             var planElement = plan_elements[f];
@@ -11275,7 +11266,7 @@ priceListModel = function (Backbone, constants) {
                 var tier = planElement.rating.tiers.data[t];
                 var maxUnits = tier.max_unit ? ReplaceNumberWithCommas(tier.max_unit) : tier.max_unit;
                 var minUnits = tier.min_unit ? ReplaceNumberWithCommas(tier.min_unit) : tier.min_unit;
-                var uom = planElement.rating.uom ? planElement.rating.uom.name : 'Unit';
+                var uom = planElement.rating.unit_of_measure ? planElement.rating.unit_of_measure : 'Unit';
                 var price = ReplaceNumberWithCommas(tier.price.toFixed(2));
                 var value_string = price;
                 tier.value_string = getValueString(maxUnits, minUnits, value_string, uom, tier.type, tier.value);
@@ -11283,14 +11274,14 @@ priceListModel = function (Backbone, constants) {
             } else {
               var maxUnits = planElement.rating.max_unit ? ReplaceNumberWithCommas(planElement.rating.max_unit) : planElement.rating.max_unit;
               var minUnits = planElement.rating.min_unit ? ReplaceNumberWithCommas(planElement.rating.min_unit) : planElement.rating.min_unit;
-              var uom = planElement.entitlements && planElement.entitlements.uom ? planElement.entitlements.uom.name : 'Unit';
+              var uom = planElement.entitlements && planElement.entitlements.unit_of_measure ? planElement.entitlements.unit_of_measure : 'Unit';
               var price = planElement.rating.price ? ReplaceNumberWithCommas(planElement.rating.price.toFixed(2)) : undefined;
               var value_string = price;
               var limit = planElement.entitlements ? planElement.entitlements.limit : undefined;
               if (planElement.entitlements && planElement.entitlements.value) {
                 plan_elements[f].rating.value_string = planElement.entitlements.value;
               } else {
-                plan_elements[f].rating.value_string = getValueString(maxUnits, minUnits, value_string, uom, tier.type, tier.value, limit);
+                plan_elements[f].rating.value_string = getValueString(maxUnits, minUnits, value_string, uom, tier && tier.type, tier && tier.value, limit);
               }
             }
           }
