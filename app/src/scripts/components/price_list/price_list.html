@@ -291,7 +291,7 @@ a:hover{
 
                 {{ if(planElement.rating.type === 'tiered') { }}
                   <!-- TIERED -->
-                  {{ var tiers = planElement.rating.tiers.data; }}
+                  {{ var tiers = planElement.rating.tiers.data || []; }}
                   <div class="plan_features_cell tiered_feature_wrapper">
                     <div class="plan_tiered_cell" title="{{=plans[plan].name}}">
                       {{  for(var tier in tiers ) { }}

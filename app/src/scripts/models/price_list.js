@@ -97,7 +97,7 @@ define(["backbone","constants"],function(Backbone,constants){
 
     function setPlansFeatureValues(plans){
 
-      function getValueString(maxUnits, minUnits, value_string, uom, plan_type, plan_value, limit) {
+      function getValueString(price, maxUnits, minUnits, value_string, uom, plan_type, plan_value, limit) {
         if((maxUnits && maxUnits !== 0) || limit){
           if(value_string){
             value_string += " up to " + (maxUnits || limit)  + " " + uom + "s";
@@ -127,39 +127,37 @@ define(["backbone","constants"],function(Backbone,constants){
         return value_string;
       }
 
-      for(var i = 0; i < plans.length; i++){
-        var plan_elements = plans[i].plan_elements ? plans[i].plan_elements.data : [];
-        for (var f in plan_elements){
-          var planElement = plan_elements[f];
-          if(planElement.rating.tiers){
-            for (var t in planElement.rating.tiers.data){
-              var tier = planElement.rating.tiers.data[t];
-              var maxUnits = tier.max_unit ? ReplaceNumberWithCommas(tier.max_unit) : tier.max_unit;
-              var minUnits = tier.min_unit ? ReplaceNumberWithCommas(tier.min_unit) : tier.min_unit;
-              var uom = planElement.rating.unit_of_measure ? planElement.rating.unit_of_measure : "Unit";
-              var price = ReplaceNumberWithCommas(tier.price.toFixed(2));
-              var value_string = price;
+      (plans || []).forEach(function(plan) {
+        var planElements = plan.plan_elements ? plan.plan_elements.data : [];
+        (planElements || []).forEach(function(planElement) {
+          if(planElement.rating){
+            if(planElement.rating.tiers){
+              (planElement.rating.tiers.data || []).forEach(function(tier) {
+                var maxUnits = tier.max_unit ? ReplaceNumberWithCommas(tier.max_unit) : tier.max_unit;
+                var minUnits = tier.min_unit ? ReplaceNumberWithCommas(tier.min_unit) : tier.min_unit;
+                var uom = planElement.rating.unit_of_measure ? planElement.rating.unit_of_measure : "Unit";
+                var price = ReplaceNumberWithCommas(tier.price.toFixed(2));
+                var value_string = price;
 
-              tier.value_string = getValueString(maxUnits, minUnits, value_string, uom, tier.type, tier.value);
-            }
-          }else{
-
-            var maxUnits = planElement.rating.max_unit ? ReplaceNumberWithCommas(planElement.rating.max_unit) : planElement.rating.max_unit;
-            var minUnits = planElement.rating.min_unit ? ReplaceNumberWithCommas(planElement.rating.min_unit) : planElement.rating.min_unit;
-            var uom = planElement.entitlements && planElement.entitlements.unit_of_measure ? planElement.entitlements.unit_of_measure : "Unit";
-            var price = planElement.rating.price ? ReplaceNumberWithCommas(planElement.rating.price.toFixed(2)) : undefined;
-            var value_string = price;
-            var limit = planElement.entitlements ? planElement.entitlements.limit : undefined;
-
-            if(planElement.entitlements && planElement.entitlements.value){
-              plan_elements[f].rating.value_string = planElement.entitlements.value;
+                tier.value_string = getValueString(price, maxUnits, minUnits, value_string, uom, tier.type, tier.value);
+              });
             }else{
-              plan_elements[f].rating.value_string = getValueString(maxUnits, minUnits, value_string, uom, tier && tier.type, tier && tier.value, limit);
+              var maxUnits = planElement.rating.max_unit ? ReplaceNumberWithCommas(planElement.rating.max_unit) : planElement.rating.max_unit;
+              var minUnits = planElement.rating.min_unit ? ReplaceNumberWithCommas(planElement.rating.min_unit) : planElement.rating.min_unit;
+              var uom = planElement.entitlements && planElement.entitlements.unit_of_measure ? planElement.entitlements.unit_of_measure : "Unit";
+              var price = planElement.rating.price ? ReplaceNumberWithCommas(planElement.rating.price.toFixed(2)) : undefined;
+              var value_string = price;
+              var limit = planElement.entitlements ? planElement.entitlements.limit : undefined;
+
+              if(planElement.entitlements && planElement.entitlements.value){
+                planElement.rating.value_string = planElement.entitlements.value;
+              }else{
+                planElement.rating.value_string = getValueString(price, maxUnits, minUnits, value_string, uom, undefined, undefined, limit);
+              }
             }
           }
-
-        }
-      }
+        });
+      });
 
       return plans;
     }
