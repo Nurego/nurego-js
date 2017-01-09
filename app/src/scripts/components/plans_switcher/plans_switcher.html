@@ -1,46 +1,45 @@
 
 <div class="plans_wrapper">
+	{{ if(obj && obj.offering && obj.offering.plans && obj.offering.plans.data) { }}
 
-	{{for(var planObj in obj.offering.plans.data) { }}
-			{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
-					<div class="plan-wrapper selected">
-			{{ } else{ }}
-					<div class="plan-wrapper">
-			{{ } }}
+		{{ for(var planObj in obj.offering.plans.data) { }}
+				{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
+						<div class="plan-wrapper selected">
+				{{ } else{ }}
+						<div class="plan-wrapper">
+				{{ } }}
 
 
-							<h3>{{= obj.offering.plans.data[planObj].name }} </h3>
-									{{ if(obj.offering.plans.data[planObj].discounts.count != 0) { }}
+								<h3>{{= obj.offering.plans.data[planObj].name }} </h3>
+								{{ if(obj.offering.plans.data[planObj].trialPeriod) { }}
 									<div class="ribbon-wrapper-green">
-											<div class="ribbon-green">
-												{{=obj.offering.plans.data[planObj].discounts.data[0].days_to_apply}} days Free
-											</div>
+										<div class="ribbon-green">
+											{{=obj.offering.plans.data[planObj].trialPeriodInterval}} days Free
+										</div>
 									</div>
-									{{ } }}
+								{{ } }}
 
 
-			{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
-					<div class="select-btn-wrapper selected">
+				{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
+						<div class="select-btn-wrapper selected">
 
-			{{ } else{ }}
-					<div class="select-btn-wrapper">
-			{{ } }}
-							{{ _.each(obj.offering.plans.data[planObj].features.data, function(item) { }}
-											{{ if(item.name === "recurring"){ }}
-															<div class="row price" style="margin:auto; text-align:left;">
-																<div class="col-md-4">
-																			<b style="font-size:18px;">
-																					Price
-																			</b>
-																</div>
-																<div class="col-md-8">
-																			<b style="background:green; font-size:18px;">
-											${{	print(item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")) }}
-																			</b>
-																</div>
-													</div>
-													{{ } }}
-							{{ }); }}
+				{{ } else{ }}
+						<div class="select-btn-wrapper">
+				{{ } }}
+							{{ if(obj.offering.plans.data[planObj].price){ }}
+									<div class="row price" style="margin:auto; text-align:left;">
+										<div class="col-md-4">
+											<b style="font-size:18px;">
+													Price
+											</b>
+										</div>
+										<div class="col-md-8">
+											<b style="background:green; font-size:18px;">
+												${{	print(obj.offering.plans.data[planObj].price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")) }}
+											</b>
+										</div>
+									</div>
+							{{ } }}
 
 									<form>
 											<input type="hidden" class="form-control" value="{{=obj.offering.plans.data[planObj].id }}" name="plan_id">
@@ -49,25 +48,25 @@
 
 							</div>
 
-							{{ _.each(obj.offering.plans.data[planObj].features.data, function(item) { }}
-													{{ if(item.name != "recurring"){ }}
-															 <div class="row" style="margin:auto; text-align:left;">
-																		<div class="col-md-9">
-																					{{=item.name}}
-																		</div>
-																		<div class="col-md-3">
-																					{{ if(item.max_unit === 0 ) { }}
-																					<span class="fa-check-circle fa" style="font-size:18px;"></span>
-																					{{ }else{ }}
-																							{{=item.max_unit}}
-																				{{ } }}
-																		</div>
-															</div>
-													{{ } }}
-							{{ }); }}
+							{{ if(obj.offering.plans.data[planObj].planElements && obj.offering.plans.data[planObj].planElements.data){ }}
+								{{ _.each(obj.offering.plans.data[planObj].planElements.data, function(planElement) { }}
+									 <div class="row" style="margin:auto; text-align:left;">
+											<div class="col-md-9">
+														{{=planElement.name}}
+											</div>
+											<div class="col-md-3">
+												{{ if(planElement.entitlements && planElement.entitlements.limit){ }}
+													{{=planElement.entitlements.limit}}
+												{{ }else{ }}
+													<span class="fa-check-circle fa" style="font-size:18px;"></span>
+												{{ } }}
+											</div>
+									</div>
+								{{ }); }}
+							{{ } }}
 					</div>
 			{{ }; }}
-
+		{{ } }}
 </div>
 <div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">
 	  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
