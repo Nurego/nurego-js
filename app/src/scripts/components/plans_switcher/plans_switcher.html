@@ -1,29 +1,31 @@
 
 <div class="plans_wrapper">
-	{{ for(var planObj in obj.offering.plans.data) { }}
-			{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
-					<div class="plan-wrapper selected">
-			{{ } else{ }}
-					<div class="plan-wrapper">
-			{{ } }}
+	{{ if(obj && obj.offering && obj.offering.plans && obj.offering.plans.data) { }}
+
+		{{ for(var planObj in obj.offering.plans.data) { }}
+				{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
+						<div class="plan-wrapper selected">
+				{{ } else{ }}
+						<div class="plan-wrapper">
+				{{ } }}
 
 
-							<h3>{{= obj.offering.plans.data[planObj].name }} </h3>
-							{{ if(obj.offering.plans.data[planObj].trialPeriod) { }}
-								<div class="ribbon-wrapper-green">
-									<div class="ribbon-green">
-										{{=obj.offering.plans.data[planObj].trialPeriodInterval}} days Free
+								<h3>{{= obj.offering.plans.data[planObj].name }} </h3>
+								{{ if(obj.offering.plans.data[planObj].trialPeriod) { }}
+									<div class="ribbon-wrapper-green">
+										<div class="ribbon-green">
+											{{=obj.offering.plans.data[planObj].trialPeriodInterval}} days Free
+										</div>
 									</div>
-								</div>
-							{{ } }}
+								{{ } }}
 
 
-			{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
-					<div class="select-btn-wrapper selected">
+				{{ if(obj.offering.plans.data[planObj].id == obj.urlParams['sub-plan-id']) { }}
+						<div class="select-btn-wrapper selected">
 
-			{{ } else{ }}
-					<div class="select-btn-wrapper">
-			{{ } }}
+				{{ } else{ }}
+						<div class="select-btn-wrapper">
+				{{ } }}
 							{{ if(obj.offering.plans.data[planObj].price){ }}
 									<div class="row price" style="margin:auto; text-align:left;">
 										<div class="col-md-4">
@@ -64,7 +66,7 @@
 							{{ } }}
 					</div>
 			{{ }; }}
-
+		{{ } }}
 </div>
 <div class="alert alert-danger ajaxErrorMsg" role="alert" style="display:none">
 	  <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
